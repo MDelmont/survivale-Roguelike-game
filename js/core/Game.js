@@ -263,7 +263,7 @@ class Game {
             if (e.toRemove) {
                 if (e.hp <= 0) {
                     this.killCount++;
-                    this.spawnLoot(e.x, e.y, e.xpValue, Math.random() < 0.05 ? 'weapon' : 'xp');
+                    this.spawnLoot(e.x, e.y, e.xpValue, Math.random() < 0.15 ? 'weapon' : 'xp');
                 }
                 this.enemies.splice(i, 1);
             }

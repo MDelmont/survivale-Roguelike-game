@@ -12,7 +12,7 @@
             "default_weapon": "basic_shot",
             "available_weapons": [
                 "basic_shot",
-                "shield_orbit"
+                "poison_shot"
             ],
             "boss": {
                 "name": "L'Ovule Géant",
@@ -34,7 +34,7 @@
             "default_weapon": "basic_shot",
             "available_weapons": [
                 "basic_shot",
-                "shield_orbit"
+                "poison_shot"
             ],
             "boss": {
                 "name": "La Purée de Brocolis",
