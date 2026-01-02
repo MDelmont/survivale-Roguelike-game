@@ -77,6 +77,32 @@ export class Enemy {
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 1;
         ctx.stroke();
+
+        // Barre de vie au-dessus de la tête
+        if (this.hp < (this.stats.hp || 20)) {
+            this.drawHealthBar(ctx);
+        }
+    }
+
+    drawHealthBar(ctx) {
+        const barWidth = this.radius * 2;
+        const barHeight = 4;
+        const x = this.x - barWidth / 2;
+        const y = this.y - this.radius - 8;
+
+        // Fond (gris foncé)
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(x, y, barWidth, barHeight);
+
+        // Vie (rouge -> vert en dégradé ou couleur fixe)
+        const ratio = Math.max(0, this.hp / (this.stats.hp || 20));
+        ctx.fillStyle = ratio > 0.5 ? '#0f0' : (ratio > 0.25 ? '#ff0' : '#f00');
+        ctx.fillRect(x, y, barWidth * ratio, barHeight);
+
+        // Bordure
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x, y, barWidth, barHeight);
     }
 
     takeDamage(amount) {
