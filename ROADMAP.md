@@ -32,29 +32,30 @@ Cette roadmap détaille les étapes de développement par jalons testables. Chaq
 - [x] **Test** : Monter de niveau après avoir tué assez d'ennemis.
 
 ## Étape 6 : Système d'Améliorations (Upgrades)
-- [ ] Créer le menu d'upgrade qui met le jeu en pause.
-- [ ] Implémenter quelques bonus de base (Vitesse, Dégâts, Cadence).
-- [ ] Logique de modification des statistiques du joueur.
-- [ ] **Test** : Choisir une amélioration et constater l'effet immédiat en jeu.
+- [x] Créer le menu d'upgrade qui met le jeu en pause.
+- [x] Implémenter quelques bonus de base (Vitesse, Dégâts, Cadence).
+- [x] Logique de modification des statistiques du joueur.
+- [x] **Test** : Choisir une amélioration et constater l'effet immédiat en jeu.
 
 ## Étape 7 : Moteur Data-Driven (Phases)
-- [ ] Charger une phase depuis un fichier JSON (vitesse, ennemis, background).
-- [ ] Gérer la transition entre le chargement et le début du jeu.
-- [ ] **Test** : Le jeu charge ses paramètres depuis un fichier JSON externe.
+- [x] Charger une phase depuis un fichier JSON (vitesse, ennemis, background).
+- [x] Gérer la transition entre le chargement et le début du jeu.
+- [x] **Test** : Le jeu charge ses paramètres depuis un fichier JSON externe.
 
 ## Étape 8 : Le Boss et Fin de Phase
-- [ ] Implémenter le timer de phase (temps avant boss).
-- [ ] Apparition du boss et arrêt du spawn classique.
-- [ ] Condition de victoire : mort du boss -> écran de fin de phase.
-- [ ] **Test** : Survivre au timer, battre le boss et voir l'écran de succès.
+- [x] Implémenter le timer de phase (temps avant boss).
+- [x] Apparition du boss et arrêt du spawn classique.
+- [x] Condition de victoire : mort du boss -> écran de fin de phase.
+- [x] **Test** : Survivre au timer, battre le boss et voir l'écran de succès.
 
 ## Étape 9 : Menus et Interface (HUD)
-- [ ] HUD complet (Santé, XP, Niveau, Timer).
-- [ ] Écran titre, Écran Game Over.
-- [ ] **Test** : Une boucle complète (Menu -> Jeu -> Mort/Victoire -> Menu).
+- [x] HUD complet et esthétique (Santé, XP, Niveau, Timer, Kills).
+- [x] Écran Titre avec bouton "Démarrer".
+- [x] Écran Game Over avec bouton "Réessayer".
+- [x] **Test** : Une boucle complète (Menu -> Jeu -> Mort/Victoire -> Menu).
 
 ## Étape 10 : Persistance et Contenu
-- [ ] Sauvegarde auto de la phase débloquée dans le `localStorage`.
-- [ ] Création du contenu final pour les 6 phases (Spermatozoïde -> Mariage).
-- [ ] Intégration des assets visuels (si disponibles).
-- [ ] **Test** : Jeu complet jouable de bout en bout.
+- [x] Sauvegarde auto de la phase débloquée dans le `localStorage`.
+- [x] Création du contenu final pour les 6 phases (Spermatozoïde -> Mariage).
+- [x] Intégration des assets visuels (si disponibles).
+- [x] **Test** : Jeu complet jouable de bout en bout.

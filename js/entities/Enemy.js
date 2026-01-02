@@ -6,6 +6,7 @@ export class Enemy {
     constructor(x, y, stats) {
         this.x = x;
         this.y = y;
+        this.stats = stats;
         this.radius = stats.radius || 15;
         this.hp = stats.hp || 20;
         this.speed = stats.speed || 100;

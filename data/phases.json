@@ -2,31 +2,108 @@
     "phases": [
         {
             "id": 1,
-            "name": "Conception",
-            "duration_before_boss": 60,
+            "name": "La Conception",
+            "duration_before_boss": 45,
             "enemy_types": [
-                "basic"
+                "basic_cell",
+                "fast_cell"
             ],
-            "spawn_rate": 2000,
+            "spawn_rate": 1500,
             "boss": {
                 "name": "L'Ovule Géant",
                 "hp": 500,
-                "damage": 20
+                "damage": 20,
+                "radius": 80,
+                "fireRate": 2500
             }
         },
         {
             "id": 2,
-            "name": "Bébé",
+            "name": "Le Bébé",
+            "duration_before_boss": 60,
+            "enemy_types": [
+                "basic_baby",
+                "tank_baby"
+            ],
+            "spawn_rate": 1200,
+            "boss": {
+                "name": "La Purée de Brocolis",
+                "hp": 1000,
+                "damage": 30,
+                "radius": 90,
+                "fireRate": 2200
+            }
+        },
+        {
+            "id": 3,
+            "name": "L'École",
+            "duration_before_boss": 60,
+            "enemy_types": [
+                "basic_school",
+                "fast_school",
+                "tank_school"
+            ],
+            "spawn_rate": 1000,
+            "boss": {
+                "name": "Le Prof de Maths",
+                "hp": 2000,
+                "damage": 50,
+                "radius": 100,
+                "fireRate": 2000
+            }
+        },
+        {
+            "id": 4,
+            "name": "L'Adolescence",
+            "duration_before_boss": 75,
+            "enemy_types": [
+                "basic_teen",
+                "fast_teen",
+                "tank_teen"
+            ],
+            "spawn_rate": 800,
+            "boss": {
+                "name": "La Crise de Révolte",
+                "hp": 4000,
+                "damage": 80,
+                "radius": 110,
+                "fireRate": 1800
+            }
+        },
+        {
+            "id": 5,
+            "name": "La Vie Adulte",
             "duration_before_boss": 90,
             "enemy_types": [
-                "basic",
-                "fast"
+                "basic_adult",
+                "fast_adult",
+                "tank_adult"
             ],
-            "spawn_rate": 1500,
+            "spawn_rate": 700,
             "boss": {
-                "name": "Le Biberon Empoisonné",
-                "hp": 800,
-                "damage": 25
+                "name": "Le Burn-out",
+                "hp": 8000,
+                "damage": 120,
+                "radius": 120,
+                "fireRate": 1500
+            }
+        },
+        {
+            "id": 6,
+            "name": "Le Mariage",
+            "duration_before_boss": 120,
+            "enemy_types": [
+                "basic_wedding",
+                "fast_wedding",
+                "tank_wedding"
+            ],
+            "spawn_rate": 600,
+            "boss": {
+                "name": "Le Prêtre Interminable",
+                "hp": 20000,
+                "damage": 250,
+                "radius": 150,
+                "fireRate": 1200
             }
         }
     ]
