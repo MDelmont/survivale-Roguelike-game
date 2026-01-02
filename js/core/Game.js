@@ -282,8 +282,8 @@ class Game {
     openWeaponMenu() {
         const pool = (this.currentPhase.available_weapons || []).map(id => this.dataManager.getWeaponData(id)).filter(w => w && w.id !== this.player.weapon?.id);
         this.upgradeOptions = pool.slice(0, 2);
-        if (this.player.weapon && this.player.weapon.level <= this.player.weapon.upgrades.length) {
-            this.upgradeOptions.push({ id: 'upgrade_current', name: `Améliorer ${this.player.weapon.name}`, description: `Niveau ${this.player.weapon.level + 1}` });
+        if (this.player.weapon && this.player.weapon.level <= (this.player.weapon.upgrades?.length || 0)) {
+            this.upgradeOptions.push({ id: 'upgrade_current', name: `Améliorer ${this.player.weapon.name}`, description: `Niveau ${this.player.weapon.level + 1}`, level: this.player.weapon.level + 1 });
         }
     }
 
@@ -301,35 +301,202 @@ class Game {
 
     spawnLoot(x, y, v, t) { this.loots.push(new Loot(x, y, v, t)); }
     spawnProjectile(x, y, dx, dy, s) { this.projectiles.push(new Projectile(x, y, dx, dy, s)); }
-    spawnEnemyProjectile(x, y, dx, dy) { this.enemyProjectiles.push(new Projectile(x, y, dx, dy, { speed: 200, damage: 10, color: '#f0f' })); }
+    spawnEnemyProjectile(x, y, dx, dy) { this.enemyProjectiles.push(new Projectile(x, y, dx, dy, { projectileSpeed: 200, damage: 10, color: '#f0f' })); }
 
     draw() {
-        this.ctx.fillStyle = '#111';
+        this.ctx.fillStyle = '#0a0a1a';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Background Particles (Subtle Grid or Stars)
+        this.drawBackground();
+
         if (this.state === GameState.MENU) { this.drawMenu(); return; }
+
         this.loots.forEach(l => l.draw(this.ctx));
         this.projectiles.forEach(p => p.draw(this.ctx));
         this.enemyProjectiles.forEach(ep => ep.draw(this.ctx));
         this.enemies.forEach(e => e.draw(this.ctx));
+
         if (this.boss) this.boss.draw(this.ctx);
-        if (this.player) { this.player.draw(this.ctx); this.drawUI(); }
-        this.explosions.forEach(exp => {
-            const a = exp.timer / exp.maxTimer;
-            this.ctx.beginPath(); this.ctx.arc(exp.x, exp.y, exp.radius, 0, Math.PI * 2);
-            this.ctx.fillStyle = `rgba(255, 100, 0, ${a * 0.4})`; this.ctx.fill();
-            this.ctx.strokeStyle = `rgba(255, 200, 0, ${a})`; this.ctx.lineWidth = 2; this.ctx.stroke();
-        });
+        if (this.player) {
+            this.player.draw(this.ctx);
+            // Explosions avec dégradé
+            this.explosions.forEach(exp => {
+                const a = exp.timer / exp.maxTimer;
+                const grad = this.ctx.createRadialGradient(exp.x, exp.y, 0, exp.x, exp.y, exp.radius);
+                grad.addColorStop(0, `rgba(255, 200, 50, ${a})`);
+                grad.addColorStop(0.5, `rgba(255, 50, 0, ${a * 0.5})`);
+                grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                this.ctx.beginPath();
+                this.ctx.arc(exp.x, exp.y, exp.radius, 0, Math.PI * 2);
+                this.ctx.fillStyle = grad;
+                this.ctx.fill();
+            });
+            this.drawUI();
+        }
+
         this.input.draw(this.ctx);
-        if (this.state === GameState.UPGRADE) this.drawChoiceMenu('AMÉLIORATION !', '#0af');
-        if (this.state === GameState.WEAPON_MENU) this.drawChoiceMenu('ARME !', '#ffd700', 100);
-        if (this.state === GameState.VICTORY) this.drawEndScreen('PHASE TERMINÉE !', '#0f0');
+
+        if (this.state === GameState.UPGRADE) this.drawChoiceMenu('AMÉLIORATION DISPONIBLE !', '#0af');
+        if (this.state === GameState.WEAPON_MENU) this.drawChoiceMenu('CHOISIS TON ARME !', '#ffd700', 100);
+        if (this.state === GameState.VICTORY) this.drawEndScreen('VICTOIRE !', '#0f0');
         if (this.state === GameState.GAMEOVER) this.drawEndScreen('GAME OVER', '#f00');
     }
 
-    drawMenu() { /* ... simplifiée pour gain de place ... */ }
-    drawUI() { /* ... simplifiée ... */ }
-    drawChoiceMenu(t, c, h) { /* ... simplifiée ... */ }
-    drawEndScreen(t, c) { /* ... simplifiée ... */ }
+    drawBackground() {
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+        this.ctx.lineWidth = 1;
+        const spacing = 100;
+        for (let x = 0; x < this.canvas.width; x += spacing) {
+            this.ctx.beginPath(); this.ctx.moveTo(x, 0); this.ctx.lineTo(x, this.canvas.height); this.ctx.stroke();
+        }
+        for (let y = 0; y < this.canvas.height; y += spacing) {
+            this.ctx.beginPath(); this.ctx.moveTo(0, y); this.ctx.lineTo(this.canvas.width, y); this.ctx.stroke();
+        }
+    }
+
+    drawMenu() {
+        const ctx = this.ctx;
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+
+        // Title with glow
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = '#0af';
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 60px Inter, Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('EVG ANTHONY', w / 2, h / 2 - 100);
+        ctx.font = '24px Inter, Arial';
+        ctx.fillText('SURVIVOR EDITION', w / 2, h / 2 - 60);
+        ctx.shadowBlur = 0;
+
+        // Buttons
+        this.drawButton(w / 2, h / 2 + 50, 'NOUVELLE PARTIE', '#0af');
+        if (this.saveSystem.getProgress() > 0) {
+            this.drawButton(w / 2, h / 2 + 130, 'CONTINUER', '#0f0');
+        }
+    }
+
+    drawButton(x, y, text, color) {
+        const ctx = this.ctx;
+        const bW = 250;
+        const bH = 60;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fillRect(x - bW / 2, y - bH / 2, bW, bH);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x - bW / 2, y - bH / 2, bW, bH);
+
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 20px Inter, Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, x, y);
+    }
+
+    drawUI() {
+        const ctx = this.ctx;
+        const p = this.player;
+
+        // HUD Bottom: HP
+        const hpW = 300;
+        const hpH = 30;
+        const hpX = this.canvas.width / 2 - hpW / 2;
+        const hpY = this.canvas.height - 60;
+
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fillRect(hpX, hpY, hpW, hpH);
+        const ratio = p.stats.hp / p.stats.maxHp;
+        const grad = ctx.createLinearGradient(hpX, 0, hpX + hpW, 0);
+        grad.addColorStop(0, '#f00');
+        grad.addColorStop(1, '#f55');
+        ctx.fillStyle = grad;
+        ctx.fillRect(hpX, hpY, hpW * ratio, hpH);
+        ctx.strokeStyle = 'white';
+        ctx.strokeRect(hpX, hpY, hpW, hpH);
+
+        // XP Top
+        const xpW = this.canvas.width - 100;
+        const xpH = 10;
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.fillRect(50, 20, xpW, xpH);
+        const xpRatio = p.stats.xp / p.stats.xpNextLevel;
+        ctx.fillStyle = '#0f0';
+        ctx.fillRect(50, 20, xpW * xpRatio, xpH);
+
+        // Stats & Phase
+        ctx.fillStyle = 'white';
+        ctx.font = '14px Inter, Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText(`PHASE: ${this.currentPhaseIndex + 1} - ${this.currentPhase.name}`, 50, 50);
+        ctx.fillText(`KILLS: ${this.killCount}`, 50, 70);
+
+        if (this.player.weapon) {
+            ctx.textAlign = 'right';
+            ctx.fillText(`ARME: ${this.player.weapon.name} (LVL ${this.player.weapon.level})`, this.canvas.width - 50, 50);
+        }
+    }
+
+    drawChoiceMenu(title, color, optionHeight = 80) {
+        const ctx = this.ctx;
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+
+        // Overlay transparent
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.fillStyle = color;
+        ctx.font = 'bold 40px Inter, Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(title, w / 2, 100);
+
+        const menuWidth = 400;
+        const startX = w / 2 - menuWidth / 2;
+        const startY = 180;
+
+        this.upgradeOptions.forEach((opt, i) => {
+            const optY = startY + i * (optionHeight + 20);
+
+            // Background with hover logic (approximative for drawing)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillRect(startX, optY, menuWidth, optionHeight);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(startX, optY, menuWidth, optionHeight);
+
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 20px Inter, Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText(opt.name, startX + 20, optY + 35);
+
+            ctx.font = '14px Inter, Arial';
+            ctx.fillStyle = '#ccc';
+            ctx.fillText(opt.description || 'Amélioration mystérieuse...', startX + 20, optY + 60);
+
+            if (opt.id === 'upgrade_current') {
+                ctx.fillStyle = '#0f0';
+                ctx.fillText('AMÉLIORATION', startX + menuWidth - 110, optY + 35);
+            }
+        });
+    }
+
+    drawEndScreen(text, color) {
+        const ctx = this.ctx;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        ctx.fillStyle = color;
+        ctx.font = 'bold 80px Inter, Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(text, this.canvas.width / 2, this.canvas.height / 2 - 50);
+
+        ctx.fillStyle = 'white';
+        ctx.font = '24px Inter, Arial';
+        ctx.fillText(`KILLS: ${this.killCount}`, this.canvas.width / 2, this.canvas.height / 2 + 20);
+        ctx.fillText('CLIQUE POUR RECOMMENCER', this.canvas.width / 2, this.canvas.height / 2 + 100);
+    }
 
     updateFPS(dt) {
         this.frameCount++; this.fpsTimer += dt;
