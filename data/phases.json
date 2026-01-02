@@ -1,0 +1,33 @@
+{
+    "phases": [
+        {
+            "id": 1,
+            "name": "Conception",
+            "duration_before_boss": 60,
+            "enemy_types": [
+                "basic"
+            ],
+            "spawn_rate": 2000,
+            "boss": {
+                "name": "L'Ovule Géant",
+                "hp": 500,
+                "damage": 20
+            }
+        },
+        {
+            "id": 2,
+            "name": "Bébé",
+            "duration_before_boss": 90,
+            "enemy_types": [
+                "basic",
+                "fast"
+            ],
+            "spawn_rate": 1500,
+            "boss": {
+                "name": "Le Biberon Empoisonné",
+                "hp": 800,
+                "damage": 25
+            }
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "baseStats": {
+        "speed": 250,
+        "hp": 100,
+        "maxHp": 100,
+        "fireRate": 300,
+        "damage": 10,
+        "projectileSpeed": 400,
+        "pickupRadius": 100,
+        "xp": 0,
+        "level": 1,
+        "xpNextLevel": 50
+    }
+}

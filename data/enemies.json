@@ -1,0 +1,31 @@
+{
+    "enemies": {
+        "basic": {
+            "name": "Spermatozoïde",
+            "hp": 20,
+            "speed": 100,
+            "damage": 5,
+            "xpValue": 10,
+            "radius": 15,
+            "color": "#f00"
+        },
+        "fast": {
+            "name": "Neurone Fou",
+            "hp": 10,
+            "speed": 180,
+            "damage": 3,
+            "xpValue": 15,
+            "radius": 12,
+            "color": "#ff0"
+        },
+        "tank": {
+            "name": "Bactérie",
+            "hp": 60,
+            "speed": 60,
+            "damage": 10,
+            "xpValue": 30,
+            "radius": 25,
+            "color": "#f0f"
+        }
+    }
+}
