@@ -95,9 +95,15 @@
             },
             "upgrades": [
                 {
-                    "name": "Perçage +",
+                    "name": "Perçage Mastoc",
                     "stats": {
                         "piercingCount": 2
+                    }
+                },
+                {
+                    "name": "Multi-Stylos",
+                    "stats": {
+                        "projectileCount": 1
                     }
                 }
             ]
@@ -133,7 +139,7 @@
             "name": "Aura frozen",
             "type": "aoe",
             "stats": {
-                "damage": 20,
+                "damage": 0,
                 "range": 85,
                 "isSlowing": true,
                 "slowMultiplier": 0.6

@@ -17,7 +17,10 @@ export class Player {
             pickupRadius: 100,
             // Stats globales pouvant influencer les armes
             fireRateMultiplier: 1.0,
-            damageMultiplier: 1.0
+            damageMultiplier: 1.0,
+            projectileBonus: 0,
+            rangeMultiplier: 1.0,
+            piercingBonus: 0
         };
 
         this.color = '#0af';

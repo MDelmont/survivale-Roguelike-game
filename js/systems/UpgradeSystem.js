@@ -45,6 +45,30 @@ export class UpgradeSystem {
                 type: 'stat',
                 stat: 'pickupRadius',
                 multiplier: 1.3
+            },
+            {
+                id: 'projectile_boost',
+                name: 'Munitions Doubles',
+                description: 'Ajoute +1 projectile à toutes vos armes de tir.',
+                type: 'stat',
+                stat: 'projectileBonus',
+                add: 1
+            },
+            {
+                id: 'aura_range_boost',
+                name: 'Amplificateur',
+                description: 'Augmente la portée de vos auras de 20%.',
+                type: 'stat',
+                stat: 'rangeMultiplier',
+                multiplier: 1.2
+            },
+            {
+                id: 'piercing_boost',
+                name: 'Munitions Perçantes',
+                description: 'Toutes vos balles traversent +1 ennemi supplémentaire.',
+                type: 'stat',
+                stat: 'piercingBonus',
+                add: 1
             }
         ];
     }

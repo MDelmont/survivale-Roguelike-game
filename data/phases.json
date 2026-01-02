@@ -14,7 +14,8 @@
                 "basic_shot",
                 "poison_shot",
                 "double_shot",
-                "shield_orbit"
+                "shield_orbit",
+                "smartphone_poison"
             ],
             "boss_id": "ovule_geant"
         },

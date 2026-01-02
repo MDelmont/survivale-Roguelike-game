@@ -134,7 +134,8 @@
 
             reset() {
                 this.player = new Player(60, 120, { hp: 100, speed: 0 });
-                this.player.setWeapon(WeaponFactory.create({ ...this.config.weapon, name: this.config.name }));
+                this.player.weapons = []; // Reset arsenal for showcase
+                this.player.addWeapon(WeaponFactory.create({ ...this.config.weapon, name: this.config.name }));
                 this.enemies = this.config.enemies.map(e => new Enemy(e.x, e.y, { hp: e.hp, speed: 0, radius: 15 }));
                 this.projectiles = [];
                 this.explosions = [];

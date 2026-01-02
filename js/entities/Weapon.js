@@ -16,7 +16,13 @@ export class Weapon {
             const upgrade = this.upgrades[this.level - 1];
             if (upgrade && upgrade.stats) {
                 for (const stat in upgrade.stats) {
-                    this.stats[stat] = (this.stats[stat] || 0) + upgrade.stats[stat];
+                    const value = upgrade.stats[stat];
+                    if (typeof value === 'number') {
+                        this.stats[stat] = (this.stats[stat] || 0) + value;
+                    } else {
+                        // Pour les boeux, strings ou objets, on remplace
+                        this.stats[stat] = value;
+                    }
                 }
             }
             this.level++;
@@ -44,10 +50,16 @@ export class ProjectileWeapon extends Weapon {
     update(deltaTime, owner, context) {
         super.update(deltaTime, owner, context);
 
-        if (this.shotTimer >= this.stats.fireRate) {
+        const fireRate = (this.stats.fireRate || 500) * (owner.stats.fireRateMultiplier || 1.0);
+        if (this.shotTimer >= fireRate) {
             this.shotTimer = 0;
             if (context.onShoot && context.targetDir) {
-                const count = this.stats.projectileCount || 1;
+                const count = (this.stats.projectileCount || 1) + (owner.stats.projectileBonus || 0);
+                const weaponStats = {
+                    ...this.stats,
+                    damage: (this.stats.damage || 10) * (owner.stats.damageMultiplier || 1.0),
+                    piercingCount: (this.stats.piercingCount || 0) + (owner.stats.piercingBonus || 0)
+                };
                 const spread = 20;
                 const perpX = -context.targetDir.dy;
                 const perpY = context.targetDir.dx;
@@ -59,7 +71,7 @@ export class ProjectileWeapon extends Weapon {
                         owner.y + perpY * offset,
                         context.targetDir.dx,
                         context.targetDir.dy,
-                        { ...this.stats }
+                        weaponStats
                     );
                 }
             }
@@ -81,8 +93,8 @@ export class OrbitalWeapon extends Weapon {
 
     update(deltaTime, owner, context) {
         this.spawnTimer += deltaTime;
-        const maxSatellites = this.stats.projectileCount || 1;
-        const spawnRate = this.stats.fireRate || 2000;
+        const maxSatellites = (this.stats.projectileCount || 1) + (owner.stats.projectileBonus || 0);
+        const spawnRate = (this.stats.fireRate || 2000) * (owner.stats.fireRateMultiplier || 1.0);
 
         // Apparition régulière de nouveaux satellites
         if (this.satellites.length < maxSatellites && this.spawnTimer >= spawnRate) {
@@ -114,7 +126,8 @@ export class OrbitalWeapon extends Weapon {
 
             enemies.forEach(e => {
                 if (checkCollision(e)) {
-                    const hitDamage = (this.stats.damage || 0) * dt * 5;
+                    const baseDamage = (this.stats.damage || 0) * (owner.stats.damageMultiplier || 1.0);
+                    const hitDamage = baseDamage * dt * 5;
                     if (hitDamage > 0) e.takeDamage(hitDamage);
 
                     if (this.stats.isPoisonous) {
@@ -172,9 +185,9 @@ export class AreaWeapon extends Weapon {
 
     update(deltaTime, owner, context) {
         // L'aura est constante, on applique des dégâts continus
-        const range = this.stats.range || 100;
+        const range = (this.stats.range || 100) * (owner.stats.rangeMultiplier || 1.0);
         const dt = deltaTime / 1000;
-        const damage = (this.stats.damage || 0) * dt;
+        const damage = (this.stats.damage || 0) * (owner.stats.damageMultiplier || 1.0) * dt;
 
         const enemies = context.enemies || [];
         const boss = context.boss;
@@ -213,7 +226,7 @@ export class AreaWeapon extends Weapon {
     }
 
     draw(ctx, owner) {
-        const range = this.stats.range || 100;
+        const range = (this.stats.range || 100) * (owner.stats.rangeMultiplier || 1.0);
         ctx.save();
         ctx.beginPath();
         ctx.arc(owner.x, owner.y, range, 0, Math.PI * 2);
