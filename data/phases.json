@@ -16,13 +16,7 @@
                 "double_shot",
                 "shield_orbit"
             ],
-            "boss": {
-                "name": "L'Ovule Géant",
-                "hp": 500,
-                "damage": 20,
-                "radius": 80,
-                "fireRate": 2500
-            }
+            "boss_id": "ovule_geant"
         },
         {
             "id": 2,

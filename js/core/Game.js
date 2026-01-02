@@ -314,7 +314,15 @@ class Game {
         this.state = GameState.WEAPON_MENU;
     }
 
-    spawnBoss() { const c = this.currentPhase.boss; this.boss = new Boss(this.canvas.width / 2, -100, { ...c, color: '#f0f' }); }
+    spawnBoss() {
+        const bossId = this.currentPhase.boss_id;
+        const bossStats = this.dataManager.getBossData(bossId);
+        if (bossStats) {
+            this.boss = new Boss(this.canvas.width / 2, -100, bossStats);
+        } else {
+            console.error(`Boss ID inconnu : ${bossId}`);
+        }
+    }
     spawnEnemy() {
         const type = this.currentPhase.enemy_types[Math.floor(Math.random() * this.currentPhase.enemy_types.length)];
         const side = Math.floor(Math.random() * 4);

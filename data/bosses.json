@@ -1,0 +1,37 @@
+{
+    "bosses": {
+        "ovule_geant": {
+            "name": "L'Ovule Géant",
+            "hp": 2000,
+            "speed": 50,
+            "damage": 20,
+            "fireRate": 1500,
+            "attackPattern": "spiral",
+            "movePattern": "constant",
+            "radius": 80,
+            "color": "#fff"
+        },
+        "biberon_alpha": {
+            "name": "Biberon Alpha",
+            "hp": 1500,
+            "speed": 100,
+            "damage": 25,
+            "fireRate": 1000,
+            "attackPattern": "spray",
+            "movePattern": "rush",
+            "radius": 60,
+            "color": "#0ff"
+        },
+        "cahier_supreme": {
+            "name": "Le Cahier Suprême",
+            "hp": 3000,
+            "speed": 40,
+            "damage": 30,
+            "fireRate": 2000,
+            "attackPattern": "wall",
+            "movePattern": "fixed",
+            "radius": 90,
+            "color": "#3f3"
+        }
+    }
+}

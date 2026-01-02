@@ -17,17 +17,19 @@ export class DataManager {
      */
     async loadAll() {
         try {
-            const [playerRes, enemiesRes, phasesRes, weaponsRes] = await Promise.all([
+            const [playerRes, enemiesRes, phasesRes, weaponsRes, bossesRes] = await Promise.all([
                 fetch('./data/player.json'),
                 fetch('./data/enemies.json'),
                 fetch('./data/phases.json'),
-                fetch('./data/weapons.json')
+                fetch('./data/weapons.json'),
+                fetch('./data/bosses.json')
             ]);
 
             this.data.player = await playerRes.json();
             this.data.enemies = await enemiesRes.json();
             this.data.phases = await phasesRes.json();
             this.data.weapons = await weaponsRes.json();
+            this.data.bosses = await bossesRes.json();
 
             console.log('Données chargées avec succès:', this.data);
             return true;
@@ -51,5 +53,9 @@ export class DataManager {
 
     getWeaponData(id) {
         return this.data.weapons.weapons.find(w => w.id === id);
+    }
+
+    getBossData(id) {
+        return this.data.bosses.bosses[id];
     }
 }

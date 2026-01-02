@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Boss Attack Showcase - EVG Anthony</title>
+    <style>
+        body {
+            margin: 0;
+            background: #050510;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            display: flex;
+        }
+
+        #controls {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        canvas {
+            flex-grow: 1;
+            background: radial-gradient(circle, #0a0a20 0%, #050510 100%);
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            color: #f0f;
+            margin-top: 0;
+        }
+
+        .attack-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .attack-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #f0f;
+        }
+
+        .attack-btn.active {
+            background: #f0f;
+            color: black;
+            font-weight: bold;
+        }
+
+        .description {
+            font-size: 0.85rem;
+            color: #ccc;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .stat-badge {
+            font-size: 0.7rem;
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="controls">
+        <h1>Boss Attacks</h1>
+        <p class="description">Test des différents patterns d'attaque pour les boss. Cliquez pour activer un pattern.
+        </p>
+
+        <button class="attack-btn active" onclick="setPattern('circle')">
+            <span class="stat-badge">BURST</span> Cercle Radial
+        </button>
+        <button class="attack-btn" onclick="setPattern('spiral')">
+            <span class="stat-badge">DYN</span> Spirale Étoilée
+        </button>
+        <button class="attack-btn" onclick="setPattern('spray')">
+            <span class="stat-badge">TARGET</span> Éventail Ciblé
+        </button>
+        <button class="attack-btn" onclick="setPattern('cross')">
+            <span class="stat-badge">AOE</span> Croix Cardinale
+        </button>
+        <button class="attack-btn" onclick="setPattern('vortex')">
+            <span class="stat-badge">STORM</span> Vortex de Projectiles
+        </button>
+        <button class="attack-btn" onclick="setPattern('double_spiral')">
+            <span class="stat-badge">TWIN</span> Spirale Double
+        </button>
+        <button class="attack-btn" onclick="setPattern('flower')">
+            <span class="stat-badge">ART</span> Floraison Mortelle
+        </button>
+        <button class="attack-btn" onclick="setPattern('wave_spray')">
+            <span class="stat-badge">WAVE</span> Vague Oscillante
+        </button>
+        <button class="attack-btn" onclick="setPattern('barrage')">
+            <span class="stat-badge">CHAOS</span> Déluge Chaotique
+        </button>
+        <button class="attack-btn" onclick="setPattern('star')">
+            <span class="stat-badge">SHAPE</span> Étoile Mystique
+        </button>
+        <button class="attack-btn" onclick="setPattern('oscillator')">
+            <span class="stat-badge">WAVE</span> Oscillateur Multiple
+        </button>
+        <button class="attack-btn" onclick="setPattern('wall')">
+            <span class="stat-badge">BLOCK</span> Muraille de Plasma
+        </button>
+        <button class="attack-btn" onclick="setPattern('web')">
+            <span class="stat-badge">TRAP</span> Toile Arachnéenne
+        </button>
+
+        <div style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+            <h3>Stats Simulation</h3>
+            <label>Rapidité (ms)</label>
+            <input type="range" id="fireRate" min="100" max="3000" value="1500" style="width:100%">
+            <label>Vitesse Bulle</label>
+            <input type="range" id="projSpeed" min="50" max="600" value="200" style="width:100%">
+        </div>
+
+        <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+            <h3>Movement Pattern</h3>
+            <button class="attack-btn active" id="move-fixed" onclick="setMove('fixed')">FIXED (Stable)</button>
+            <button class="attack-btn" id="move-constant" onclick="setMove('constant')">CONSTANT (Focus)</button>
+            <button class="attack-btn" id="move-rush" onclick="setMove('rush')">RUSH (Charge)</button>
+        </div>
+    </div>
+    <canvas id="showcase"></canvas>
+
+    <script type="module">
+        import { Projectile } from '../js/entities/Projectile.js';
+
+        const canvas = document.getElementById('showcase');
+        const ctx = canvas.getContext('2d');
+        const fireRateInput = document.getElementById('fireRate');
+        const projSpeedInput = document.getElementById('projSpeed');
+
+        canvas.width = window.innerWidth - 300;
+        canvas.height = window.innerHeight;
+
+        const boss = {
+            x: canvas.width / 2,
+            y: canvas.height / 3,
+            radius: 60,
+            color: '#fff',
+            angle: 0
+        };
+
+        const player = {
+            x: canvas.width / 2,
+            y: canvas.height * 0.8,
+            radius: 20
+        };
+
+        let projectiles = [];
+        let currentPattern = 'circle';
+        let currentMove = 'fixed';
+        let lastShootTime = 0;
+        let rushTimer = 0;
+        let isRushing = false;
+        let rushTarget = null;
+
+        window.setPattern = (p) => {
+            currentPattern = p;
+            document.querySelectorAll('#controls > .attack-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            projectiles = [];
+        };
+
+        window.setMove = (m) => {
+            currentMove = m;
+            document.querySelectorAll('#controls > div > .attack-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('move-' + m).classList.add('active');
+            // Reset position if fixed
+            if (m === 'fixed') { boss.x = canvas.width / 2; boss.y = canvas.height / 3; }
+            rushTimer = 0;
+            isRushing = false;
+        };
+
+        function handleMovement(deltaTime) {
+            const dt = deltaTime / 1000;
+            const speed = 100;
+
+            if (currentMove === 'constant') {
+                const dx = player.x - boss.x;
+                const dy = player.y - boss.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > 5) {
+                    boss.x += (dx / dist) * (speed * 0.5) * dt;
+                    boss.y += (dy / dist) * (speed * 0.5) * dt;
+                }
+            } else if (currentMove === 'rush') {
+                rushTimer += deltaTime;
+                if (!isRushing && rushTimer > 2000) {
+                    isRushing = true;
+                    rushTimer = 0;
+                    rushTarget = { x: player.x, y: player.y };
+                }
+                if (isRushing) {
+                    const dx = rushTarget.x - boss.x;
+                    const dy = rushTarget.y - boss.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist > 10) {
+                        boss.x += (dx / dist) * (speed * 4) * dt;
+                        boss.y += (dy / dist) * (speed * 4) * dt;
+                    } else {
+                        isRushing = false;
+                        rushTimer = 0;
+                    }
+                }
+            }
+        }
+
+        function spawnProj(dx, dy, stats = {}) {
+            const speed = parseInt(projSpeedInput.value);
+            projectiles.push(new Projectile(boss.x, boss.y, dx, dy, {
+                projectileSpeed: speed,
+                color: '#f0f',
+                ...stats
+            }));
+        }
+
+        const patterns = {
+            circle: () => {
+                const count = 12;
+                for (let i = 0; i < count; i++) {
+                    const a = (i / count) * Math.PI * 2;
+                    spawnProj(Math.cos(a), Math.sin(a));
+                }
+            },
+            spiral: (time) => {
+                boss.angle += 0.2;
+                const a = boss.angle;
+                spawnProj(Math.cos(a), Math.sin(a));
+                spawnProj(Math.cos(a + Math.PI), Math.sin(a + Math.PI));
+            },
+            spray: () => {
+                const dx = player.x - boss.x;
+                const dy = player.y - boss.y;
+                const baseAngle = Math.atan2(dy, dx);
+                const count = 5;
+                const spread = 0.5;
+                for (let i = 0; i < count; i++) {
+                    const a = baseAngle - spread / 2 + (i / (count - 1)) * spread;
+                    spawnProj(Math.cos(a), Math.sin(a));
+                }
+            },
+            cross: (time) => {
+                const a = (Math.floor(time / 1000) % 2 === 0) ? 0 : Math.PI / 4;
+                for (let i = 0; i < 4; i++) {
+                    const ang = a + (i / 4) * Math.PI * 2;
+                    spawnProj(Math.cos(ang), Math.sin(ang), { projectileSpeed: parseInt(projSpeedInput.value) * 1.5 });
+                }
+            },
+            vortex: () => {
+                const count = 3;
+                boss.angle += 0.5;
+                for (let i = 0; i < count; i++) {
+                    const a = boss.angle + (i / count) * Math.PI * 2;
+                    spawnProj(Math.cos(a), Math.sin(a), { projectileSpeed: 150 });
+                }
+            },
+            double_spiral: () => {
+                boss.angle += 0.15;
+                spawnProj(Math.cos(boss.angle), Math.sin(boss.angle), { color: '#f0f' });
+                spawnProj(Math.cos(-boss.angle), Math.sin(-boss.angle), { color: '#0ff' });
+            },
+            flower: () => {
+                const petals = 8;
+                for (let i = 0; i < petals; i++) {
+                    const a = (i / petals) * Math.PI * 2;
+                    spawnProj(Math.cos(a), Math.sin(a), { projectileSpeed: parseInt(projSpeedInput.value) * 0.8 });
+                    spawnProj(Math.cos(a), Math.sin(a), { projectileSpeed: parseInt(projSpeedInput.value) * 1.2 });
+                }
+            },
+            wave_spray: (time) => {
+                const dx = player.x - boss.x;
+                const dy = player.y - boss.y;
+                const baseAngle = Math.atan2(dy, dx);
+                const wave = Math.sin(time / 200) * 0.8;
+                spawnProj(Math.cos(baseAngle + wave), Math.sin(baseAngle + wave));
+            },
+            barrage: () => {
+                const count = 3;
+                for (let i = 0; i < count; i++) {
+                    const a = Math.random() * Math.PI * 2;
+                    const speedVar = 0.5 + Math.random();
+                    spawnProj(Math.cos(a), Math.sin(a), { projectileSpeed: parseInt(projSpeedInput.value) * speedVar });
+                }
+            },
+            star: () => {
+                const branches = 5;
+                const perBranch = 4;
+                for (let i = 0; i < branches; i++) {
+                    const baseA = (i / branches) * Math.PI * 2;
+                    for (let j = 0; j < perBranch; j++) {
+                        spawnProj(Math.cos(baseA), Math.sin(baseA), { projectileSpeed: 100 + j * 50 });
+                    }
+                }
+            },
+            oscillator: (time) => {
+                const count = 4;
+                for (let i = 0; i < count; i++) {
+                    const baseA = (i / count) * Math.PI * 2;
+                    const offset = Math.sin(time / 500) * 0.8;
+                    spawnProj(Math.cos(baseA + offset), Math.sin(baseA + offset));
+                }
+            },
+            wall: (time) => {
+                const count = 12;
+                const spacing = 40;
+                const fireRate = parseInt(fireRateInput.value);
+                const isVertical = (Math.floor(time / fireRate) % 2 === 0);
+                for (let i = 0; i < count; i++) {
+                    const offset = (i - count / 2) * spacing;
+                    if (isVertical) spawnProj(0, 1, { x: boss.x + offset, projectileSpeed: 180 });
+                    else spawnProj(1, 0, { y: boss.y + offset, projectileSpeed: 180 });
+                }
+            },
+            web: () => {
+                const count = 20;
+                boss.angle += 0.3;
+                const a = boss.angle;
+                const speed = 100 + Math.sin(boss.angle * 2) * 50;
+                spawnProj(Math.cos(a), Math.sin(a), { projectileSpeed: speed });
+            }
+        };
+
+        function loop(time) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            handleMovement(16);
+
+            // Rendu Boss
+            ctx.beginPath();
+            ctx.arc(boss.x, boss.y, boss.radius, 0, Math.PI * 2);
+            ctx.fillStyle = boss.color;
+            ctx.fill();
+            ctx.strokeStyle = '#f0f';
+            ctx.lineWidth = 10;
+            ctx.stroke();
+
+            // Rendu Joueur (Cible)
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#0af';
+            ctx.fill();
+
+            // Logique de tir
+            const fireRate = parseInt(fireRateInput.value);
+            let interval = fireRate;
+            const fastPatterns = ['spiral', 'vortex', 'double_spiral', 'wave_spray', 'barrage', 'oscillator', 'web'];
+            if (fastPatterns.includes(currentPattern)) interval = 50;
+
+            if (time - lastShootTime > interval) {
+                patterns[currentPattern](time);
+                lastShootTime = time;
+            }
+
+            // Update & Draw projectiles
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                const p = projectiles[i];
+                p.update(16); // ~60fps simulation
+                p.draw(ctx);
+                if (p.isOutOfBounds(canvas.width, canvas.height)) {
+                    projectiles.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        requestAnimationFrame(loop);
+
+        // Movement player with mouse
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            player.x = e.clientX - rect.left;
+            player.y = e.clientY - rect.top;
+        });
+
+    </script>
+</body>
+
+</html>
