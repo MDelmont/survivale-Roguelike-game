@@ -1,61 +1,88 @@
-# Système d'Armes et Spécialisations (Data-Driven)
+# Système d'Armes et Projectiles (Scalable)
 
-Ce système remplace et enrichit les précédentes mécaniques de spécialisations. Il base la progression sur des armes spécifiques à chaque phase, tout en permettant une évolution via le loot rare.
+Ce document décrit l'architecture décentralisée des armes et des effets de statut, permettant une scalabilité maximale.
 
-## 1. Fonctionnement Global
-- **Arme de Phase** : Au début de chaque phase, le joueur est équipé de l'arme "par défaut" (ex: Spermatozoïde -> Tir de base, École -> Lance-Stylos).
-- **Reliques d'Arme (Loot Doré)** : Chance rare (5%) lors de la mort d'un ennemi. Ramasser le loot ouvre un menu proposant de nouvelles armes ou d'améliorer l'actuelle.
+## 1. Types d'Armes (La Forme)
+Chaque arme appartient à une classe de comportement qui définit comment elle se manifeste dans le jeu.
 
-## 2. Dictionnaire des Propriétés (`weapons.json`)
+| Type | Classe Technique | Description |
+| :--- | :--- | :--- |
+| **Projectile** | `ProjectileWeapon` | Tire un ou plusieurs projectiles vers l'ennemi le plus proche. |
+| **Orbital** | `OrbitalWeapon` | Crée des projectiles/objets qui tournent en permanence autour du joueur. |
+| **Aura** | `AreaWeapon` | Génère une zone d'effet constante ou pulsée centrée sur le joueur. |
 
-Voici la liste exhaustive des paramètres configurables pour les armes et leurs upgrades.
+## 2. Dictionnaire des Propriétés (`stats`)
 
-### A. Statistiques Communes
-- `id` : Identifiant unique de l'arme.
-- `name` : Nom affiché dans le menu.
-- `type` : Catégorie d'arme (`attack`, `defense`, `aoe`).
-- `damage` : Dégâts infligés par coup/contact.
-- `fireRate` : Temps en ms entre deux tirs (uniquement pour le type `attack` ou `aoe`).
+Voici tous les réglages possibles à utiliser dans l'objet `stats` d'une arme (ou d'un upgrade).
 
-### B. Spécificités du Type "Attack" (Projectiles)
-- `projectileSpeed` : Vitesse de déplacement du projectile.
-- `projectileCount` : Nombre de projectiles tirés simultanément (ex: 2 pour un Double Tir).
-- `isExplosive` : (booléen) Si vrai, crée une explosion de zone (AOE) à l'impact.
-- `isPoisonous` : (booléen) Si vrai, applique un effet de poison (DoT) aux ennemis.
-- `piercingCount` : Nombre d'ennemis que le projectile peut traverser avant de disparaître.
+### A. Paramètres Communs
+| Propriété | Type | Description |
+| :--- | :--- | :--- |
+| `damage` | Nombre | Dégâts de base infligés par l'impact ou par seconde (aura). |
+| `fireRate` | Nombre | Délai en ms entre deux tirs / réapparitions d'objets orbitaux. |
+| `projectileCount`| Nombre | Nb de balles simultanées (Attaque) ou de billes (Défense). |
+| `isPoisonous` | Booléen| Si `true`, applique un DoT (Damage over Time). |
+| `poisonDamage` | Nombre | Dégâts infligés par tick de poison. |
+| `poisonDuration`| Nombre | Durée totale de l'effet de poison en ms. |
+| `poisonTickRate`| Nombre | Intervalle entre deux ticks de dégâts en ms (ex: 500). |
+| `isSlowing` | Booléen| Si `true`, ralentit la cible. |
+| `slowMultiplier` | Nombre | Puissance du ralenti (ex: `0.5` = vitesse divisée par 2). |
+| `slowDuration` | Nombre | Durée de l'effet de ralentissement en ms. |
 
-### C. Spécificités du Type "Defense" (Bouclier/Orbital)
-- `radius` : Distance entre le joueur et l'objet orbital.
-- `orbitSpeed` : Vitesse de rotation autour du joueur.
+### B. Spécifiques par Type
+- **Attaque (Projectile)**
+    - `projectileSpeed` : Vitesse de déplacement des balles.
+    - `piercingCount` : Nb d'ennemis traversés (0 = s'arrête au 1er).
+    - `isExplosive` : Déclenche une déflagration de zone à l'impact.
+    - `color` : Couleur hexadécimale du projectile.
+- **Défense (Orbital)**
+    - `radius` : Distance de rotation autour du joueur.
+    - `orbitSpeed` : Vitesse de rotation (plus le chiffre est haut, plus ça tourne vite).
+- **AOE (Aura)**
+    - `range` : Rayon de la zone d'effet constante.
 
-### D. Spécificités du Type "AOE" (Zones d'Effet)
-- `range` : Rayon de la zone d'effet (ex: ondes wifi, explosion).
+## 3. Effets et Munitions (Le Fond)
+Indépendamment de son type, une arme peut porter différents effets de statut via ses projectiles ou sa zone.
 
-## 3. Exemple de Configuration Complète
+### A. Types d'Effets de Statut (Status Effects)
+- **Basic** : Dégâts directs à l'impact.
+- **Explosion** : Déclenche une AOE (dégâts de zone) au point d'impact.
+- **Poison** : Applique un DoT (Damage over Time) ; la cible devient **verte**.
+- **Ralentissant** : Réduit la vitesse de déplacement de la cible (ex: glace, glue).
+
+### B. Paramètres de Projectiles
+- `projectileCount` : Nombre de balles (Tir multiple).
+- `projectileSpeed` : Vitesse de déplacement.
+- `piercingCount` : Nombre d'ennemis traversés avant disparition.
+
+## 3. Évolution et Upgrades
+Chaque niveau d'upgrade peut modifier indépendamment :
+- **Puissance** : Dégâts de base, dégâts de poison.
+- **Vitesse** : Cadence de tir (`fireRate`), vitesse d'orbite.
+- **Déploiement** : Temps de réapparition des projectiles orbitaux, rayon de l'aura.
+- **Durée** : Durée des effets de statut sur les cibles.
+
+## 4. Exemple de Configuration JSON (`weapons.json`)
 
 ```json
 {
-  "id": "smartphone_wave",
-  "name": "Ondes Wifi",
-  "type": "aoe",
+  "id": "shield_orbit",
+  "name": "Bouclier Orbital",
+  "type": "defense",
   "stats": {
-    "damage": 15,
-    "range": 100,
-    "fireRate": 1000
+    "damage": 10,
+    "radius": 60,
+    "orbitSpeed": 2,
+    "spawnRate": 2000
   },
   "upgrades": [
     {
-      "name": "Fréquence 5G",
-      "stats": { "fireRate": -200, "damage": 5 }
-    },
-    {
-      "name": "Amplificateur de Signal",
-      "stats": { "range": 50 }
+      "name": "Poison Orbital",
+      "stats": { "isPoisonous": true, "damagePerTick": 5 }
     }
   ]
 }
 ```
 
-## 4. Effets Spéciaux (États)
-- **Poison** : Inflige des dégâts périodiques (Ticks) et change la couleur de l'ennemi en vert.
-- **Explosion** : Inflige 50% des dégâts de base dans un rayon de 80 pixels autour du point d'impact.
+> [!TIP]
+> **Scalabilité** : Grâce à l'architecture O.O.P, un projectile de type "Poison" se comportera de la même manière qu'il soit tiré par un pistolet ou qu'il tourne autour d'Anthony dans un bouclier.

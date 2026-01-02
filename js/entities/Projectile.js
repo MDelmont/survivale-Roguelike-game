@@ -1,6 +1,8 @@
+import { CombatSystem } from '../systems/CombatSystem.js';
+
 /**
  * Projectile Class
- * Gère le mouvement et l'affichage des projectiles tirés.
+ * Gère le mouvement et ses propres conséquences d'impact.
  */
 export class Projectile {
     constructor(x, y, dx, dy, stats) {
@@ -8,15 +10,65 @@ export class Projectile {
         this.y = y;
         this.dx = dx;
         this.dy = dy;
-        this.speed = stats.speed || 400;
+        this.speed = stats.projectileSpeed || stats.speed || 400;
         this.damage = stats.damage || 10;
         this.radius = 5;
-        this.color = stats.color || '#ff0'; // Jaune par défaut
+        this.color = stats.color || '#ff0';
+        this.stats = stats; // Stocker les stats pour les effets étendus (slowing, etc.)
         this.toRemove = false;
 
-        // Effets spéciaux
+        // Propriétés de combat (Scalable)
         this.isExplosive = stats.isExplosive || false;
         this.isPoisonous = stats.isPoisonous || false;
+        this.piercingCount = stats.piercingCount || 0;
+        this.hitTargets = new Set(); // Registre des ennemis déjà touchés
+    }
+
+    /**
+     * Gère l'impact sur une cible.
+     */
+    hit(target, combatContext) {
+        // Empêcher de toucher deux fois la même cible (Perçage)
+        if (this.hitTargets.has(target)) return;
+        this.hitTargets.add(target);
+
+        // Dégâts directs
+        target.takeDamage(this.damage);
+
+        // Effet de poison
+        if (this.isPoisonous && target.applyEffect) {
+            target.applyEffect({
+                type: 'poison',
+                duration: this.stats.poisonDuration || 3000,
+                damagePerTick: this.stats.poisonDamage || this.damage * 0.2,
+                tickRate: this.stats.poisonTickRate || 500
+            });
+        }
+
+        // Effet de ralentissement
+        if (this.stats.isSlowing && target.applyEffect) {
+            target.applyEffect({ type: 'slowing', duration: 2000, multiplier: this.stats.slowMultiplier || 0.5 });
+        }
+
+        // Effet d'explosion (AOE)
+        if (this.isExplosive && combatContext) {
+            CombatSystem.handleAOE({
+                x: this.x,
+                y: this.y,
+                radius: 80,
+                damage: this.damage * 0.5,
+                enemies: combatContext.enemies,
+                boss: combatContext.boss,
+                explosions: combatContext.explosions
+            });
+        }
+
+        // Gestion de la disparition / perçage
+        if (this.piercingCount > 0) {
+            this.piercingCount--;
+        } else {
+            this.toRemove = true;
+        }
     }
 
     update(deltaTime) {
@@ -30,16 +82,15 @@ export class Projectile {
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
 
         if (this.isPoisonous) {
-            ctx.fillStyle = '#0f0'; // Vert pour le poison
+            ctx.fillStyle = '#0f0';
         } else if (this.isExplosive) {
-            ctx.fillStyle = '#f50'; // Rouge-orange pour explosif
+            ctx.fillStyle = '#f50';
         } else {
             ctx.fillStyle = this.color;
         }
 
         ctx.fill();
 
-        // Traînée ou halo selon l'effet
         if (this.isExplosive || this.isPoisonous) {
             ctx.shadowBlur = 10;
             ctx.shadowColor = ctx.fillStyle;

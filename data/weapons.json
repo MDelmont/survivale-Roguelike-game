@@ -18,9 +18,66 @@
                     }
                 },
                 {
-                    "name": "Double Tir",
+                    "name": "Tir Cryogénique",
                     "stats": {
-                        "projectileCount": 1
+                        "isSlowing": true,
+                        "slowMultiplier": 0.4
+                    }
+                }
+            ]
+        },
+        {
+            "id": "poison_shot",
+            "name": "Tir de Poison",
+            "type": "attack",
+            "stats": {
+                "damage": 10,
+                "fireRate": 500,
+                "projectileSpeed": 60,
+                "projectileCount": 1,
+                "isPoisonous": true,
+                "poisonDuration": 2000,
+                "poisonDamage": 20,
+                "poisonTickRate": 500
+            },
+            "upgrades": [
+                {
+                    "name": "Vitesse Accrue",
+                    "stats": {
+                        "fireRate": -100
+                    }
+                },
+                {
+                    "name": "Tir Cryogénique",
+                    "stats": {
+                        "isSlowing": true,
+                        "slowMultiplier": 0.4
+                    }
+                }
+            ]
+        },
+        {
+            "id": "double_shot",
+            "name": "Tir Double",
+            "type": "attack",
+            "stats": {
+                "damage": 10,
+                "fireRate": 500,
+                "projectileSpeed": 400,
+                "projectileCount": 2
+            },
+            "upgrades": [
+                {
+                    "name": "Vitesse Accrue",
+                    "stats": {
+                        "fireRate": -100
+                    }
+                },
+                {
+                    "name": "Tir Cryogénique",
+                    "stats": {
+                        "isSlowing": true,
+                        "slowMultiplier": 0.4
                     }
                 }
             ]
@@ -33,19 +90,14 @@
                 "damage": 20,
                 "fireRate": 400,
                 "projectileSpeed": 500,
-                "projectileCount": 1
+                "projectileCount": 1,
+                "piercingCount": 1
             },
             "upgrades": [
                 {
-                    "name": "Pointe Acérée",
+                    "name": "Perçage +",
                     "stats": {
-                        "damage": 10
-                    }
-                },
-                {
-                    "name": "Tir Multiple",
-                    "stats": {
-                        "projectileCount": 1
+                        "piercingCount": 2
                     }
                 }
             ]
@@ -55,45 +107,90 @@
             "name": "Bouclier de Protection",
             "type": "defense",
             "stats": {
-                "damage": 5,
+                "damage": 15,
                 "radius": 60,
-                "orbitSpeed": 2
+                "orbitSpeed": 3,
+                "projectileCount": 4,
+                "fireRate": 2000
             },
             "upgrades": [
                 {
-                    "name": "Largeur +",
+                    "name": "Satellite Supplémentaire",
                     "stats": {
-                        "radius": 20
+                        "projectileCount": 1
                     }
                 },
                 {
-                    "name": "Vitesse +",
+                    "name": "Pointe Empoisonnée",
                     "stats": {
-                        "orbitSpeed": 1
+                        "isPoisonous": true
                     }
                 }
             ]
         },
         {
             "id": "smartphone_wave",
-            "name": "Ondes Wifi",
+            "name": "Aura frozen",
             "type": "aoe",
             "stats": {
-                "damage": 15,
-                "range": 100,
-                "fireRate": 1000
+                "damage": 20,
+                "range": 85,
+                "isSlowing": true,
+                "slowMultiplier": 0.6
             },
             "upgrades": [
                 {
-                    "name": "Fréquence +",
+                    "name": "Portée +",
                     "stats": {
-                        "fireRate": -200
+                        "range": 40
                     }
                 },
                 {
+                    "name": "Ondes Toxiques",
+                    "stats": {
+                        "isPoisonous": true
+                    }
+                }
+            ]
+        },
+        {
+            "id": "smartphone_poison",
+            "name": "Aura poisson",
+            "type": "aoe",
+            "stats": {
+                "poisonDuration": 2000,
+                "poisonDamage": 200,
+                "poisonTickRate": 500,
+                "damage": 0,
+                "range": 100,
+                "isPoisonous": true,
+                "slowMultiplier": 0.6
+            },
+            "upgrades": [
+                {
                     "name": "Portée +",
                     "stats": {
-                        "range": 50
+                        "range": 40
+                    }
+                }
+            ]
+        },
+        {
+            "id": "smartphone",
+            "name": "Aura",
+            "type": "aoe",
+            "stats": {
+                "damage": 20,
+                "range": 100,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.6
+            },
+            "upgrades": [
+                {
+                    "name": "Portée +",
+                    "stats": {
+                        "range": 40
                     }
                 }
             ]

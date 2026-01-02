@@ -11,62 +11,49 @@ export class Player {
             speed: stats.speed || 200,
             hp: stats.hp || 100,
             maxHp: stats.hp || 100,
-            fireRate: stats.fireRate || 500,
-            damage: stats.damage || 10,
-            projectileSpeed: stats.projectileSpeed || 400,
             xp: 0,
             level: 1,
             xpNextLevel: 50,
-            pickupRadius: 100
+            pickupRadius: 100,
+            // Stats globales pouvant influencer les armes
+            fireRateMultiplier: 1.0,
+            damageMultiplier: 1.0
         };
 
-        this.shotTimer = 0;
         this.color = '#0af';
         this.originalColor = '#0af';
         this.lastShootDir = { dx: 0, dy: -1 };
 
-        // Système d'armes
-        this.currentWeapon = null;
-        this.weaponLevel = 1;
-        this.weaponStats = {}; // Fusion de stats de base de l'arme + bonus de niveau
+        // Système d'armes (Instances)
+        this.weapon = null;
 
         this.pendingUpgrade = false;
         this.pendingWeaponUpgrade = false;
+
+        this.activeEffects = []; // Système d'états décentralisé
     }
 
-    setWeapon(weaponData) {
-        this.currentWeapon = weaponData;
-        this.weaponLevel = 1;
-        this.updateWeaponStats();
-    }
-
-    updateWeaponStats() {
-        if (!this.currentWeapon) return;
-
-        // On repart des stats de base
-        const newStats = { ...this.currentWeapon.stats };
-
-        // On applique les upgrades accumulées jusqu'au niveau actuel
-        for (let i = 0; i < this.weaponLevel - 1; i++) {
-            const upgrade = this.currentWeapon.upgrades[i];
-            if (upgrade && upgrade.stats) {
-                for (const stat in upgrade.stats) {
-                    if (stat === 'fireRate' || stat === 'damage' || stat === 'projectileSpeed' || stat === 'projectileCount') {
-                        newStats[stat] = (newStats[stat] || 0) + upgrade.stats[stat];
-                    }
-                }
-            }
+    /**
+     * Applique un effet de statut (Poison, etc.)
+     */
+    applyEffect(effect) {
+        const existing = this.activeEffects.find(e => e.type === effect.type);
+        if (existing) {
+            existing.duration = Math.max(existing.duration, effect.duration);
+            if (effect.damagePerTick !== undefined) existing.damagePerTick = effect.damagePerTick;
+            if (effect.tickRate !== undefined) existing.tickRate = effect.tickRate;
+            if (effect.multiplier !== undefined) existing.multiplier = effect.multiplier;
+        } else {
+            this.activeEffects.push({ ...effect, tickTimer: 0 });
         }
-        this.weaponStats = newStats;
     }
 
-    upgradeWeapon() {
-        if (!this.currentWeapon) return;
-        if (this.weaponLevel < this.currentWeapon.upgrades.length + 1) {
-            this.weaponLevel++;
-            this.updateWeaponStats();
-            console.log(`Arme améliorée niveau ${this.weaponLevel} : ${this.currentWeapon.name}`);
-        }
+    /**
+     * Équipe une instance d'arme.
+     */
+    setWeapon(weaponInstance) {
+        this.weapon = weaponInstance;
+        console.log(`Arme équipée : ${this.weapon.name}`);
     }
 
     addXP(amount) {
@@ -84,46 +71,44 @@ export class Player {
         this.pendingUpgrade = true;
     }
 
-    update(deltaTime, movement, onShoot, targetDir = null) {
-        const dt = deltaTime / 1000;
-        this.x += movement.dx * this.stats.speed * dt;
-        this.y += movement.dy * this.stats.speed * dt;
+    update(deltaTime, movement, combatContext) {
+        // Gestion des effets de statut
+        let speedMultiplier = 1.0;
+        for (let i = this.activeEffects.length - 1; i >= 0; i--) {
+            const effect = this.activeEffects[i];
+            effect.duration -= deltaTime;
 
-        if (targetDir) {
-            this.lastShootDir = targetDir;
-        }
-
-        // Tir automatique basé sur l'arme équipée
-        if (this.currentWeapon && this.currentWeapon.type === 'attack') {
-            const fireInterval = this.weaponStats.fireRate || this.stats.fireRate;
-            this.shotTimer += deltaTime;
-
-            if (this.shotTimer >= fireInterval) {
-                this.shotTimer = 0;
-                if (onShoot) {
-                    const count = this.weaponStats.projectileCount || 1;
-                    if (count > 1) {
-                        const spread = 20;
-                        const perpX = -this.lastShootDir.dy;
-                        const perpY = this.lastShootDir.dx;
-                        for (let i = 0; i < count; i++) {
-                            const offset = (i - (count - 1) / 2) * spread;
-                            onShoot(
-                                this.x + perpX * offset,
-                                this.y + perpY * offset,
-                                this.lastShootDir.dx,
-                                this.lastShootDir.dy,
-                                this.weaponStats
-                            );
-                        }
-                    } else {
-                        onShoot(this.x, this.y, this.lastShootDir.dx, this.lastShootDir.dy, this.weaponStats);
-                    }
+            if (effect.type === 'poison') {
+                effect.tickTimer = (effect.tickTimer || 0) + deltaTime;
+                const tickRate = effect.tickRate || 500;
+                if (effect.tickTimer >= tickRate) {
+                    this.takeDamage(effect.damagePerTick);
+                    effect.tickTimer = 0;
                 }
+            } else if (effect.type === 'slowing') {
+                speedMultiplier = Math.min(speedMultiplier, effect.multiplier || 0.5);
+            }
+
+            if (effect.duration <= 0) {
+                this.activeEffects.splice(i, 1);
             }
         }
 
-        // Gestion des autres types d'armes (Bouclier, AOE) à venir dans Game.js/update
+        const dt = deltaTime / 1000;
+        this.x += movement.dx * (this.stats.speed * speedMultiplier) * dt;
+        this.y += movement.dy * (this.stats.speed * speedMultiplier) * dt;
+
+        if (combatContext.targetDir) {
+            this.lastShootDir = combatContext.targetDir;
+        }
+
+        // Délégation de la mise à jour à l'arme équipée
+        if (this.weapon) {
+            this.weapon.update(deltaTime, this, {
+                ...combatContext,
+                targetDir: this.lastShootDir
+            });
+        }
     }
 
     draw(ctx) {
@@ -133,28 +118,27 @@ export class Player {
         // Corps du joueur
         ctx.beginPath();
         ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
+
+        // Couleur d'état
+        if (this.activeEffects.some(e => e.type === 'poison')) {
+            ctx.fillStyle = '#0f0';
+        } else if (this.activeEffects.some(e => e.type === 'slowing')) {
+            ctx.fillStyle = '#0ff'; // Cyan pour ralentissement
+        } else {
+            ctx.fillStyle = this.color;
+        }
+
         ctx.fill();
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Rendu visuel spécifique à l'arme (Bouclier)
-        if (this.currentWeapon && this.currentWeapon.type === 'defense') {
-            const radius = this.weaponStats.radius || 60;
-            const orbitSpeed = this.weaponStats.orbitSpeed || 2;
-            const time = Date.now() / 1000;
-            const angle = time * orbitSpeed;
-
-            ctx.beginPath();
-            ctx.arc(Math.cos(angle) * radius, Math.sin(angle) * radius, 10, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-            ctx.fill();
-            ctx.strokeStyle = '#fff';
-            ctx.stroke();
-        }
-
         ctx.restore();
+
+        // Rendu visuel délégué à l'arme
+        if (this.weapon) {
+            this.weapon.draw(ctx, this);
+        }
     }
 
     takeDamage(amount) {
