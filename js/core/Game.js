@@ -15,6 +15,7 @@ const GameState = {
     MENU: 'MENU',
     PLAYING: 'PLAYING',
     UPGRADE: 'UPGRADE',
+    WEAPON_MENU: 'WEAPON_MENU', // Nouveau menu de choix d'arme
     VICTORY: 'VICTORY',
     GAMEOVER: 'GAMEOVER'
 };
@@ -106,6 +107,12 @@ class Game {
             this.player.y = this.canvas.height / 2;
             this.player.stats.hp = this.player.stats.maxHp;
         }
+
+        // Arme par défaut pour la phase
+        if (this.currentPhase.default_weapon) {
+            const weaponData = this.dataManager.getWeaponData(this.currentPhase.default_weapon);
+            if (weaponData) this.player.setWeapon(weaponData);
+        }
     }
 
     handleResize() {
@@ -119,12 +126,10 @@ class Game {
         const mouseY = e.clientY - rect.top;
 
         if (this.state === GameState.MENU) {
-            // Bouton Démarrer
             if (mouseX >= this.canvas.width / 2 - 120 && mouseX <= this.canvas.width / 2 + 120 &&
                 mouseY >= this.canvas.height / 2 - 20 && mouseY <= this.canvas.height / 2 + 40) {
                 this.startNewGame();
             }
-            // Bouton Continuer (si progrès > 0)
             const progress = this.saveSystem.getProgress();
             if (progress > 0) {
                 if (mouseX >= this.canvas.width / 2 - 120 && mouseX <= this.canvas.width / 2 + 120 &&
@@ -133,19 +138,22 @@ class Game {
                 }
             }
         } else if (this.state === GameState.UPGRADE) {
-            const menuWidth = 400;
-            const optionHeight = 80;
-            const startX = this.canvas.width / 2 - menuWidth / 2;
-            const startY = 150;
-
-            for (let i = 0; i < this.upgradeOptions.length; i++) {
-                const optY = startY + i * (optionHeight + 20);
-                if (mouseX >= startX && mouseX <= startX + menuWidth &&
-                    mouseY >= optY && mouseY <= optY + optionHeight) {
-                    this.selectUpgrade(this.upgradeOptions[i]);
-                    break;
+            this.handleChoiceMenuClick(mouseX, mouseY, 80, (choice) => {
+                this.upgradeSystem.applyUpgrade(this.player, choice);
+                this.player.pendingUpgrade = false;
+                this.state = GameState.PLAYING;
+            });
+        } else if (this.state === GameState.WEAPON_MENU) {
+            this.handleChoiceMenuClick(mouseX, mouseY, 100, (choice) => {
+                if (choice.id === 'upgrade_current') {
+                    this.player.upgradeWeapon();
+                } else {
+                    const weaponData = this.dataManager.getWeaponData(choice.id);
+                    if (weaponData) this.player.setWeapon(weaponData);
                 }
-            }
+                this.player.pendingWeaponUpgrade = false;
+                this.state = GameState.PLAYING;
+            });
         } else if (this.state === GameState.VICTORY) {
             this.saveSystem.saveProgress(this.currentPhaseIndex + 1);
             if (this.currentPhaseIndex + 1 < this.dataManager.data.phases.phases.length) {
@@ -159,10 +167,19 @@ class Game {
         }
     }
 
-    selectUpgrade(upgrade) {
-        this.upgradeSystem.applyUpgrade(this.player, upgrade);
-        this.player.pendingUpgrade = false;
-        this.state = GameState.PLAYING;
+    handleChoiceMenuClick(mouseX, mouseY, optionHeight, callback) {
+        const menuWidth = 400;
+        const startX = this.canvas.width / 2 - menuWidth / 2;
+        const startY = 150;
+
+        for (let i = 0; i < this.upgradeOptions.length; i++) {
+            const optY = startY + i * (optionHeight + 20);
+            if (mouseX >= startX && mouseX <= startX + menuWidth &&
+                mouseY >= optY && mouseY <= optY + optionHeight) {
+                callback(this.upgradeOptions[i]);
+                break;
+            }
+        }
     }
 
     loop(currentTime) {
@@ -187,6 +204,11 @@ class Game {
             return;
         }
 
+        if (this.player && this.player.pendingWeaponUpgrade) {
+            this.openWeaponMenu();
+            return;
+        }
+
         if (this.player && this.player.stats.hp <= 0) {
             this.state = GameState.GAMEOVER;
             return;
@@ -199,7 +221,7 @@ class Game {
             this.spawnBoss();
         }
 
-        // Cible
+        // Cible pour tir auto
         let targetDir = null;
         if (this.player) {
             let potentialTargets = this.boss ? [this.boss] : this.enemies;
@@ -223,17 +245,32 @@ class Game {
 
         // Joueur
         if (this.player) {
-            this.player.update(deltaTime, movement, (x, y, dx, dy) => {
-                this.spawnProjectile(x, y, dx, dy);
+            this.player.update(deltaTime, movement, (x, y, dx, dy, ws) => {
+                this.spawnProjectile(x, y, dx, dy, ws);
             }, targetDir);
 
-            if (this.player.x < this.player.radius) this.player.x = this.player.radius;
-            if (this.player.x > this.canvas.width - this.player.radius) this.player.x = this.canvas.width - this.player.radius;
-            if (this.player.y < this.player.radius) this.player.y = this.player.radius;
-            if (this.player.y > this.canvas.height - this.player.radius) this.player.y = this.canvas.height - this.player.radius;
+            this.constrainPlayer();
+
+            // Logique de bouclier (Défense)
+            if (this.player.currentWeapon && this.player.currentWeapon.type === 'defense') {
+                const radius = this.player.weaponStats.radius || 60;
+                const time = Date.now() / 1000;
+                const angle = time * (this.player.weaponStats.orbitSpeed || 2);
+                const shieldX = this.player.x + Math.cos(angle) * radius;
+                const shieldY = this.player.y + Math.sin(angle) * radius;
+
+                // Collision bouclier-ennemis
+                this.enemies.forEach(e => {
+                    const dx = e.x - shieldX;
+                    const dy = e.y - shieldY;
+                    if (Math.sqrt(dx * dx + dy * dy) < (15 + e.radius)) {
+                        e.takeDamage(this.player.weaponStats.damage || 5);
+                    }
+                });
+            }
         }
 
-        // Spawn ennemis classiques
+        // Spawns
         if (!this.boss) {
             this.spawnTimer += deltaTime;
             if (this.spawnTimer >= this.currentPhase.spawn_rate) {
@@ -242,6 +279,17 @@ class Game {
             }
         }
 
+        this.updateGameEntities(deltaTime);
+    }
+
+    constrainPlayer() {
+        if (this.player.x < this.player.radius) this.player.x = this.player.radius;
+        if (this.player.x > this.canvas.width - this.player.radius) this.player.x = this.canvas.width - this.player.radius;
+        if (this.player.y < this.player.radius) this.player.y = this.player.radius;
+        if (this.player.y > this.canvas.height - this.player.radius) this.player.y = this.canvas.height - this.player.radius;
+    }
+
+    updateGameEntities(deltaTime) {
         // Projectiles joueur
         for (let i = this.projectiles.length - 1; i >= 0; i--) {
             const p = this.projectiles[i];
@@ -274,7 +322,11 @@ class Game {
             }
             l.update(deltaTime, { x: this.player ? this.player.x : 0, y: this.player ? this.player.y : 0 });
             if (l.toRemove && this.player) {
-                this.player.addXP(l.value);
+                if (l.type === 'xp') {
+                    this.player.addXP(l.value);
+                } else if (l.type === 'weapon') {
+                    this.player.pendingWeaponUpgrade = true;
+                }
                 this.loots.splice(i, 1);
             }
         }
@@ -300,7 +352,8 @@ class Game {
             if (e.toRemove) {
                 if (e.hp <= 0) {
                     this.killCount++;
-                    this.spawnLoot(e.x, e.y, e.xpValue);
+                    const isRare = Math.random() < 0.05; // 5% chance pour tester
+                    this.spawnLoot(e.x, e.y, e.xpValue, isRare ? 'weapon' : 'xp');
                 }
                 this.enemies.splice(i, 1);
             }
@@ -308,33 +361,58 @@ class Game {
 
         // Boss
         if (this.boss) {
-            this.boss.update(deltaTime, { x: this.player ? this.player.x : 0, y: this.player ? this.player.y : 0 }, (x, y, dx, dy) => {
-                this.spawnEnemyProjectile(x, y, dx, dy);
-            });
+            this.updateBoss(deltaTime);
+        }
+    }
 
-            if (this.player && this.checkCollision(this.player, this.boss)) {
-                this.player.takeDamage(this.boss.damage * (deltaTime / 1000));
-            }
+    updateBoss(deltaTime) {
+        this.boss.update(deltaTime, { x: this.player ? this.player.x : 0, y: this.player ? this.player.y : 0 }, (x, y, dx, dy) => {
+            this.spawnEnemyProjectile(x, y, dx, dy);
+        });
 
-            for (let j = this.projectiles.length - 1; j >= 0; j--) {
-                const p = this.projectiles[j];
-                if (this.checkCollision(p, this.boss)) {
-                    this.boss.takeDamage(p.damage);
-                    p.toRemove = true;
-                }
-            }
+        if (this.player && this.checkCollision(this.player, this.boss)) {
+            this.player.takeDamage(this.boss.damage * (deltaTime / 1000));
+        }
 
-            if (this.boss.hp <= 0) {
-                this.killCount++;
-                this.state = GameState.VICTORY;
-                this.boss = null;
+        for (let j = this.projectiles.length - 1; j >= 0; j--) {
+            const p = this.projectiles[j];
+            if (this.checkCollision(p, this.boss)) {
+                this.boss.takeDamage(p.damage);
+                p.toRemove = true;
             }
+        }
+
+        if (this.boss.hp <= 0) {
+            this.killCount++;
+            this.state = GameState.VICTORY;
+            this.boss = null;
         }
     }
 
     openUpgradeMenu() {
         this.state = GameState.UPGRADE;
         this.upgradeOptions = this.upgradeSystem.getRandomOptions(3);
+    }
+
+    openWeaponMenu() {
+        this.state = GameState.WEAPON_MENU;
+        // Options : Armes dispo dans la phase + "Améliorer arme actuelle"
+        const phaseWeapons = this.currentPhase.available_weapons || [];
+        const options = phaseWeapons
+            .map(id => this.dataManager.getWeaponData(id))
+            .filter(w => w && w.id !== this.player.currentWeapon?.id)
+            .slice(0, 2);
+
+        // On ajoute toujours l'option d'amélioration si possible
+        if (this.player.currentWeapon && this.player.weaponLevel < this.player.currentWeapon.upgrades.length + 1) {
+            options.push({
+                id: 'upgrade_current',
+                name: `Améliorer ${this.player.currentWeapon.name}`,
+                description: `Passe au niveau ${this.player.weaponLevel + 1}`
+            });
+        }
+
+        this.upgradeOptions = options;
     }
 
     spawnBoss() {
@@ -358,15 +436,12 @@ class Game {
         this.enemies.push(new Enemy(x, y, enemyConfig));
     }
 
-    spawnLoot(x, y, value) {
-        this.loots.push(new Loot(x, y, value));
+    spawnLoot(x, y, value, type = 'xp') {
+        this.loots.push(new Loot(x, y, value, type));
     }
 
-    spawnProjectile(x, y, dx, dy) {
-        this.projectiles.push(new Projectile(x, y, dx, dy, {
-            speed: this.player.stats.projectileSpeed,
-            damage: this.player.stats.damage
-        }));
+    spawnProjectile(x, y, dx, dy, stats) {
+        this.projectiles.push(new Projectile(x, y, dx, dy, stats));
     }
 
     spawnEnemyProjectile(x, y, dx, dy) {
@@ -390,7 +465,6 @@ class Game {
             return;
         }
 
-        // Rendu du jeu
         this.loots.forEach(l => l.draw(this.ctx));
         this.projectiles.forEach(p => p.draw(this.ctx));
         this.enemyProjectiles.forEach(ep => ep.draw(this.ctx));
@@ -405,12 +479,12 @@ class Game {
         this.input.draw(this.ctx);
 
         if (this.state === GameState.UPGRADE) this.drawUpgradeMenu();
+        if (this.state === GameState.WEAPON_MENU) this.drawWeaponMenu();
         if (this.state === GameState.VICTORY) this.drawVictoryScreen();
         if (this.state === GameState.GAMEOVER) this.drawGameOver();
     }
 
     drawMenu() {
-        // Titre
         this.ctx.fillStyle = 'white';
         this.ctx.font = 'bold 64px Arial';
         this.ctx.textAlign = 'center';
@@ -419,14 +493,12 @@ class Game {
         this.ctx.fillStyle = '#aaa';
         this.ctx.fillText('Prêt pour la grande aventure ?', this.canvas.width / 2, this.canvas.height / 2 - 70);
 
-        // Bouton Start
         this.ctx.fillStyle = '#0af';
         this.ctx.fillRect(this.canvas.width / 2 - 120, this.canvas.height / 2 - 20, 240, 60);
         this.ctx.fillStyle = 'white';
         this.ctx.font = 'bold 24px Arial';
         this.ctx.fillText('NOUVELLE VIE', this.canvas.width / 2, this.canvas.height / 2 + 18);
 
-        // Bouton Continue (si progrès)
         const progress = this.saveSystem.getProgress();
         if (progress > 0) {
             this.ctx.fillStyle = '#f0a';
@@ -438,7 +510,6 @@ class Game {
     }
 
     drawUI() {
-        // Barre de vie Joueur
         const hw = 200;
         this.ctx.fillStyle = '#333';
         this.ctx.fillRect(this.canvas.width / 2 - hw / 2, 25, hw, 15);
@@ -448,14 +519,12 @@ class Game {
         this.ctx.strokeStyle = '#fff';
         this.ctx.strokeRect(this.canvas.width / 2 - hw / 2, 25, hw, 15);
 
-        // Barre d'XP
         this.ctx.fillStyle = '#222';
         this.ctx.fillRect(0, 0, this.canvas.width, 10);
         this.ctx.fillStyle = '#0af';
         const xpWidth = (this.player.stats.xp / this.player.stats.xpNextLevel) * this.canvas.width;
         this.ctx.fillRect(0, 0, xpWidth, 10);
 
-        // Timer
         this.ctx.fillStyle = 'white';
         this.ctx.font = 'bold 16px Arial';
         this.ctx.textAlign = 'center';
@@ -463,9 +532,9 @@ class Game {
         const mins = Math.floor(remaining / 60);
         const secs = Math.floor(remaining % 60);
         const timerText = this.boss ? "BOSS EN COURS !" : `BOSS DANS: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
-        this.ctx.fillText(`${this.currentPhase.name.toUpperCase()} | ${timerText}`, this.canvas.width / 2, 60);
+        this.ctx.fillText(`${this.currentPhase.name.toUpperCase()} | ${this.player.currentWeapon?.name || 'Pas d\'arme'} Lvl.${this.player.weaponLevel}`, this.canvas.width / 2, 60);
+        this.ctx.fillText(timerText, this.canvas.width / 2, 80);
 
-        // Stats
         this.ctx.textAlign = 'left';
         this.ctx.fillText(`NIVEAU: ${this.player.stats.level}`, 20, 30);
         this.ctx.textAlign = 'right';
@@ -473,31 +542,39 @@ class Game {
     }
 
     drawUpgradeMenu() {
+        this.drawChoiceMenu('AMÉLIORATION DISPONIBLE !', '#0af');
+    }
+
+    drawWeaponMenu() {
+        this.drawChoiceMenu('CADEAU D\'ARME !', '#ffd700', 100);
+    }
+
+    drawChoiceMenu(title, color, optionHeight = 80) {
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle = '#0af';
+        this.ctx.fillStyle = color;
         this.ctx.font = 'bold 32px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('AMÉLIORATION DISPONIBLE !', this.canvas.width / 2, 100);
+        this.ctx.fillText(title, this.canvas.width / 2, 100);
 
         const menuWidth = 400;
-        const optionHeight = 80;
         const startX = this.canvas.width / 2 - menuWidth / 2;
         const startY = 150;
+
         this.upgradeOptions.forEach((opt, i) => {
             const optY = startY + i * (optionHeight + 20);
             this.ctx.fillStyle = '#222';
-            this.ctx.strokeStyle = '#0af';
+            this.ctx.strokeStyle = color;
             this.ctx.lineWidth = 3;
             this.ctx.fillRect(startX, optY, menuWidth, optionHeight);
             this.ctx.strokeRect(startX, optY, menuWidth, optionHeight);
             this.ctx.fillStyle = 'white';
             this.ctx.font = 'bold 18px Arial';
             this.ctx.textAlign = 'left';
-            this.ctx.fillText(opt.name, startX + 20, optY + 30);
+            this.ctx.fillText(opt.name, startX + 20, optY + 35);
             this.ctx.font = '14px Arial';
             this.ctx.fillStyle = '#aaa';
-            this.ctx.fillText(opt.description, startX + 20, optY + 55);
+            this.ctx.fillText(opt.description || 'Amélioration de niveau', startX + 20, optY + 65);
         });
     }
 

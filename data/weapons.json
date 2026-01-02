@@ -1,0 +1,102 @@
+{
+    "weapons": [
+        {
+            "id": "basic_shot",
+            "name": "Tir de Base",
+            "type": "attack",
+            "stats": {
+                "damage": 10,
+                "fireRate": 500,
+                "projectileSpeed": 400,
+                "projectileCount": 1
+            },
+            "upgrades": [
+                {
+                    "name": "Vitesse Accrue",
+                    "stats": {
+                        "fireRate": -100
+                    }
+                },
+                {
+                    "name": "Double Tir",
+                    "stats": {
+                        "projectileCount": 1
+                    }
+                }
+            ]
+        },
+        {
+            "id": "pen_launcher",
+            "name": "Lance-Stylos",
+            "type": "attack",
+            "stats": {
+                "damage": 20,
+                "fireRate": 400,
+                "projectileSpeed": 500,
+                "projectileCount": 1
+            },
+            "upgrades": [
+                {
+                    "name": "Pointe Acérée",
+                    "stats": {
+                        "damage": 10
+                    }
+                },
+                {
+                    "name": "Tir Multiple",
+                    "stats": {
+                        "projectileCount": 1
+                    }
+                }
+            ]
+        },
+        {
+            "id": "shield_orbit",
+            "name": "Bouclier de Protection",
+            "type": "defense",
+            "stats": {
+                "damage": 5,
+                "radius": 60,
+                "orbitSpeed": 2
+            },
+            "upgrades": [
+                {
+                    "name": "Largeur +",
+                    "stats": {
+                        "radius": 20
+                    }
+                },
+                {
+                    "name": "Vitesse +",
+                    "stats": {
+                        "orbitSpeed": 1
+                    }
+                }
+            ]
+        },
+        {
+            "id": "smartphone_wave",
+            "name": "Ondes Wifi",
+            "type": "aoe",
+            "stats": {
+                "damage": 15,
+                "range": 100,
+                "fireRate": 1000
+            },
+            "upgrades": [
+                {
+                    "name": "Fréquence +",
+                    "stats": {
+                        "fireRate": -200
+                    }
+                },
+                {
+                    "name": "Portée +",
+                    "stats": {
+                        "range": 50
+                    }
+                }
+            ]
+        }
+    ]
+}

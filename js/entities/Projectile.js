@@ -1,6 +1,6 @@
 /**
  * Projectile Class
- * Gère le mouvement et l'affichage des balles.
+ * Gère le mouvement et l'affichage des projectiles tirés.
  */
 export class Projectile {
     constructor(x, y, dx, dy, stats) {
@@ -8,13 +8,15 @@ export class Projectile {
         this.y = y;
         this.dx = dx;
         this.dy = dy;
-
         this.speed = stats.speed || 400;
         this.damage = stats.damage || 10;
-        this.radius = stats.radius || 5;
+        this.radius = 5;
         this.color = stats.color || '#ff0'; // Jaune par défaut
-
         this.toRemove = false;
+
+        // Effets spéciaux
+        this.isExplosive = stats.isExplosive || false;
+        this.isPoisonous = stats.isPoisonous || false;
     }
 
     update(deltaTime) {
@@ -26,16 +28,34 @@ export class Projectile {
     draw(ctx) {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
+
+        if (this.isPoisonous) {
+            ctx.fillStyle = '#0f0'; // Vert pour le poison
+        } else if (this.isExplosive) {
+            ctx.fillStyle = '#f50'; // Rouge-orange pour explosif
+        } else {
+            ctx.fillStyle = this.color;
+        }
+
         ctx.fill();
+
+        // Traînée ou halo selon l'effet
+        if (this.isExplosive || this.isPoisonous) {
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.strokeStyle = '#fff';
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
     }
 
     isOutOfBounds(width, height) {
+        const margin = 50;
         return (
-            this.x < -this.radius ||
-            this.x > width + this.radius ||
-            this.y < -this.radius ||
-            this.y > height + this.radius
+            this.x < -margin ||
+            this.x > width + margin ||
+            this.y < -margin ||
+            this.y > height + margin
         );
     }
 }

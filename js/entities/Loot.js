@@ -7,15 +7,15 @@ export class Loot {
         this.x = x;
         this.y = y;
         this.value = value;
-        this.type = type;
-        this.radius = 6;
+        this.type = type; // 'xp' ou 'weapon'
+        this.radius = type === 'xp' ? 6 : 12;
         this.toRemove = false;
 
         // Pour l'animation de magnétisme
         this.isFollowing = false;
         this.followSpeed = 500;
 
-        this.color = (type === 'xp') ? '#0f0' : '#f0f';
+        this.color = (type === 'xp') ? '#0f0' : '#ffd700';
     }
 
     update(deltaTime, playerPos) {
@@ -35,14 +35,49 @@ export class Loot {
     }
 
     draw(ctx) {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
+        if (this.type === 'xp') {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        } else {
+            // Dessin d'une étoile pour le butin rare
+            this.drawStar(ctx, this.x, this.y, 5, this.radius, this.radius / 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
 
-        // Petit effet de brillance
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1;
-        ctx.stroke();
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#ffd700';
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+    }
+
+    drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+        let rot = Math.PI / 2 * 3;
+        let x = cx;
+        let y = cy;
+        let step = Math.PI / spikes;
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - outerRadius);
+        for (let i = 0; i < spikes; i++) {
+            x = cx + Math.cos(rot) * outerRadius;
+            y = cy + Math.sin(rot) * outerRadius;
+            ctx.lineTo(x, y);
+            rot += step;
+
+            x = cx + Math.cos(rot) * innerRadius;
+            y = cy + Math.sin(rot) * innerRadius;
+            ctx.lineTo(x, y);
+            rot += step;
+        }
+        ctx.lineTo(cx, cy - outerRadius);
+        ctx.closePath();
     }
 }

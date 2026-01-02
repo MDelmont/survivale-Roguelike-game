@@ -1,10 +1,10 @@
 /**
  * UpgradeSystem Class
- * Gère la génération et l'application des améliorations du joueur.
+ * Gère la génération et l'application des améliorations de statistiques du joueur.
  */
 export class UpgradeSystem {
     constructor() {
-        // Liste des upgrades disponibles pour le MVP
+        // Liste des upgrades de statistiques de base
         this.availableUpgrades = [
             {
                 id: 'speed_boost',
@@ -17,7 +17,7 @@ export class UpgradeSystem {
             {
                 id: 'damage_boost',
                 name: 'Force de la Nature',
-                description: 'Augmente les dégâts de 20%.',
+                description: 'Augmente les dégâts globaux de 20%.',
                 type: 'stat',
                 stat: 'damage',
                 multiplier: 1.2
@@ -25,10 +25,10 @@ export class UpgradeSystem {
             {
                 id: 'fire_rate_boost',
                 name: 'Caféine',
-                description: 'Tire 15% plus vite.',
+                description: 'Tire 15% plus vite (toutes armes).',
                 type: 'stat',
                 stat: 'fireRate',
-                multiplier: 0.85 // Temps entre tirs réduit
+                multiplier: 0.85
             },
             {
                 id: 'max_hp_boost',
@@ -50,7 +50,7 @@ export class UpgradeSystem {
     }
 
     /**
-     * Retourne 3 options aléatoires pour le menu d'upgrade.
+     * Retourne X options aléatoires pour les statistiques.
      */
     getRandomOptions(count = 3) {
         const shuffled = [...this.availableUpgrades].sort(() => 0.5 - Math.random());
@@ -58,7 +58,7 @@ export class UpgradeSystem {
     }
 
     /**
-     * Applique une upgrade au joueur.
+     * Applique une amélioration de statistique au joueur.
      */
     applyUpgrade(player, upgrade) {
         if (upgrade.type === 'stat') {
@@ -67,12 +67,11 @@ export class UpgradeSystem {
             }
             if (upgrade.add) {
                 player.stats[upgrade.stat] += upgrade.add;
-                // Si on augmente les HP max, on soigne du même montant
                 if (upgrade.stat === 'maxHp') {
-                    player.stats.hp += upgrade.add;
+                    player.stats.hp += upgrade.add; // Soit soigné du montant ajouté
                 }
             }
         }
-        console.log(`Upgrade appliquée : ${upgrade.name}`);
+        console.log(`Statistique augmentée : ${upgrade.name}`);
     }
 }

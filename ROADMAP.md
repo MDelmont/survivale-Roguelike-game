@@ -59,3 +59,11 @@ Cette roadmap détaille les étapes de développement par jalons testables. Chaq
 - [x] Création du contenu final pour les 6 phases (Spermatozoïde -> Mariage).
 - [x] Intégration des assets visuels (si disponibles).
 - [x] **Test** : Jeu complet jouable de bout en bout.
+
+## Étape 11 : Système d'Armes Data-Driven
+- [x] Documenter le nouveau système d'armes (`09_specialisations_armes.md`).
+- [x] Créer `data/weapons.json` et configurer les armes par phase dans `phases.json`.
+- [x] Charger les armes via `DataManager.js`.
+- [x] Implémenter le changement d'arme auto au début de phase.
+- [x] Créer le menu de loot d'arme (Nouvelle Arme vs Amélioration).
+- [x] Implémenter les différents types d'armes (Attaque, Bouclier, AOE).

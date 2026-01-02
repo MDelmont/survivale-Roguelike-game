@@ -13,12 +13,31 @@ export class Enemy {
         this.damage = stats.damage || 5;
         this.xpValue = stats.xpValue || 10;
         this.color = stats.color || '#f00'; // Rouge par défaut
-
         this.toRemove = false;
+
+        this.activeEffects = []; // Pour le poison, etc.
     }
 
     update(deltaTime, playerPos) {
         const dt = deltaTime / 1000;
+
+        // Gestion des effets (Poison)
+        for (let i = this.activeEffects.length - 1; i >= 0; i--) {
+            const effect = this.activeEffects[i];
+            effect.duration -= deltaTime;
+
+            if (effect.type === 'poison') {
+                effect.timer += deltaTime;
+                if (effect.timer >= 500) { // Un "tick" toutes les 0.5s
+                    this.takeDamage(effect.damagePerTick);
+                    effect.timer = 0;
+                }
+            }
+
+            if (effect.duration <= 0) {
+                this.activeEffects.splice(i, 1);
+            }
+        }
 
         // Comportement simple : foncer vers le joueur
         const dx = playerPos.x - this.x;
@@ -38,19 +57,31 @@ export class Enemy {
     draw(ctx) {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
 
-        // Petite barre de vie au-dessus de l'ennemi (optionnel pour MVP mais aide au test)
-        /*
-        ctx.fillStyle = '#000';
-        ctx.fillRect(this.x - 10, this.y - 20, 20, 4);
-        ctx.fillStyle = '#0f0';
-        ctx.fillRect(this.x - 10, this.y - 20, (this.hp / 20) * 20, 4);
-        */
+        // Indicateur visuel si empoisonné
+        if (this.activeEffects.some(e => e.type === 'poison')) {
+            ctx.fillStyle = '#0f0';
+        } else {
+            ctx.fillStyle = this.color;
+        }
+
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1;
+        ctx.stroke();
     }
 
     takeDamage(amount) {
         this.hp -= amount;
+    }
+
+    applyEffect(effect) {
+        // Évite de cumuler le même poison, on reset juste la durée
+        const existing = this.activeEffects.find(e => e.type === effect.type);
+        if (existing) {
+            existing.duration = effect.duration;
+        } else {
+            this.activeEffects.push({ ...effect, timer: 0 });
+        }
     }
 }

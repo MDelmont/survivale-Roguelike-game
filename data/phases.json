@@ -9,6 +9,11 @@
                 "fast_cell"
             ],
             "spawn_rate": 1500,
+            "default_weapon": "basic_shot",
+            "available_weapons": [
+                "basic_shot",
+                "shield_orbit"
+            ],
             "boss": {
                 "name": "L'Ovule Géant",
                 "hp": 500,
@@ -26,6 +31,11 @@
                 "tank_baby"
             ],
             "spawn_rate": 1200,
+            "default_weapon": "basic_shot",
+            "available_weapons": [
+                "basic_shot",
+                "shield_orbit"
+            ],
             "boss": {
                 "name": "La Purée de Brocolis",
                 "hp": 1000,
@@ -44,6 +54,11 @@
                 "tank_school"
             ],
             "spawn_rate": 1000,
+            "default_weapon": "pen_launcher",
+            "available_weapons": [
+                "pen_launcher",
+                "shield_orbit"
+            ],
             "boss": {
                 "name": "Le Prof de Maths",
                 "hp": 2000,
@@ -62,6 +77,11 @@
                 "tank_teen"
             ],
             "spawn_rate": 800,
+            "default_weapon": "pen_launcher",
+            "available_weapons": [
+                "pen_launcher",
+                "smartphone_wave"
+            ],
             "boss": {
                 "name": "La Crise de Révolte",
                 "hp": 4000,
@@ -80,6 +100,11 @@
                 "tank_adult"
             ],
             "spawn_rate": 700,
+            "default_weapon": "smartphone_wave",
+            "available_weapons": [
+                "smartphone_wave",
+                "pen_launcher"
+            ],
             "boss": {
                 "name": "Le Burn-out",
                 "hp": 8000,
@@ -98,6 +123,12 @@
                 "tank_wedding"
             ],
             "spawn_rate": 600,
+            "default_weapon": "smartphone_wave",
+            "available_weapons": [
+                "smartphone_wave",
+                "pen_launcher",
+                "shield_orbit"
+            ],
             "boss": {
                 "name": "Le Prêtre Interminable",
                 "hp": 20000,
