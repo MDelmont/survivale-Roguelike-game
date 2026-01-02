@@ -90,10 +90,9 @@ class Game {
             this.player.stats.hp = this.player.stats.maxHp;
         }
 
-        // Arme par défaut via Factory
         if (this.currentPhase.default_weapon) {
             const weaponData = this.dataManager.getWeaponData(this.currentPhase.default_weapon);
-            this.player.setWeapon(WeaponFactory.create(weaponData));
+            this.player.addWeapon(WeaponFactory.create(weaponData));
         }
     }
 
@@ -118,10 +117,13 @@ class Game {
             });
         } else if (this.state === GameState.WEAPON_MENU) {
             this.handleChoiceMenuClick(mouseX, mouseY, 100, (choice) => {
-                if (choice.id === 'upgrade_current') {
-                    this.player.weapon.upgrade();
+                if (choice.type === 'upgrade') {
+                    // Amélioration d'une arme existante spécifique
+                    const weapon = this.player.weapons.find(w => w.id === choice.weaponId);
+                    if (weapon) weapon.upgrade();
                 } else {
-                    this.player.setWeapon(WeaponFactory.create(choice));
+                    // Ajout d'une nouvelle arme à l'arsenal
+                    this.player.addWeapon(WeaponFactory.create(choice));
                 }
                 this.player.pendingWeaponUpgrade = false;
                 this.state = GameState.PLAYING;
@@ -280,11 +282,36 @@ class Game {
     handleAOE(x, y, r, d) { CombatSystem.handleAOE({ x, y, radius: r, damage: d, enemies: this.enemies, boss: this.boss, explosions: this.explosions }); }
     openUpgradeMenu() { this.state = GameState.UPGRADE; this.upgradeOptions = this.upgradeSystem.getRandomOptions(3); }
     openWeaponMenu() {
-        const pool = (this.currentPhase.available_weapons || []).map(id => this.dataManager.getWeaponData(id)).filter(w => w && w.id !== this.player.weapon?.id);
-        this.upgradeOptions = pool.slice(0, 2);
-        if (this.player.weapon && this.player.weapon.level <= (this.player.weapon.upgrades?.length || 0)) {
-            this.upgradeOptions.push({ id: 'upgrade_current', name: `Améliorer ${this.player.weapon.name}`, description: `Niveau ${this.player.weapon.level + 1}`, level: this.player.weapon.level + 1 });
+        this.upgradeOptions = [];
+
+        // 1. Proposer de nouvelles armes que le joueur n'a pas encore
+        const availablePool = (this.currentPhase.available_weapons || [])
+            .filter(id => !this.player.weapons.find(w => w.id === id))
+            .map(id => this.dataManager.getWeaponData(id))
+            .filter(w => w);
+
+        // Prendre max 2 nouvelles armes aléatoires
+        const newWeapons = availablePool.sort(() => 0.5 - Math.random()).slice(0, 2);
+        this.upgradeOptions.push(...newWeapons);
+
+        // 2. Proposer une amélioration pour une arme déjà possédée (si elle a encore des niveaux)
+        const upgradeableWeapons = this.player.weapons.filter(w => w.level <= (w.upgrades?.length || 0));
+        if (upgradeableWeapons.length > 0) {
+            const weaponToUpgrade = upgradeableWeapons[Math.floor(Math.random() * upgradeableWeapons.length)];
+            this.upgradeOptions.push({
+                type: 'upgrade',
+                weaponId: weaponToUpgrade.id,
+                name: `Améliorer ${weaponToUpgrade.name}`,
+                description: `Passe au niveau ${weaponToUpgrade.level + 1}`
+            });
         }
+
+        // S'assurer qu'on a au moins 2 options (cas rare où toutes les armes sont maxées)
+        if (this.upgradeOptions.length < 2 && availablePool.length === 0) {
+            this.upgradeOptions.push({ name: 'Bonus XP', description: 'Toutes les armes sont au maximum !', id: 'bonus_xp' });
+        }
+
+        this.state = GameState.WEAPON_MENU;
     }
 
     spawnBoss() { const c = this.currentPhase.boss; this.boss = new Boss(this.canvas.width / 2, -100, { ...c, color: '#f0f' }); }
@@ -296,7 +323,12 @@ class Game {
         else if (side === 1) { x = Math.random() * this.canvas.width; y = this.canvas.height + 50; }
         else if (side === 2) { x = -50; y = Math.random() * this.canvas.height; }
         else { x = this.canvas.width + 50; y = Math.random() * this.canvas.height; }
-        this.enemies.push(new Enemy(x, y, this.dataManager.getEnemyData(type)));
+        const enemyData = this.dataManager.getEnemyData(type);
+        if (!enemyData) {
+            console.error(`Type d'ennemi inconnu : ${type}`);
+            return;
+        }
+        this.enemies.push(new Enemy(x, y, enemyData));
     }
 
     spawnLoot(x, y, v, t) { this.loots.push(new Loot(x, y, v, t)); }
@@ -432,9 +464,11 @@ class Game {
         ctx.fillText(`PHASE: ${this.currentPhaseIndex + 1} - ${this.currentPhase.name}`, 50, 50);
         ctx.fillText(`KILLS: ${this.killCount}`, 50, 70);
 
-        if (this.player.weapon) {
+        if (this.player.weapons.length > 0) {
             ctx.textAlign = 'right';
-            ctx.fillText(`ARME: ${this.player.weapon.name} (LVL ${this.player.weapon.level})`, this.canvas.width - 50, 50);
+            this.player.weapons.forEach((w, i) => {
+                ctx.fillText(`${w.name} (LVL ${w.level})`, this.canvas.width - 50, 50 + i * 20);
+            });
         }
     }
 

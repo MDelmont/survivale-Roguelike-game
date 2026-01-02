@@ -6,13 +6,13 @@ export class Enemy {
     constructor(x, y, stats) {
         this.x = x;
         this.y = y;
-        this.stats = stats;
-        this.radius = stats.radius || 15;
-        this.hp = stats.hp || 20;
-        this.speed = (stats.speed !== undefined) ? stats.speed : 100;
-        this.damage = stats.damage || 5;
-        this.xpValue = stats.xpValue || 10;
-        this.color = stats.color || '#f00'; // Rouge par défaut
+        this.stats = stats || { hp: 10, speed: 100, radius: 10, color: '#f00' };
+        this.radius = this.stats.radius || 15;
+        this.hp = this.stats.hp || 20;
+        this.speed = (this.stats.speed !== undefined) ? this.stats.speed : 100;
+        this.damage = this.stats.damage || 5;
+        this.xpValue = this.stats.xpValue || 10;
+        this.color = this.stats.color || '#f00'; // Rouge par défaut
         this.toRemove = false;
 
         this.activeEffects = []; // Pour le poison, etc.

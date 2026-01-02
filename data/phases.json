@@ -12,7 +12,9 @@
             "default_weapon": "basic_shot",
             "available_weapons": [
                 "basic_shot",
-                "poison_shot"
+                "poison_shot",
+                "double_shot",
+                "shield_orbit"
             ],
             "boss": {
                 "name": "L'Ovule Géant",

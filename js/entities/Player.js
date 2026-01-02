@@ -24,8 +24,8 @@ export class Player {
         this.originalColor = '#0af';
         this.lastShootDir = { dx: 0, dy: -1 };
 
-        // Système d'armes (Instances)
-        this.weapon = null;
+        // Système d'armes (Arsenal)
+        this.weapons = [];
 
         this.pendingUpgrade = false;
         this.pendingWeaponUpgrade = false;
@@ -49,11 +49,15 @@ export class Player {
     }
 
     /**
-     * Équipe une instance d'arme.
+     * Ajoute une nouvelle arme à l'arsenal ou l'ignore si déjà présente.
      */
-    setWeapon(weaponInstance) {
-        this.weapon = weaponInstance;
-        console.log(`Arme équipée : ${this.weapon.name}`);
+    addWeapon(weaponInstance) {
+        if (!weaponInstance) return;
+        const exists = this.weapons.find(w => w.id === weaponInstance.id);
+        if (!exists) {
+            this.weapons.push(weaponInstance);
+            console.log(`Nouvelle arme ajoutée : ${weaponInstance.name}`);
+        }
     }
 
     addXP(amount) {
@@ -102,13 +106,13 @@ export class Player {
             this.lastShootDir = combatContext.targetDir;
         }
 
-        // Délégation de la mise à jour à l'arme équipée
-        if (this.weapon) {
-            this.weapon.update(deltaTime, this, {
+        // Mise à jour de TOUTES les armes de l'arsenal
+        this.weapons.forEach(w => {
+            w.update(deltaTime, this, {
                 ...combatContext,
                 targetDir: this.lastShootDir
             });
-        }
+        });
     }
 
     draw(ctx) {
@@ -135,10 +139,10 @@ export class Player {
 
         ctx.restore();
 
-        // Rendu visuel délégué à l'arme
-        if (this.weapon) {
-            this.weapon.draw(ctx, this);
-        }
+        // Rendu visuel de TOUTES les armes
+        this.weapons.forEach(w => {
+            w.draw(ctx, this);
+        });
     }
 
     takeDamage(amount) {
