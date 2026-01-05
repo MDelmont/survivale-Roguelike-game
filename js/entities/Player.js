@@ -1,9 +1,11 @@
+import { Animator } from './Animator.js';
+
 /**
  * Player Class
  * Gère l'affichage, le mouvement et les stats du joueur.
  */
 export class Player {
-    constructor(x, y, stats) {
+    constructor(x, y, stats, assetManager) {
         this.x = x;
         this.y = y;
         this.radius = 20;
@@ -26,6 +28,12 @@ export class Player {
         this.color = '#0af';
         this.originalColor = '#0af';
         this.lastShootDir = { dx: 0, dy: -1 };
+
+        // Système d'animation data-driven
+        this.visuals = stats.visuals;
+        this.animator = this.visuals ? new Animator(this.visuals, assetManager) : null;
+        this.velocity = { x: 0, y: 0 };
+        this.isHurt = false;
 
         // Système d'armes (Arsenal)
         this.weapons = [];
@@ -102,11 +110,32 @@ export class Player {
         }
 
         const dt = deltaTime / 1000;
-        this.x += movement.dx * (this.stats.speed * speedMultiplier) * dt;
-        this.y += movement.dy * (this.stats.speed * speedMultiplier) * dt;
+        this.velocity.x = movement.dx * (this.stats.speed * speedMultiplier);
+        this.velocity.y = movement.dy * (this.stats.speed * speedMultiplier);
+        
+        // Mise à jour de l'angle si le joueur bouge
+        if (movement.dx !== 0 || movement.dy !== 0) {
+            this.angle = Math.atan2(movement.dy, movement.dx);
+        }
+        
+        this.x += this.velocity.x * dt;
+        this.y += this.velocity.y * dt;
 
         if (combatContext.targetDir) {
             this.lastShootDir = combatContext.targetDir;
+            // Si on ne bouge pas, on s'oriente vers la cible de tir
+            if (movement.dx === 0 && movement.dy === 0) {
+                this.angle = Math.atan2(this.lastShootDir.dy, this.lastShootDir.dx);
+            }
+        }
+
+        // Mise à jour de l'animateur
+        if (this.animator) {
+            this.animator.update(deltaTime, {
+                velocity: this.velocity,
+                isHurt: this.isHurt
+            });
+            this.isHurt = false; // Reset après lecture par l'animator
         }
 
         // Mise à jour de TOUTES les armes de l'arsenal
@@ -119,28 +148,32 @@ export class Player {
     }
 
     draw(ctx) {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-
-        // Corps du joueur
-        ctx.beginPath();
-        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-
-        // Couleur d'état
-        if (this.activeEffects.some(e => e.type === 'poison')) {
-            ctx.fillStyle = '#0f0';
-        } else if (this.activeEffects.some(e => e.type === 'slowing')) {
-            ctx.fillStyle = '#0ff'; // Cyan pour ralentissement
+        if (this.animator) {
+            // Rendu Data-Driven - Passage de l'angle calculé
+            this.animator.draw(ctx, this.x, this.y, this.angle || 0);
         } else {
-            ctx.fillStyle = this.color;
+            // Rendu de secours (Fallback)
+            ctx.save();
+            ctx.translate(this.x, this.y);
+
+            ctx.beginPath();
+            ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+
+            if (this.activeEffects.some(e => e.type === 'poison')) {
+                ctx.fillStyle = '#0f0';
+            } else if (this.activeEffects.some(e => e.type === 'slowing')) {
+                ctx.fillStyle = '#0ff';
+            } else {
+                ctx.fillStyle = this.color;
+            }
+
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.restore();
         }
-
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.restore();
 
         // Rendu visuel de TOUTES les armes
         this.weapons.forEach(w => {
@@ -151,9 +184,15 @@ export class Player {
     takeDamage(amount) {
         this.stats.hp -= amount;
         if (this.stats.hp < 0) this.stats.hp = 0;
-        this.color = '#f00';
-        setTimeout(() => {
-            this.color = this.originalColor;
-        }, 100);
+        this.isHurt = true;
+        
+        // Flash rouge de secours si pas d'animator
+        if (!this.animator) {
+            this.color = '#f00';
+            setTimeout(() => {
+                this.color = this.originalColor;
+            }, 100);
+        }
     }
 }
+

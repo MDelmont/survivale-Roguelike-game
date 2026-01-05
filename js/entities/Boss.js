@@ -5,8 +5,8 @@ import { Enemy } from './Enemy.js';
  * Hérite d'Enemy mais avec des comportements plus complexes et beaucoup plus de PV.
  */
 export class Boss extends Enemy {
-    constructor(x, y, stats) {
-        super(x, y, stats);
+    constructor(x, y, stats, assetManager) {
+        super(x, y, stats, assetManager);
         this.radius = stats.radius || 60;
         this.isBoss = true;
         this.shootTimer = 0;
@@ -43,6 +43,15 @@ export class Boss extends Enemy {
             if (onShoot) {
                 this.executePattern(onShoot, player);
             }
+        }
+
+        // Mise à jour de l'animateur (héritée d'Enemy)
+        if (this.animator) {
+            this.animator.update(deltaTime, {
+                velocity: this.velocity,
+                isHurt: this.isHurt
+            });
+            this.isHurt = false;
         }
     }
 
@@ -240,20 +249,23 @@ export class Boss extends Enemy {
     }
 
     draw(ctx) {
-        // Cercle plus imposant
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 4;
-        ctx.stroke();
+        if (this.animator) {
+            this.animator.draw(ctx, this.x, this.y, this.angle);
+        } else {
+            // Cercle plus imposant (fallback)
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            ctx.restore();
+        }
 
-        // Barre de vie spécifique au Boss (Haut de l'écran ou au-dessus)
+        // Barre de vie spécifique au Boss
         this.drawBossHealthBar(ctx);
-
-        ctx.restore();
     }
 
     drawBossHealthBar(ctx) {

@@ -1,11 +1,12 @@
 import { CombatSystem } from '../systems/CombatSystem.js';
+import { Animator } from './Animator.js';
 
 /**
  * Projectile Class
  * Gère le mouvement et ses propres conséquences d'impact.
  */
 export class Projectile {
-    constructor(x, y, dx, dy, stats) {
+    constructor(x, y, dx, dy, stats, assetManager) {
         this.x = x;
         this.y = y;
         this.dx = dx;
@@ -22,6 +23,12 @@ export class Projectile {
         this.isPoisonous = stats.isPoisonous || false;
         this.piercingCount = stats.piercingCount || 0;
         this.hitTargets = new Set(); // Registre des ennemis déjà touchés
+
+        // Système d'animation data-driven
+        this.visuals = stats.visuals;
+        this.animator = this.visuals ? new Animator(this.visuals, assetManager) : null;
+        this.velocity = { x: this.dx * this.speed, y: this.dy * this.speed };
+        this.angle = Math.atan2(this.dy, this.dx);
     }
 
     /**
@@ -75,28 +82,38 @@ export class Projectile {
         const dt = deltaTime / 1000;
         this.x += this.dx * this.speed * dt;
         this.y += this.dy * this.speed * dt;
+
+        if (this.animator) {
+            this.animator.update(deltaTime, {
+                velocity: this.velocity
+            });
+        }
     }
 
     draw(ctx) {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-
-        if (this.isPoisonous) {
-            ctx.fillStyle = '#0f0';
-        } else if (this.isExplosive) {
-            ctx.fillStyle = '#f50';
+        if (this.animator) {
+            this.animator.draw(ctx, this.x, this.y, this.angle);
         } else {
-            ctx.fillStyle = this.color;
-        }
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
 
-        ctx.fill();
+            if (this.isPoisonous) {
+                ctx.fillStyle = '#0f0';
+            } else if (this.isExplosive) {
+                ctx.fillStyle = '#f50';
+            } else {
+                ctx.fillStyle = this.color;
+            }
 
-        if (this.isExplosive || this.isPoisonous) {
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = ctx.fillStyle;
-            ctx.strokeStyle = '#fff';
-            ctx.stroke();
-            ctx.shadowBlur = 0;
+            ctx.fill();
+
+            if (this.isExplosive || this.isPoisonous) {
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = ctx.fillStyle;
+                ctx.strokeStyle = '#fff';
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
         }
     }
 
@@ -110,3 +127,4 @@ export class Projectile {
         );
     }
 }
+

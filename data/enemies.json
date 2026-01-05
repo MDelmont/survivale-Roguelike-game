@@ -7,7 +7,24 @@
             "damage": 5,
             "xpValue": 10,
             "radius": 12,
-            "color": "#fff"
+            "color": "#fff",
+            "visuals": {
+                "type": "sprite",
+                "width": 48,
+                "height": 48,
+                "directionMode": "rotate",
+                "hitFlash": true,
+                "animations": {
+                    "walk": {
+                        "frames": [
+                            "assets/monster/sperm_monster_1_v1.png",
+                            "assets/monster/sperm_monster_1_v2.png"
+                        ],
+                        "frameRate": 8,
+                        "loop": true
+                    }
+                }
+            }
         },
         "fast_cell": {
             "name": "Neurone",
@@ -16,7 +33,24 @@
             "damage": 3,
             "xpValue": 15,
             "radius": 10,
-            "color": "#0ff"
+            "color": "#0ff",
+            "visuals": {
+                "type": "sprite",
+                "width": 36,
+                "height": 36,
+                "directionMode": "rotate",
+                "hitFlash": true,
+                "animations": {
+                    "walk": {
+                        "frames": [
+                            "assets/monster/sperm_monster_2_v1.png",
+                            "assets/monster/sperm_monster_2_v2.png"
+                        ],
+                        "frameRate": 12,
+                        "loop": true
+                    }
+                }
+            }
         },
         "tank_cell": {
             "name": "Globule Blanc",
@@ -25,7 +59,24 @@
             "damage": 10,
             "xpValue": 30,
             "radius": 20,
-            "color": "#f00"
+            "color": "#f00",
+            "visuals": {
+                "type": "sprite",
+                "width": 64,
+                "height": 64,
+                "directionMode": "rotate",
+                "hitFlash": true,
+                "animations": {
+                    "walk": {
+                        "frames": [
+                            "assets/monster/sperm_monster_3_v1.png",
+                            "assets/monster/sperm_monster_3_v2.png"
+                        ],
+                        "frameRate": 6,
+                        "loop": true
+                    }
+                }
+            }
         },
         "basic_baby": {
             "name": "Biberon",

@@ -9,6 +9,27 @@
         "pickupRadius": 100,
         "xp": 0,
         "level": 1,
-        "xpNextLevel": 50
+        "xpNextLevel": 50,
+        "visuals": {
+            "type": "sprite",
+            "width": 64,
+            "angleOffset": 90,
+            "directionMode": "rotate",
+            "hitFlash": true,
+            "animations": {
+                "idle": {
+                    "frames": ["assets/players/Spermateozoide-Anthony-1.png"],
+                    "frameRate": 1
+                },
+                "walk": {
+                    "frames": [
+                        "assets/players/Spermateozoide-Anthony-1.png",
+                        "assets/players/Spermateozoide-Anthony-2.png"
+                    ],
+                    "frameRate": 10,
+                    "loop": true
+                }
+            }
+        }
     }
 }

@@ -1,9 +1,11 @@
+import { Animator } from './Animator.js';
+
 /**
  * Enemy Class
  * Gère le comportement, les stats et l'affichage des ennemis.
  */
 export class Enemy {
-    constructor(x, y, stats) {
+    constructor(x, y, stats, assetManager) {
         this.x = x;
         this.y = y;
         this.stats = stats || { hp: 10, speed: 100, radius: 10, color: '#f00' };
@@ -17,6 +19,13 @@ export class Enemy {
 
         this.activeEffects = []; // Pour le poison, etc.
         this.originalColor = this.color;
+        
+        // Système d'animation data-driven
+        this.visuals = stats.visuals;
+        this.animator = this.visuals ? new Animator(this.visuals, assetManager) : null;
+        this.velocity = { x: 0, y: 0 };
+        this.angle = 0;
+        this.isHurt = false;
     }
 
     update(deltaTime, playerPos) {
@@ -51,8 +60,21 @@ export class Enemy {
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist > 0) {
-            this.x += (dx / dist) * (this.speed * speedMultiplier) * dt;
-            this.y += (dy / dist) * (this.speed * speedMultiplier) * dt;
+            this.velocity.x = (dx / dist) * (this.speed * speedMultiplier);
+            this.velocity.y = (dy / dist) * (this.speed * speedMultiplier);
+            this.angle = Math.atan2(this.velocity.y, this.velocity.x);
+            
+            this.x += this.velocity.x * dt;
+            this.y += this.velocity.y * dt;
+        }
+
+        // Mise à jour de l'animateur
+        if (this.animator) {
+            this.animator.update(deltaTime, {
+                velocity: this.velocity,
+                isHurt: this.isHurt
+            });
+            this.isHurt = false;
         }
 
         if (this.hp <= 0) {
@@ -61,22 +83,26 @@ export class Enemy {
     }
 
     draw(ctx) {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-
-        // Indicateur visuel si empoisonné
-        if (this.activeEffects.some(e => e.type === 'poison')) {
-            ctx.fillStyle = '#0f0';
-        } else if (this.activeEffects.some(e => e.type === 'slowing')) {
-            ctx.fillStyle = '#0ff';
+        if (this.animator) {
+            this.animator.draw(ctx, this.x, this.y, this.angle);
         } else {
-            ctx.fillStyle = this.color;
-        }
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
 
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1;
-        ctx.stroke();
+            // Indicateur visuel si empoisonné
+            if (this.activeEffects.some(e => e.type === 'poison')) {
+                ctx.fillStyle = '#0f0';
+            } else if (this.activeEffects.some(e => e.type === 'slowing')) {
+                ctx.fillStyle = '#0ff';
+            } else {
+                ctx.fillStyle = this.color;
+            }
+
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
 
         // Barre de vie au-dessus de la tête
         if (this.hp < (this.stats.hp || 20)) {
@@ -107,11 +133,15 @@ export class Enemy {
 
     takeDamage(amount) {
         this.hp -= amount;
-        // Feedback visuel de dégâts
-        this.color = '#fff'; // Flash blanc
-        setTimeout(() => {
-            this.color = this.originalColor;
-        }, 50);
+        this.isHurt = true;
+        
+        if (!this.animator) {
+            // Feedback visuel de dégâts (fallback)
+            this.color = '#fff'; 
+            setTimeout(() => {
+                this.color = this.originalColor;
+            }, 50);
+        }
     }
 
     applyEffect(effect) {
@@ -128,3 +158,4 @@ export class Enemy {
         }
     }
 }
+

@@ -83,7 +83,7 @@ class Game {
 
         if (!this.player) {
             const playerStats = this.dataManager.getPlayerData();
-            this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, playerStats);
+            this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, playerStats, this.dataManager.assetManager);
         } else {
             this.player.x = this.canvas.width / 2;
             this.player.y = this.canvas.height / 2;
@@ -318,7 +318,7 @@ class Game {
         const bossId = this.currentPhase.boss_id;
         const bossStats = this.dataManager.getBossData(bossId);
         if (bossStats) {
-            this.boss = new Boss(this.canvas.width / 2, -100, bossStats);
+            this.boss = new Boss(this.canvas.width / 2, -100, bossStats, this.dataManager.assetManager);
         } else {
             console.error(`Boss ID inconnu : ${bossId}`);
         }
@@ -336,12 +336,12 @@ class Game {
             console.error(`Type d'ennemi inconnu : ${type}`);
             return;
         }
-        this.enemies.push(new Enemy(x, y, enemyData));
+        this.enemies.push(new Enemy(x, y, enemyData, this.dataManager.assetManager));
     }
 
     spawnLoot(x, y, v, t) { this.loots.push(new Loot(x, y, v, t)); }
-    spawnProjectile(x, y, dx, dy, s) { this.projectiles.push(new Projectile(x, y, dx, dy, s)); }
-    spawnEnemyProjectile(x, y, dx, dy) { this.enemyProjectiles.push(new Projectile(x, y, dx, dy, { projectileSpeed: 200, damage: 10, color: '#f0f' })); }
+    spawnProjectile(x, y, dx, dy, s) { this.projectiles.push(new Projectile(x, y, dx, dy, s, this.dataManager.assetManager)); }
+    spawnEnemyProjectile(x, y, dx, dy) { this.enemyProjectiles.push(new Projectile(x, y, dx, dy, { projectileSpeed: 200, damage: 10, color: '#f0f' }, this.dataManager.assetManager)); }
 
     draw() {
         this.ctx.fillStyle = '#0a0a1a';

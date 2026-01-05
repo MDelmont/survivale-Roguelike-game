@@ -2,11 +2,12 @@
  * Weapon Base Class
  */
 export class Weapon {
-    constructor(id, name, stats, upgrades = []) {
+    constructor(id, name, stats, upgrades = [], visuals = null) {
         this.id = id;
         this.name = name;
         this.stats = { ...stats };
         this.upgrades = upgrades;
+        this.visuals = visuals; // Données visuelles pour l'arme ou ses projectiles
         this.level = 1;
         this.shotTimer = 0;
     }
@@ -43,8 +44,8 @@ export class Weapon {
  * Projectile-based Weapon
  */
 export class ProjectileWeapon extends Weapon {
-    constructor(id, name, stats, upgrades) {
-        super(id, name, stats, upgrades);
+    constructor(id, name, stats, upgrades, visuals) {
+        super(id, name, stats, upgrades, visuals);
     }
 
     update(deltaTime, owner, context) {
@@ -57,6 +58,7 @@ export class ProjectileWeapon extends Weapon {
                 const count = (this.stats.projectileCount || 1) + (owner.stats.projectileBonus || 0);
                 const weaponStats = {
                     ...this.stats,
+                    visuals: this.visuals, // Transmet les visuels au projectile
                     damage: (this.stats.damage || 10) * (owner.stats.damageMultiplier || 1.0),
                     piercingCount: (this.stats.piercingCount || 0) + (owner.stats.piercingBonus || 0)
                 };
@@ -78,6 +80,7 @@ export class ProjectileWeapon extends Weapon {
         }
     }
 }
+
 
 /**
  * Orbital/Shield Weapon

@@ -8,18 +8,19 @@ export class WeaponFactory {
     static create(weaponData) {
         if (!weaponData) return null;
 
-        const { id, name, type, stats, upgrades } = weaponData;
+        const { id, name, type, stats, upgrades, visuals } = weaponData;
 
         switch (type) {
             case 'attack':
-                return new ProjectileWeapon(id, name, stats, upgrades);
+                return new ProjectileWeapon(id, name, stats, upgrades, visuals);
             case 'defense':
-                return new OrbitalWeapon(id, name, stats, upgrades);
+                return new OrbitalWeapon(id, name, stats, upgrades, visuals);
             case 'aoe':
-                return new AreaWeapon(id, name, stats, upgrades);
+                return new AreaWeapon(id, name, stats, upgrades, visuals);
             default:
                 console.warn(`Type d'arme inconnu : ${type}`);
                 return null;
         }
     }
 }
+

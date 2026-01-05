@@ -67,3 +67,11 @@ Cette roadmap détaille les étapes de développement par jalons testables. Chaq
 - [x] Implémenter le changement d'arme auto au début de phase.
 - [x] Créer le menu de loot d'arme (Nouvelle Arme vs Amélioration).
 - [x] Implémenter les différents types d'armes (Attaque, Bouclier, AOE).
+
+## Etape 12 : Assets images parametrables (data-driven)
+- [ ] Definir un registre d'assets (ex: `data/assets.json`) avec des ids uniques -> chemin d'image + meta (taille, ancrage, hitbox si besoin).
+- [ ] Ajouter des champs d'assetId dans les JSONs: player, enemy, boss, projectile, weapon, phase (background), zone AOE, etc.
+- [ ] Charger et mettre en cache les images via `DataManager` (preload, gestion d'erreur, fallback placeholder).
+- [ ] Mettre a jour le rendu pour utiliser l'assetId de chaque element au lieu des sprites codes en dur.
+- [ ] Documenter les nouveaux schemas et exemples (comment changer un visuel via id sans code).
+- [ ] **Test** : Remplacer plusieurs visuels (player, enemy, boss, projectile, background) uniquement via JSON.
