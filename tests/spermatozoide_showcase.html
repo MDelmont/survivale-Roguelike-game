@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Showcase - Spermatozoide Spritesheet</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 30% 30%, #14202b 0%, #0b1117 45%, #05070a 100%);
+      color: #e6f1ff;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+    #hud {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+      z-index: 10;
+    }
+    #hud label { display: inline-block; margin-right: 6px; }
+    #hud input { width: 60px; margin-right: 8px; }
+    #hud input[type="checkbox"] { width: auto; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <div id="hud">
+    <div><strong>Showcase spritesheet</strong></div>
+    <div style="margin-top:6px;">
+      <label>Colonnes</label><input id="cols" type="number" min="1" value="6">
+      <label>Lignes</label><input id="rows" type="number" min="1" value="4">
+      <label>Vitesse</label><input id="speed" type="number" min="10" value="80">
+      <label><input id="rotate" type="checkbox" checked> Rotation</label>
+    </div>
+    <div style="margin-top:6px; font-size:12px; opacity:0.8;">
+      Ajuste colonnes/lignes pour correspondre a la grille.
+    </div>
+  </div>
+  <canvas id="stage"></canvas>
+
+  <script>
+    const canvas = document.getElementById('stage');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = '../assets/players/spermateozoide.svg';
+
+    const colsInput = document.getElementById('cols');
+    const rowsInput = document.getElementById('rows');
+    const speedInput = document.getElementById('speed');
+    const rotateInput = document.getElementById('rotate');
+
+    let sprites = [];
+    let frameW = 0;
+    let frameH = 0;
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(window.innerWidth * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function buildSprites() {
+      const cols = Math.max(1, parseInt(colsInput.value, 10) || 1);
+      const rows = Math.max(1, parseInt(rowsInput.value, 10) || 1);
+      frameW = img.width / cols;
+      frameH = img.height / rows;
+
+      sprites = [];
+      const total = cols * rows;
+      const speed = Math.max(10, parseInt(speedInput.value, 10) || 80);
+
+      for (let i = 0; i < total; i++) {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const angle = (i / total) * Math.PI * 2;
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed;
+        sprites.push({
+          sx: col * frameW,
+          sy: row * frameH,
+          x: (window.innerWidth / 2) + Math.cos(angle) * 120,
+          y: (window.innerHeight / 2) + Math.sin(angle) * 120,
+          vx,
+          vy,
+          rot: Math.atan2(vy, vx)
+        });
+      }
+    }
+
+    function wrap(s) {
+      const pad = Math.max(frameW, frameH) * 0.5;
+      if (s.x < -pad) s.x = window.innerWidth + pad;
+      if (s.x > window.innerWidth + pad) s.x = -pad;
+      if (s.y < -pad) s.y = window.innerHeight + pad;
+      if (s.y > window.innerHeight + pad) s.y = -pad;
+    }
+
+    let last = 0;
+    function loop(t) {
+      const dt = Math.min(0.05, (t - last) / 1000) || 0.016;
+      last = t;
+
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+      for (const s of sprites) {
+        s.x += s.vx * dt;
+        s.y += s.vy * dt;
+        wrap(s);
+
+        ctx.save();
+        ctx.translate(s.x, s.y);
+        if (rotateInput.checked) ctx.rotate(s.rot);
+        ctx.drawImage(
+          img,
+          s.sx, s.sy, frameW, frameH,
+          -frameW / 2, -frameH / 2, frameW, frameH
+        );
+        ctx.restore();
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('resize', () => {
+      resize();
+    });
+
+    [colsInput, rowsInput, speedInput, rotateInput].forEach(el => {
+      el.addEventListener('change', buildSprites);
+    });
+
+    img.onload = () => {
+      resize();
+      buildSprites();
+      requestAnimationFrame(loop);
+    };
+  </script>
+</body>
+</html>
