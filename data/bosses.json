@@ -32,6 +32,46 @@
             "movePattern": "fixed",
             "radius": 90,
             "color": "#3f3"
+        },
+        "new_boss_1767700047441": {
+            "name": "Nouveau Boss",
+            "hp": 2000,
+            "speed": 50,
+            "damage": 20,
+            "fireRate": 1500,
+            "attackPattern": "spiral",
+            "movePattern": "constant",
+            "radius": 80,
+            "color": "#ff3333",
+            "visuals": {
+                "type": "sprite",
+                "width": 128,
+                "directionMode": "none",
+                "hitFlash": true,
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/boss/sperm_monster_1_v1.png",
+                            "assets/boss/sperm_monster_1_v1.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "angleOffset": 0
+            },
+            "projectileVisuals": {
+                "type": "sprite",
+                "width": 16,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            }
         }
     }
 }

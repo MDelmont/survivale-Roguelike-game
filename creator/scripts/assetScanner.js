@@ -7,7 +7,8 @@ class AssetScanner {
         this.assets = {
             players: [],
             monster: [],
-            projectiles: [],
+            boss: [],
+            projectile: [],
             other: []
         };
         this.assetURLs = new Map(); // Cache des URLs d'assets
@@ -25,7 +26,8 @@ class AssetScanner {
         this.assets = {
             players: [],
             monster: [],
-            projectiles: [],
+            boss: [],
+            projectile: [],
             other: []
         };
 
@@ -57,8 +59,10 @@ class AssetScanner {
                         this.assets.players.push(assetInfo);
                     } else if (path.includes('monster')) {
                         this.assets.monster.push(assetInfo);
+                    } else if (path.includes('boss')) {
+                        this.assets.boss.push(assetInfo);
                     } else if (path.includes('projectile')) {
-                        this.assets.projectiles.push(assetInfo);
+                        this.assets.projectile.push(assetInfo);
                     } else {
                         this.assets.other.push(assetInfo);
                     }
@@ -74,7 +78,8 @@ class AssetScanner {
         return [
             ...this.assets.players,
             ...this.assets.monster,
-            ...this.assets.projectiles,
+            ...this.assets.boss,
+            ...this.assets.projectile,
             ...this.assets.other
         ];
     }
