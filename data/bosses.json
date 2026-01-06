@@ -9,7 +9,35 @@
             "attackPattern": "spiral",
             "movePattern": "constant",
             "radius": 80,
-            "color": "#fff"
+            "color": "#fff",
+            "visuals": {
+                "type": "sprite",
+                "width": 128,
+                "directionMode": "none",
+                "angleOffset": 0,
+                "hitFlash": false,
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/boss/ovule_boss.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "projectileVisuals": {
+                "type": "sprite",
+                "width": 16,
+                "directionMode": "none",
+                "animations": {
+                    "idle": {
+                        "frames": [],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            }
         },
         "biberon_alpha": {
             "name": "Biberon Alpha",
@@ -21,6 +49,61 @@
             "movePattern": "rush",
             "radius": 60,
             "color": "#0ff"
+        },
+        "puree_brocolis": {
+            "name": "La Purée de Brocolis",
+            "hp": 1000,
+            "speed": 40,
+            "damage": 30,
+            "radius": 90,
+            "fireRate": 2200,
+            "attackPattern": "circle",
+            "movePattern": "constant",
+            "color": "#4b5320"
+        },
+        "prof_maths": {
+            "name": "Le Prof de Maths",
+            "hp": 2000,
+            "speed": 50,
+            "damage": 50,
+            "radius": 100,
+            "fireRate": 2000,
+            "attackPattern": "wall",
+            "movePattern": "fixed",
+            "color": "#555"
+        },
+        "crise_revolte": {
+            "name": "La Crise de Révolte",
+            "hp": 4000,
+            "speed": 80,
+            "damage": 80,
+            "radius": 110,
+            "fireRate": 1800,
+            "attackPattern": "spiral",
+            "movePattern": "rush",
+            "color": "#f00"
+        },
+        "burn_out": {
+            "name": "Le Burn-out",
+            "hp": 8000,
+            "speed": 30,
+            "damage": 120,
+            "radius": 120,
+            "fireRate": 1500,
+            "attackPattern": "vortex",
+            "movePattern": "constant",
+            "color": "#000"
+        },
+        "pretre_interminable": {
+            "name": "Le Prêtre Interminable",
+            "hp": 20000,
+            "speed": 20,
+            "damage": 250,
+            "radius": 150,
+            "fireRate": 1200,
+            "attackPattern": "web",
+            "movePattern": "fixed",
+            "color": "#4b0082"
         },
         "cahier_supreme": {
             "name": "Le Cahier Suprême",

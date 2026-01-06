@@ -361,6 +361,12 @@ class BossesModule {
                                 Hit Flash
                             </label>
                         </div>
+                        <div class="form-group">
+                            <label class="form-label form-check">
+                                <input type="checkbox" id="bossPixelPerfect" ${b.visuals?.pixelPerfect ? 'checked' : ''}>
+                                Pixel Perfect (Hitbox précise)
+                            </label>
+                        </div>
                     </div>
                     
                     <h4 style="margin-top: var(--space-md); margin-bottom: var(--space-sm);">Animations du Boss</h4>
@@ -720,6 +726,7 @@ class BossesModule {
         b.visuals.directionMode = document.getElementById('bossDirMode')?.value || 'none';
         b.visuals.angleOffset = parseInt(document.getElementById('bossAngleOffset')?.value) || 0;
         b.visuals.hitFlash = document.getElementById('bossHitFlash')?.checked || false;
+        b.visuals.pixelPerfect = document.getElementById('bossPixelPerfect')?.checked || false;
 
         // Animations boss
         b.visuals.animations = this.collectAnimations('boss');

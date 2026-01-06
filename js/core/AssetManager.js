@@ -5,6 +5,7 @@
 export class AssetManager {
     constructor() {
         this.images = new Map();
+        this.alphaData = new Map(); // Cache des données alpha (transparence)
         this.loadingPromises = [];
     }
 
@@ -40,6 +41,48 @@ export class AssetManager {
      */
     getImage(path) {
         return this.images.get(path);
+    }
+
+    /**
+     * Vérifie si une image est chargée.
+     */
+    isLoaded(path) {
+        const img = this.images.get(path);
+        return img && img.complete;
+    }
+
+    /**
+     * Génère ou récupère un masque alpha pour une image.
+     */
+    getAlphaData(path) {
+        if (this.alphaData.has(path)) return this.alphaData.get(path);
+        
+        const img = this.images.get(path);
+        if (!img || !img.complete) return null;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        
+        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+        const data = imageData.data;
+        
+        // On ne stocke que la valeur alpha pour économiser de la mémoire
+        const alpha = new Uint8Array(img.width * img.height);
+        for (let i = 0; i < data.length; i += 4) {
+            alpha[i / 4] = data[i + 3];
+        }
+        
+        const result = {
+            width: img.width,
+            height: img.height,
+            data: alpha
+        };
+        
+        this.alphaData.set(path, result);
+        return result;
     }
 
     /**

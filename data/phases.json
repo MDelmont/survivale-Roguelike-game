@@ -8,6 +8,7 @@
                 "basic_cell",
                 "fast_cell"
             ],
+            "player_id": "anthony",
             "spawn_rate": 1500,
             "default_weapon": "basic_shot",
             "available_weapons": [
@@ -45,13 +46,7 @@
                 "basic_shot",
                 "poison_shot"
             ],
-            "boss": {
-                "name": "La Purée de Brocolis",
-                "hp": 1000,
-                "damage": 30,
-                "radius": 90,
-                "fireRate": 2200
-            }
+            "boss_id": "puree_brocolis"
         },
         {
             "id": 3,
@@ -68,13 +63,7 @@
                 "pen_launcher",
                 "shield_orbit"
             ],
-            "boss": {
-                "name": "Le Prof de Maths",
-                "hp": 2000,
-                "damage": 50,
-                "radius": 100,
-                "fireRate": 2000
-            }
+            "boss_id": "prof_maths"
         },
         {
             "id": 4,
@@ -91,13 +80,7 @@
                 "pen_launcher",
                 "smartphone_wave"
             ],
-            "boss": {
-                "name": "La Crise de Révolte",
-                "hp": 4000,
-                "damage": 80,
-                "radius": 110,
-                "fireRate": 1800
-            }
+            "boss_id": "crise_revolte"
         },
         {
             "id": 5,
@@ -114,13 +97,7 @@
                 "smartphone_wave",
                 "pen_launcher"
             ],
-            "boss": {
-                "name": "Le Burn-out",
-                "hp": 8000,
-                "damage": 120,
-                "radius": 120,
-                "fireRate": 1500
-            }
+            "boss_id": "burn_out"
         },
         {
             "id": 6,
@@ -138,13 +115,7 @@
                 "pen_launcher",
                 "shield_orbit"
             ],
-            "boss": {
-                "name": "Le Prêtre Interminable",
-                "hp": 20000,
-                "damage": 250,
-                "radius": 150,
-                "fireRate": 1200
-            }
+            "boss_id": "pretre_interminable"
         }
     ]
 }

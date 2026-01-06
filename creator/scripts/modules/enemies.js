@@ -321,6 +321,12 @@ class EnemiesModule {
                                 Hit Flash (clignotement)
                             </label>
                         </div>
+                        <div class="form-group">
+                            <label class="form-label form-check">
+                                <input type="checkbox" id="enemyPixelPerfect" ${e.visuals?.pixelPerfect ? 'checked' : ''}>
+                                Pixel Perfect (Hitbox précise)
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -631,6 +637,7 @@ class EnemiesModule {
         e.visuals.directionMode = document.getElementById('enemyDirMode')?.value || 'rotate';
         e.visuals.angleOffset = parseInt(document.getElementById('enemyAngleOffset')?.value) || 0;
         e.visuals.hitFlash = document.getElementById('enemyHitFlash')?.checked || false;
+        e.visuals.pixelPerfect = document.getElementById('enemyPixelPerfect')?.checked || false;
 
         // Animations
         if (!e.visuals.animations) e.visuals.animations = {};

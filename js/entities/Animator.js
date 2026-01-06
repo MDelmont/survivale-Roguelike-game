@@ -164,5 +164,61 @@ export class Animator {
 
         ctx.restore();
     }
+
+    /**
+     * Vérifie si un point du monde (x, y) touche un pixel opaque de l'entité.
+     */
+    isPixelOpaque(worldX, worldY, entityX, entityY, entityAngle) {
+        const anim = this.getAnimation(this.currentState);
+        if (!anim || !anim.frames) return false;
+
+        const imagePath = anim.frames[this.currentFrameIndex];
+        const alphaMask = this.assetManager.getAlphaData(imagePath);
+        if (!alphaMask) return true;
+
+        const img = this.assetManager.getImage(imagePath);
+        if (!img) return true;
+
+        // 1. Translation inverse
+        let localX = worldX - (entityX + this.displayOffset.x);
+        let localY = worldY - (entityY + this.displayOffset.y);
+
+        // 2. Rotation inverse
+        if (this.directionMode === 'rotate') {
+            const rot = -(entityAngle + this.angleOffset);
+            const cos = Math.cos(rot);
+            const sin = Math.sin(rot);
+            const rx = localX * cos - localY * sin;
+            const ry = localX * sin + localY * cos;
+            localX = rx;
+            localY = ry;
+        }
+
+        // 3. Flip inverse
+        if (this.directionMode === 'flip' && this.currentDirection === 'left') {
+            localX = -localX;
+        }
+
+        // 4. Mapping aux dimensions de l'image source
+        let drawW = this.width;
+        let drawH = this.height;
+
+        if (drawW && !drawH) drawH = (img.height / img.width) * drawW;
+        else if (!drawW && drawH) drawW = (img.width / img.height) * drawH;
+        else if (!drawH && !drawW) {
+            drawW = img.width;
+            drawH = img.height;
+        }
+
+        const imgX = Math.floor(((localX + drawW / 2) / drawW) * alphaMask.width);
+        const imgY = Math.floor(((localY + drawH / 2) / drawH) * alphaMask.height);
+
+        if (imgX < 0 || imgX >= alphaMask.width || imgY < 0 || imgY >= alphaMask.height) {
+            return false;
+        }
+
+        const alpha = alphaMask.data[imgY * alphaMask.width + imgX];
+        return alpha > 10; 
+    }
 }
 

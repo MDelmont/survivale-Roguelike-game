@@ -124,8 +124,27 @@ class Game {
         const mouseY = e.clientY - rect.top;
 
         if (this.state === GameState.MENU) {
-            if (mouseY < this.canvas.height / 2 + 50) this.startNewGame();
-            else this.continueGame();
+            const btnW = 250;
+            const btnH = 60;
+            const centerX = this.canvas.width / 2;
+            
+            // Check Nouvelle Partie
+            const npY = this.canvas.height / 2 + 50;
+            if (mouseX >= centerX - btnW/2 && mouseX <= centerX + btnW/2 &&
+                mouseY >= npY - btnH/2 && mouseY <= npY + btnH/2) {
+                this.startNewGame();
+                return;
+            }
+
+            // Check Continuer
+            if (this.saveSystem.getProgress() > 0) {
+                const cY = this.canvas.height / 2 + 130;
+                if (mouseX >= centerX - btnW/2 && mouseX <= centerX + btnW/2 &&
+                    mouseY >= cY - btnH/2 && mouseY <= cY + btnH/2) {
+                    this.continueGame();
+                    return;
+                }
+            }
         } else if (this.state === GameState.STORY) {
             this.nextStoryPage();
         } else if (this.state === GameState.UPGRADE) {
@@ -165,8 +184,8 @@ class Game {
         }
     }
 
-    startNewGame() { this.player = null; this.startPhase(0); this.state = GameState.PLAYING; }
-    continueGame() { this.player = null; this.startPhase(this.saveSystem.getProgress()); this.state = GameState.PLAYING; }
+    startNewGame() { this.player = null; this.startPhase(0); }
+    continueGame() { this.player = null; this.startPhase(this.saveSystem.getProgress()); }
 
     loop(currentTime) {
         const deltaTime = currentTime - this.lastTime;

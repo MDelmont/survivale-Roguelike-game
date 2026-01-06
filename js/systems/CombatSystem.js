@@ -9,7 +9,22 @@ export const CombatSystem = {
     checkCollision(a, b) {
         const dx = a.x - b.x;
         const dy = a.y - b.y;
-        return Math.sqrt(dx * dx + dy * dy) < (a.radius + b.radius);
+        const distSq = dx * dx + dy * dy;
+        const radiusSum = a.radius + b.radius;
+        
+        // Test circulaire rapide
+        if (distSq >= radiusSum * radiusSum) return false;
+
+        // Test Pixel-Perfect si configuré
+        if (a.visuals?.pixelPerfect && a.animator) {
+            return a.animator.isPixelOpaque(b.x, b.y, a.x, a.y, a.angle);
+        }
+        
+        if (b.visuals?.pixelPerfect && b.animator) {
+            return b.animator.isPixelOpaque(a.x, a.y, b.x, b.y, b.angle);
+        }
+
+        return true;
     },
 
     /**
