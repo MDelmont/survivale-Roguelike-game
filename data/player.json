@@ -20,7 +20,9 @@
                 "hitFlash": true,
                 "animations": {
                     "idle": {
-                        "frames": ["assets/players/Spermateozoide-Anthony-1.png"],
+                        "frames": [
+                            "assets/players/Spermateozoide-Anthony-1.png"
+                        ],
                         "frameRate": 1
                     },
                     "walk": {
@@ -50,8 +52,19 @@
                 "directionMode": "rotate",
                 "hitFlash": true,
                 "animations": {
-                    "idle": { "frames": ["assets/players/Spermateozoide-Anthony-1.png"], "frameRate": 1 },
-                    "walk": { "frames": ["assets/players/Spermateozoide-Anthony-1.png"], "frameRate": 10, "loop": true }
+                    "idle": {
+                        "frames": [
+                            "assets/players/Spermateozoide-Anthony-1.png"
+                        ],
+                        "frameRate": 1
+                    },
+                    "walk": {
+                        "frames": [
+                            "assets/players/Spermateozoide-Anthony-1.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
                 }
             }
         }

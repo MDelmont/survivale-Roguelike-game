@@ -12,6 +12,7 @@ L'outil est conçu pour être **Data-Driven**. L'objectif est de permettre à un
 - Utilisation de la police **Outfit** (Moderne/Tech).
 - Effets de **Glassmorphism** (transparence et flou sur les panneaux).
 - Micro-animations (hover sur les cartes, transitions fluides).
+- **Transparence Technique** : Panneau escamotable affichant le JSON en direct pour validation.
 
 ---
 
@@ -40,6 +41,13 @@ L'outil est conçu pour être **Data-Driven**. L'objectif est de permettre à un
 - **Configuration Boss** : Choisir quel boss apparaît à la fin du timer.
 - **Narration & Histoire** : Éditeur de pages pour l'introduction et la conclusion de la phase (Titre + Texte).
 
+### E. Le Studio de Transition
+- **Séquenceur de Pages** : Glisser-déposer pour réorganiser l'ordre des slides.
+- **Éditeur de Texte Riche** : Zone de saisie pour le titre et le corps du texte.
+- **Zone de Mise en Page** : Choisir la position de l'image (gauche, droite, fond).
+- **Contrôles Audio & Timing** : Assigner une musique d'ambiance et une durée de transition.
+- **Aperçu Instantané** : Mode "Play" pour voir le rendu final de la séquence narrative.
+
 ---
 
 ## 3. Fonctionnalités Clés
@@ -49,6 +57,7 @@ L'outil est conçu pour être **Data-Driven**. L'objectif est de permettre à un
 | **Auto-Save JSON** | Sauvegarde directe dans le dossier `data/` via un serveur local Node.js. |
 | **Hot Reload Friendly** | Produit des JSON propres et structurés, prêts à être consommés par le moteur du jeu. |
 | **Validation visuelle** | Affiche les images réelles dès que le chemin est saisi ou sélectionné. |
+| **Live JSON Preview** | Affiche en temps réel le code JSON généré pour permettre un contrôle technique direct. |
 | **Asset Explorer** | Plus besoin de taper les noms de fichiers à la main (évite les erreurs de typo). |
 
 ---

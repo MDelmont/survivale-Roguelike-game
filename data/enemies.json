@@ -213,5 +213,21 @@
             "radius": 45,
             "color": "#4b0082"
         }
+    },
+    "new_enemy_1767689085676": {
+        "name": "Nouvel Ennemi",
+        "hp": 100,
+        "speed": 200,
+        "damage": 10,
+        "xpValue": 5,
+        "radius": 20,
+        "visuals": {
+            "type": "sprite",
+            "animations": {
+                "idle": {
+                    "frames": []
+                }
+            }
+        }
     }
 }

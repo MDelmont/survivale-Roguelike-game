@@ -139,3 +139,23 @@ Structure du déroulement d'un niveau.
 ```
 | `default_weapon`| String | Arme de départ du joueur. |
 | `available_weapons`| Array | Armes proposées en loot. |
+## 7. Pages de Transition (`transitions.json` - Optionnel ou Global)
+Utilisées pour l'histoire entre les niveaux ou les cinématiques simples.
+
+| Champ | Type | Valeurs / Description |
+| :--- | :--- | :--- |
+| `id` | String | Identifiant unique de la séquence. |
+| `pages` | Array | Liste d'objets "Page" (voir ci-dessous). |
+
+### Structure d'une Page de Transition
+```json
+{
+    "title": "Titre de la transition",
+    "text": "Texte narratif...",
+    "image": "assets/images/story/page1.png",
+    "background": "#000000",
+    "duration": 5000,          // Temps d'affichage auto (optionnel)
+    "animation": "fade-in",   // Type d'entrée
+    "music": "audio/story_1.mp3" // Ambiance sonore
+}
+```
