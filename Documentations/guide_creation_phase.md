@@ -118,9 +118,16 @@ C'est ici que vous liez tout ensemble pour définir le déroulement de la partie
     "duration": 60000,          // Durée avant le boss (en ms, ex: 60s)
     "spawn_rate": 1000,         // Un ennemi toutes les 1000ms
     "enemy_types": ["basic_cell", "mon_nouvel_ennemi"], // Ennemis qui apparaissent
+    "player_id": "anthony",     // Héros choisi pour cette phase
     "boss_id": "mon_boss_final", // ID défini dans bosses.json
     "default_weapon": "basic_shot", // Arme de départ
-    "available_weapons": ["poison_shot", "lance_bulles"] // Armes déblocables
+    "available_weapons": ["poison_shot", "lance_bulles"], // Armes déblocables
+    "story_intro": [            // Narration avant le niveau (optionnel)
+        { "title": "Chapitre 1", "text": "Bienvenue dans l'aventure..." }
+    ],
+    "story_outro": [            // Narration après le boss (optionnel)
+        { "title": "Victoire", "text": "Vous avez franchi l'étape !" }
+    ]
 }
 ```
 
@@ -129,9 +136,9 @@ C'est ici que vous liez tout ensemble pour définir le déroulement de la partie
 ## Résumé du Workflow
 
 1. **Images** -> Les mettre dans `assets/`.
-2. **Ennemis/Boss/Armes** -> Les définir dans leurs JSON respectifs avec le bloc `visuals`.
-3. **Phase** -> Créer l'objet dans `phases.json` en listant les IDs créés précédemment.
-4. **Test** -> Lancer le jeu, la phase commencera après la précédente !
+2. **Héros/Ennemis/Boss/Armes** -> Les définir dans leurs JSON respectifs.
+3. **Phase** -> Créer l'objet dans `phases.json` en liant les IDs et en ajoutant l'histoire.
+4. **Test** -> Lancer le jeu.
 
 ---
 *Document conçu pour le système d'animation Data-Driven v1.0*

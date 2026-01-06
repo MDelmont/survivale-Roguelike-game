@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecte de Phases | Creator Engine</title>
+    <link rel="stylesheet" href="css/creator.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .list-chip { display: inline-flex; align-items: center; background: var(--bg-input); border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px; margin: 4px; font-size: 0.85rem; }
+        .list-chip button { background: none; color: var(--danger); padding: 0; padding-left: 8px; font-size: 1rem; }
+        .story-page-editor { background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; position: relative; }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <button class="secondary" onclick="location.href='index.html'"><span>⬅️</span> Retour</button>
+            <h1>ARCHITECTE DE PHASES</h1>
+        </div>
+        <div style="display: flex; gap: 1rem;"><button id="btn-save" style="background: var(--success);"><span>💾</span> Sauvegarder les Phases</button></div>
+    </header>
+    <div class="container">
+        <div class="editor-layout" style="grid-template-columns: 350px 1fr;">
+            <div class="panel">
+                <div class="panel-header"><span>NIVEAUX DE SURVIE</span><button class="secondary" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;" id="btn-new">Ajouter Phase</button></div>
+                <div class="panel-content" id="phase-list"></div>
+            </div>
+            <div class="panel">
+                <div class="panel-header" id="phase-title">SÉLECTIONNEZ UNE PHASE</div>
+                <div class="panel-content">
+                    <div id="editor-form" style="max-width: 800px; margin: 0 auto; display: none;">
+                        <div class="tabs">
+                            <div class="tab active" data-target="tab-config">Configuration</div>
+                            <div class="tab" data-target="tab-story">Histoire & Narration</div>
+                        </div>
+
+                        <div id="tab-config" class="tab-pane">
+                            <div class="grid-2">
+                                <div class="form-group"><label>Nom de la Phase</label><input type="text" id="field-name"></div>
+                                <div class="form-group">
+                                    <label>Joueur (Héros)</label>
+                                    <select id="field-player_id"><option value="">Par défaut (Anthony)</option></select>
+                                </div>
+                            </div>
+                            <div class="grid-2">
+                                <div class="form-group"><label>Durée (ms)</label><input type="number" id="field-duration"></div>
+                                <div class="form-group"><label>Fréquence Spawn (ms)</label><input type="number" id="field-spawn_rate"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Boss de Fin</label>
+                                <select id="field-boss_id"><option value="">Sélectionner un Boss...</option></select>
+                            </div>
+                            <div style="margin-top: 2rem;">
+                                <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--accent);">Bestiaire</h3>
+                                <div id="box-enemy-types" style="min-height: 50px; border: 1px dashed var(--border); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"></div>
+                                <select id="field-add-enemy"><option value="">+ Ajouter un ennemi...</option></select>
+                            </div>
+                            <div style="margin-top: 2rem;">
+                                <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--accent);">Arsenal</h3>
+                                <div class="form-group"><label>Arme de Départ</label><select id="field-default_weapon"><option value="">Sélectionner...</option></select></div>
+                                <label>Upgrades possibles</label>
+                                <div id="box-available-weapons" style="min-height: 50px; border: 1px dashed var(--border); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"></div>
+                                <select id="field-add-weapon"><option value="">+ Ajouter upgrade...</option></select>
+                            </div>
+                        </div>
+
+                        <div id="tab-story" class="tab-pane" style="display: none;">
+                            <div style="margin-bottom: 2rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <h3 style="color: var(--accent);">Introduction (Avant le niveau)</h3>
+                                    <button class="secondary" style="font-size: 0.7rem; padding: 2px 8px;" onclick="addStoryPage('story_intro')">+ Ajouter Page</button>
+                                </div>
+                                <div id="story-intro-list"></div>
+                            </div>
+                            <div style="margin-bottom: 2rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <h3 style="color: var(--accent);">Outro (Après le Boss)</h3>
+                                    <button class="secondary" style="font-size: 0.7rem; padding: 2px 8px;" onclick="addStoryPage('story_outro')">+ Ajouter Page</button>
+                                </div>
+                                <div id="story-outro-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="empty-state" style="text-align: center; color: var(--text-dim); margin-top: 4rem;"><div style="font-size: 4rem; opacity: 0.2;">🌌</div><p>Sélectionnez une phase pour commencer.</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/editor_utils.js"></script>
+    <script>
+        let phases = [], bosses = {}, enemies = {}, weapons = [], players = {}, assets = [];
+        let currentIndex = null;
+
+        async function init() {
+            phases = await API.loadJSON('data/phases.json') || [];
+            bosses = await API.loadJSON('data/bosses.json') || {};
+            enemies = await API.loadJSON('data/enemies.json') || {};
+            weapons = await API.loadJSON('data/weapons.json') || [];
+            players = (await API.loadJSON('data/player.json'))?.players || {};
+            assets = await API.listAssets();
+
+            const pSel = document.getElementById('field-player_id');
+            Object.keys(players).forEach(id => pSel.innerHTML += `<option value="${id}">${players[id].name || id}</option>`);
+            const bSel = document.getElementById('field-boss_id');
+            Object.keys(bosses).forEach(id => bSel.innerHTML += `<option value="${id}">${bosses[id].name || id}</option>`);
+            const eSel = document.getElementById('field-add-enemy');
+            Object.keys(enemies).forEach(id => eSel.innerHTML += `<option value="${id}">${enemies[id].name || id}</option>`);
+            const wAdd = document.getElementById('field-add-weapon'), wDef = document.getElementById('field-default_weapon');
+            weapons.forEach(w => { const opt = `<option value="${w.id}">${w.name}</option>`; wAdd.innerHTML += opt; wDef.innerHTML += opt; });
+
+            setupTabs();
+            renderList();
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(t => {
+                t.onclick = () => {
+                    document.querySelector('.tab.active').classList.remove('active');
+                    t.classList.add('active');
+                    document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+                    document.getElementById(t.dataset.target).style.display = 'block';
+                };
+            });
+        }
+
+        function renderList() {
+            const list = document.getElementById('phase-list'); list.innerHTML = '';
+            phases.sort((a,b)=>a.id-b.id).forEach((p,i)=>{
+                const item = document.createElement('div');
+                item.className = 'entity-list-item' + (i===currentIndex?' active':'');
+                item.innerHTML = `<span><strong>Phase ${p.id}</strong> : ${p.name}</span>`;
+                item.onclick = () => selectPhase(i);
+                list.appendChild(item);
+            });
+        }
+
+        function selectPhase(index) {
+            currentIndex = index; const p = phases[index];
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('editor-form').style.display = 'block';
+            document.getElementById('phase-title').innerText = `PHASE ${p.id} : ${p.name.toUpperCase()}`;
+            document.getElementById('field-name').value = p.name;
+            document.getElementById('field-player_id').value = p.player_id || "";
+            document.getElementById('field-duration').value = p.duration || p.duration_before_boss * 1000 || 60000;
+            document.getElementById('field-spawn_rate').value = p.spawn_rate;
+            document.getElementById('field-boss_id').value = p.boss_id;
+            document.getElementById('field-default_weapon').value = p.default_weapon;
+            renderChips('box-enemy-types', p.enemy_types || [], id => { p.enemy_types = p.enemy_types.filter(cid=>cid!==id); selectPhase(currentIndex); });
+            renderChips('box-available-weapons', p.available_weapons || [], id => { p.available_weapons = p.available_weapons.filter(cid=>cid!==id); selectPhase(currentIndex); });
+            renderStoryList('story_intro'); renderStoryList('story_outro');
+            document.querySelectorAll('.entity-list-item').forEach((el,i)=>el.classList.toggle('active', i===index));
+        }
+
+        function renderChips(containerId, list, onRemove) {
+            const container = document.getElementById(containerId); container.innerHTML = '';
+            list.forEach(id => {
+                const chip = document.createElement('div'); chip.className = 'list-chip';
+                chip.innerHTML = `${id} <button>&times;</button>`;
+                chip.querySelector('button').onclick = () => onRemove(id);
+                container.appendChild(chip);
+            });
+        }
+
+        function renderStoryList(type) {
+            const list = document.getElementById(`story-${type.replace('_','-')}-list`);
+            list.innerHTML = '';
+            const pages = phases[currentIndex][type] || [];
+            pages.forEach((page, i) => {
+                const div = document.createElement('div');
+                div.className = 'story-page-editor';
+                div.innerHTML = `
+                    <div style="position: absolute; right: 10px; top: 10px;"><button class="secondary" style="background: var(--danger); padding: 2px 5px;" onclick="removeStoryPage('${type}', ${i})">Suppr.</button></div>
+                    <div class="form-group"><label>Titre</label><input type="text" value="${page.title || ''}" onchange="updateStoryPage('${type}', ${i}, 'title', this.value)"></div>
+                    <div class="form-group"><label>Texte Narrative</label><textarea rows="3" onchange="updateStoryPage('${type}', ${i}, 'text', this.value)">${page.text || ''}</textarea></div>
+                    <div class="form-group"><label>Image (Optionnelle)</label><select onchange="updateStoryPage('${type}', ${i}, 'image', this.value)"><option value="">Aucune</option>${assets.map(a=>`<option value="${a}" ${a===page.image?'selected':''}>${a}</option>`).join('')}</select></div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addStoryPage(type) { if (!phases[currentIndex][type]) phases[currentIndex][type] = []; phases[currentIndex][type].push({title:'',text:'',image:''}); renderStoryList(type); }
+        function removeStoryPage(type, i) { phases[currentIndex][type].splice(i, 1); renderStoryList(type); }
+        function updateStoryPage(type, i, field, val) { phases[currentIndex][type][i][field] = val; }
+
+        document.getElementById('field-add-enemy').onchange = (e) => { const id = e.target.value; if (id && !phases[currentIndex].enemy_types.includes(id)) { phases[currentIndex].enemy_types.push(id); e.target.value = ''; selectPhase(currentIndex); } };
+        document.getElementById('field-add-weapon').onchange = (e) => { const id = e.target.value; if (id && !phases[currentIndex].available_weapons.includes(id)) { phases[currentIndex].available_weapons.push(id); e.target.value = ''; selectPhase(currentIndex); } };
+        document.querySelectorAll('input, select').forEach(inp => { inp.onchange = () => { if (currentIndex === null) return; const p = phases[currentIndex]; p.name = document.getElementById('field-name').value; p.player_id = document.getElementById('field-player_id').value; p.duration = parseInt(document.getElementById('field-duration').value); p.spawn_rate = parseInt(document.getElementById('field-spawn_rate').value); p.boss_id = document.getElementById('field-boss_id').value; p.default_weapon = document.getElementById('field-default_weapon').value; renderList(); }; });
+        document.getElementById('btn-new').onclick = () => { phases.push({ id: phases.length, name: "Nouveau Niveau", duration: 60000, spawn_rate: 1000, enemy_types: [], boss_id: "", default_weapon: "", available_weapons: [], story_intro: [], story_outro: [] }); renderList(); selectPhase(phases.length-1); };
+        document.getElementById('btn-save').onclick = () => { phases.sort((a,b)=>a.id-b.id); API.saveJSON('data/phases.json', { phases: phases }); };
+        init();
+    </script>
+</body>
+</html>

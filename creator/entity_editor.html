@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratoire d'Entités | Creator Engine</title>
+    <link rel="stylesheet" href="css/creator.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <button class="secondary" onclick="location.href='index.html'"><span>⬅️</span> Retour</button>
+            <h1>LABORATOIRE D'ENTITÉS</h1>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <select id="select-category" style="width: 200px;">
+                <option value="player.json">Joueurs (Héros)</option>
+                <option value="enemies.json">Ennemis de base</option>
+                <option value="bosses.json">Boss de fin</option>
+            </select>
+            <button id="btn-save" style="background: var(--success);"><span>💾</span> Sauvegarder</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="editor-layout">
+            <!-- Sidebar: Entity List -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span>LISTE DES ENTITÉS</span>
+                    <button class="secondary" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;" id="btn-add">+ Ajouter</button>
+                </div>
+                <div class="panel-content" id="entity-list">
+                    <!-- Entities will be injected here -->
+                </div>
+            </div>
+
+            <!-- Main Workspace: Preview & Form -->
+            <div class="panel" style="grid-column: span 2;">
+                <div class="panel-header" id="editor-title">SÉLECTIONNEZ UNE ENTITÉ</div>
+                <div class="panel-content">
+                    <div id="editor-workspace" style="display: none;">
+                        <div class="preview-pane" id="preview-grid">
+                            <div id="preview-container"></div>
+                            <div class="preview-controls">
+                                <button onclick="previewer.play('idle')">Idle</button>
+                                <button onclick="previewer.play('walk')">Walk</button>
+                            </div>
+                        </div>
+
+                        <div id="editor-form" style="margin-top: 2rem;">
+                            <!-- Generic Stats -->
+                            <div class="grid-2">
+                                <div class="form-group"><label>ID Unique</label><input type="text" id="field-id"></div>
+                                <div class="form-group"><label>Nom Public</label><input type="text" id="field-name"></div>
+                            </div>
+                            <div class="grid-3">
+                                <div class="form-group"><label>Points de Vie</label><input type="number" id="field-hp"></div>
+                                <div class="form-group"><label>Vitesse</label><input type="number" id="field-speed"></div>
+                                <div class="form-group"><label>Dégâts</label><input type="number" id="field-damage"></div>
+                            </div>
+
+                            <!-- Visual System -->
+                            <div style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+                                <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--accent);">SYSTÈME VISUEL</h3>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Largeur Sprite (px)</label>
+                                        <input type="number" id="field-vis-width">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Mode de Direction</label>
+                                        <select id="field-vis-mode">
+                                            <option value="rotate">Rotation (Top-Down)</option>
+                                            <option value="flip">Flip (Gauche/Droite)</option>
+                                            <option value="none">Statique</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Animations (JSON)</label>
+                                    <textarea id="field-vis-anims" rows="8" style="font-family: monospace; font-size: 0.8rem;"></textarea>
+                                    <p style="font-size: 0.7rem; color: var(--text-dim); margin-top: 0.5rem;">Note: Utilisez l'explorateur d'assets pour copier les chemins.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Asset Explorer -->
+            <div class="panel">
+                <div class="panel-header">EXPLORATEUR D'ASSETS</div>
+                <div class="panel-content">
+                    <div class="form-group">
+                        <input type="text" id="asset-search" placeholder="Rechercher un fichier...">
+                    </div>
+                    <div id="asset-list" style="max-height: 500px; overflow-y: auto; font-size: 0.75rem;">
+                        <!-- Assets will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/editor_utils.js"></script>
+    <script>
+        let currentFile = 'player.json';
+        let currentData = null;
+        let selectedId = null;
+        let assets = [];
+        const previewer = new AnimationPreviewer('preview-container');
+
+        async function loadContent() {
+            const raw = await API.loadJSON(`data/${currentFile}`);
+            currentData = (currentFile === 'player.json') ? raw.players : raw.enemies || raw.bosses;
+            assets = await API.listAssets();
+            renderEntityList();
+            renderAssetList();
+        }
+
+        function renderEntityList() {
+            const list = document.getElementById('entity-list');
+            list.innerHTML = '';
+            Object.keys(currentData).forEach(id => {
+                const item = document.createElement('div');
+                item.className = 'entity-list-item' + (id === selectedId ? ' active' : '');
+                item.innerHTML = `<span><strong>${id}</strong></span>`;
+                item.onclick = () => selectEntity(id);
+                list.appendChild(item);
+            });
+        }
+
+        function selectEntity(id) {
+            selectedId = id;
+            const entity = currentData[id];
+            document.getElementById('editor-workspace').style.display = 'block';
+            document.getElementById('editor-title').innerText = `ÉDITION : ${id.toUpperCase()}`;
+            
+            document.getElementById('field-id').value = id;
+            document.getElementById('field-name').value = entity.name || id;
+            document.getElementById('field-hp').value = entity.hp || entity.maxHp || 0;
+            document.getElementById('field-speed').value = entity.speed || 0;
+            document.getElementById('field-damage').value = entity.damage || 0;
+            
+            if (entity.visuals) {
+                document.getElementById('field-vis-width').value = entity.visuals.width || 64;
+                document.getElementById('field-vis-mode').value = entity.visuals.directionMode || 'rotate';
+                document.getElementById('field-vis-anims').value = JSON.stringify(entity.visuals.animations || {}, null, 2);
+            }
+
+            previewer.setEntity(entity);
+            renderEntityList();
+        }
+
+        function renderAssetList() {
+            const list = document.getElementById('asset-list');
+            const search = document.getElementById('asset-search').value.toLowerCase();
+            list.innerHTML = '';
+            assets.filter(a => a.toLowerCase().includes(search)).forEach(path => {
+                const item = document.createElement('div');
+                item.style.padding = '0.5rem';
+                item.style.borderBottom = '1px solid var(--border)';
+                item.style.cursor = 'pointer';
+                item.style.display = 'flex';
+                item.style.alignItems = 'center';
+                item.style.gap = '10px';
+                item.innerHTML = `<img src="../${path}" style="width: 24px; height: 24px; object-fit: contain;"> <span>${path.split('/').pop()}</span>`;
+                item.onclick = () => {
+                    navigator.clipboard.writeText(path);
+                    showToast('Chemin copié !', 'info');
+                };
+                list.appendChild(item);
+            });
+        }
+
+        document.getElementById('select-category').onchange = (e) => {
+            currentFile = e.target.value;
+            selectedId = null;
+            document.getElementById('editor-workspace').style.display = 'none';
+            loadContent();
+        };
+
+        document.getElementById('asset-search').oninput = renderAssetList;
+
+        document.getElementById('btn-save').onclick = async () => {
+            if (selectedId) {
+                const entity = currentData[selectedId];
+                entity.name = document.getElementById('field-name').value;
+                entity.hp = parseInt(document.getElementById('field-hp').value);
+                if (entity.maxHp !== undefined) entity.maxHp = entity.hp;
+                entity.speed = parseInt(document.getElementById('field-speed').value);
+                entity.damage = parseInt(document.getElementById('field-damage').value);
+                
+                try {
+                    entity.visuals.width = parseInt(document.getElementById('field-vis-width').value);
+                    entity.visuals.directionMode = document.getElementById('field-vis-mode').value;
+                    entity.visuals.animations = JSON.parse(document.getElementById('field-vis-anims').value);
+                } catch(e) {
+                    showToast("Erreur JSON dans les animations", "danger");
+                    return;
+                }
+            }
+
+            let finalContent = {};
+            if (currentFile === 'player.json') finalContent = { players: currentData };
+            else if (currentFile === 'enemies.json') finalContent = { enemies: currentData };
+            else finalContent = { bosses: currentData };
+
+            await API.saveJSON(`data/${currentFile}`, finalContent);
+            loadContent();
+        };
+
+        loadContent();
+    </script>
+</body>
+</html>

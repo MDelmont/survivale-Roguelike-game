@@ -17,7 +17,19 @@
                 "shield_orbit",
                 "smartphone_poison"
             ],
-            "boss_id": "ovule_geant"
+            "boss_id": "ovule_geant",
+            "story_intro": [
+                {
+                    "title": "L'Étincelle de Vie",
+                    "text": "Dans l'obscurité primordiale, une course contre la montre commence. Anthony, un spermatozoïde pas comme les autres, doit se frayer un chemin parmi ses semblables pour atteindre l'objectif ultime."
+                }
+            ],
+            "story_outro": [
+                {
+                    "title": "La Premier Passage",
+                    "text": "L'ovule est en vue ! Malgré les obstacles, Anthony a réussi à percer les premières défenses. Mais ce n'est que le début d'une longue aventure vers la maturité."
+                }
+            ]
         },
         {
             "id": 2,

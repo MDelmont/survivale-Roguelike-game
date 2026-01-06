@@ -14,9 +14,12 @@ Définit le déroulement d'une partie.
 | `duration` | Nombre | Temps avant l'apparition du boss (en millisecondes). |
 | `spawn_rate` | Nombre | Intervalle entre chaque apparition d'ennemi (en ms). |
 | `enemy_types` | Liste (ID) | IDs des ennemis (définis dans `enemies.json`) pouvant apparaître. |
+| `player_id` | ID | ID du joueur à charger (défini dans `player.json`). |
 | `boss_id` | ID | ID du boss (défini dans `bosses.json`) apparaissant à la fin. |
 | `default_weapon` | ID | Arme donnée au joueur au début de cette phase. |
 | `available_weapons` | Liste (ID) | IDs des armes proposées lors de la montée de niveau. |
+| `story_intro` | Liste | Pages de narration affichées **avant** le gameplay. |
+| `story_outro` | Liste | Pages de narration affichées **après** la défaite du boss. |
 
 ---
 
@@ -90,12 +93,29 @@ Commun à tous les éléments (Joueur, Ennemis, Boss, Projectiles).
 
 ---
 
-## 6. Joueur (`data/player.json`)
-Statistiques de base au début d'une course.
+## 6. Joueurs (`data/player.json`)
+Contient la liste des personnages jouables.
+
+```json
+{
+  "players": {
+    "mon_id": {
+      "name": "Nom du Héros",
+      "speed": 250,
+      "hp": 100,
+      "maxHp": 100,
+      "pickupRadius": 100,
+      "xpNextLevel": 50,
+      "visuals": { ... }
+    }
+  }
+}
+```
 
 | Champ | Description |
 | :--- | :--- |
+| `name` | Nom affiché dans les menus. |
 | `speed` | Vitesse de marche initiale. |
-| `hp` / `maxHp` | Vie actuelle et vie maximale. |
-| `pickupRadius` | Rayon pour attirer l'expérience au sol (magnétisme). |
-| `xpNextLevel` | XP requise pour le niveau 2. |
+| `hp` / `maxHp` | Vie initiale et maximum. |
+| `pickupRadius` | Rayon magnétique pour l'XP. |
+| `xpNextLevel` | XP requise pour passer au niveau 2. |

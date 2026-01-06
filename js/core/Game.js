@@ -18,6 +18,7 @@ const GameState = {
     PLAYING: 'PLAYING',
     UPGRADE: 'UPGRADE',
     WEAPON_MENU: 'WEAPON_MENU',
+    STORY: 'STORY',
     VICTORY: 'VICTORY',
     GAMEOVER: 'GAMEOVER'
 };
@@ -58,6 +59,10 @@ class Game {
         this.state = GameState.MENU;
         this.upgradeOptions = [];
 
+        this.storyQueue = [];
+        this.storyPageIndex = 0;
+        this.onStoryComplete = null;
+
         this.init();
     }
 
@@ -81,6 +86,18 @@ class Game {
         this.explosions = [];
         this.boss = null;
 
+        if (this.currentPhase.story_intro && this.currentPhase.story_intro.length > 0) {
+            this.openStory(this.currentPhase.story_intro, () => {
+                this.setupInitialPlayer();
+                this.state = GameState.PLAYING;
+            });
+        } else {
+            this.setupInitialPlayer();
+            this.state = GameState.PLAYING;
+        }
+    }
+
+    setupInitialPlayer() {
         if (!this.player) {
             const playerStats = this.dataManager.getPlayerData(this.currentPhase.player_id);
             this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, playerStats, this.dataManager.assetManager);
@@ -109,6 +126,8 @@ class Game {
         if (this.state === GameState.MENU) {
             if (mouseY < this.canvas.height / 2 + 50) this.startNewGame();
             else this.continueGame();
+        } else if (this.state === GameState.STORY) {
+            this.nextStoryPage();
         } else if (this.state === GameState.UPGRADE) {
             this.handleChoiceMenuClick(mouseX, mouseY, 80, (choice) => {
                 this.upgradeSystem.applyUpgrade(this.player, choice);
@@ -275,7 +294,21 @@ class Game {
         if (this.boss) {
             this.boss.update(deltaTime, this.player, (x, y, dx, dy) => this.spawnEnemyProjectile(x, y, dx, dy));
             if (this.player && CombatSystem.checkCollision(this.player, this.boss)) this.player.takeDamage(this.boss.damage * (deltaTime / 1000));
-            if (this.boss.hp <= 0) { this.killCount++; this.state = GameState.VICTORY; this.boss = null; }
+            if (this.boss.hp <= 0) { 
+                this.killCount++; 
+                this.boss = null;
+                this.handlePhaseWin();
+            }
+        }
+    }
+
+    handlePhaseWin() {
+        if (this.currentPhase.story_outro && this.currentPhase.story_outro.length > 0) {
+            this.openStory(this.currentPhase.story_outro, () => {
+                this.state = GameState.VICTORY;
+            });
+        } else {
+            this.state = GameState.VICTORY;
         }
     }
 
@@ -382,8 +415,92 @@ class Game {
 
         if (this.state === GameState.UPGRADE) this.drawChoiceMenu('AMÉLIORATION DISPONIBLE !', '#0af');
         if (this.state === GameState.WEAPON_MENU) this.drawChoiceMenu('CHOISIS TON ARME !', '#ffd700', 100);
+        if (this.state === GameState.STORY) this.drawStory();
         if (this.state === GameState.VICTORY) this.drawEndScreen('VICTOIRE !', '#0f0');
         if (this.state === GameState.GAMEOVER) this.drawEndScreen('GAME OVER', '#f00');
+    }
+
+    drawStory() {
+        const ctx = this.ctx;
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        const page = this.storyQueue[this.storyPageIndex];
+
+        // Background dark overlay
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+        ctx.fillRect(0, 0, w, h);
+
+        // Illustration image (if present)
+        if (page.image && this.dataManager.assetManager.isLoaded(page.image)) {
+            const img = this.dataManager.assetManager.getImage(page.image);
+            const scale = Math.min(w / img.width, (h * 0.4) / img.height);
+            const imgW = img.width * scale;
+            const imgH = img.height * scale;
+            ctx.drawImage(img, w / 2 - imgW / 2, 100, imgW, imgH);
+        }
+
+        // Glass box for text
+        const boxW = Math.min(w * 0.8, 800);
+        const boxH = 300;
+        const boxX = w / 2 - boxW / 2;
+        const boxY = h / 2 + 50 - boxH / 2;
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.fillRect(boxX, boxY, boxW, boxH);
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+        // Title
+        ctx.fillStyle = '#3b82f6';
+        ctx.font = 'bold 32px Inter, Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(page.title || 'HISTOIRE', w / 2, boxY + 60);
+
+        // Text with wrapping
+        ctx.fillStyle = 'white';
+        ctx.font = '20px Inter, Arial';
+        ctx.textAlign = 'center';
+        this.wrapText(ctx, page.text || '', w / 2, boxY + 120, boxW - 80, 30);
+
+        // Prompt
+        ctx.fillStyle = '#666';
+        ctx.font = '16px Inter, Arial';
+        ctx.fillText('CLIQUE POUR CONTINUER...', w / 2, boxY + boxH - 40);
+    }
+
+    wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        const words = text.split(' ');
+        let line = '';
+        let testY = y;
+
+        for (let n = 0; n < words.length; n++) {
+            const testLine = line + words[n] + ' ';
+            const metrics = ctx.measureText(testLine);
+            const testWidth = metrics.width;
+            if (testWidth > maxWidth && n > 0) {
+                ctx.fillText(line, x, testY);
+                line = words[n] + ' ';
+                testY += lineHeight;
+            } else {
+                line = testLine;
+            }
+        }
+        ctx.fillText(line, x, testY);
+    }
+
+    openStory(queue, callback) {
+        this.storyQueue = queue;
+        this.storyPageIndex = 0;
+        this.onStoryComplete = callback;
+        this.state = GameState.STORY;
+    }
+
+    nextStoryPage() {
+        this.storyPageIndex++;
+        if (this.storyPageIndex >= this.storyQueue.length) {
+            if (this.onStoryComplete) this.onStoryComplete();
+        }
     }
 
     drawBackground() {

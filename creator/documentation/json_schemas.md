@@ -126,5 +126,16 @@ Structure du déroulement d'un niveau.
 | `enemy_types` | Array | Liste des IDs d'ennemis présents. |
 | `player_id` | String | ID du joueur à utiliser (configuré dans `player.json`). |
 | `boss_id` | String | ID du boss final. |
+| `story_intro` | Array | Liste de pages de texte affichées **avant** le début de la phase. |
+| `story_outro` | Array | Liste de pages de texte affichées **après** la victoire (mort du boss). |
+
+### Structure d'une page d'histoire :
+```json
+{
+    "title": "Le Titre de la Page",
+    "text": "Le contenu narratif qui sera affiché sur l'écran.",
+    "image": "assets/images/illustration.png" // Optionnel
+}
+```
 | `default_weapon`| String | Arme de départ du joueur. |
 | `available_weapons`| Array | Armes proposées en loot. |

@@ -38,6 +38,7 @@ L'outil est conçu pour être **Data-Driven**. L'objectif est de permettre à un
 - **Sélecteur de Héros** : Choisir quel joueur est assigné à cette phase.
 - **Pool d'Ennemis** : Ajouter/Supprimer des ennemis via un système de "Chips" (étiquettes cliquables).
 - **Configuration Boss** : Choisir quel boss apparaît à la fin du timer.
+- **Narration & Histoire** : Éditeur de pages pour l'introduction et la conclusion de la phase (Titre + Texte).
 
 ---
 
