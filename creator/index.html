@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survivale Creator - Éditeur de Jeu</title>
+    <meta name="description" content="Outil de création et de gestion des données JSON pour Survivale Roguelike">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/animations.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <h1 class="app-title">
+                <span class="title-icon">🧬</span>
+                Survivale Creator
+            </h1>
+        </div>
+        <div class="header-center">
+            <nav class="main-nav" id="mainNav">
+                <button class="nav-btn active" data-section="hub">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-label">Hub</span>
+                </button>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="connection-status" id="connectionStatus">
+                <span class="status-dot disconnected"></span>
+                <span class="status-text">Non connecté</span>
+            </div>
+            <button class="btn btn-primary" id="connectBtn">
+                <span class="btn-icon">📁</span>
+                Connecter Projet
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+        <!-- Hub Section -->
+        <section class="section active" id="hubSection">
+            <div class="section-header">
+                <h2 class="section-title">Tableau de Bord</h2>
+                <p class="section-subtitle">Sélectionnez un module pour commencer l'édition</p>
+            </div>
+
+            <!-- Project Stats -->
+            <div class="stats-bar" id="statsBar">
+                <div class="stat-item">
+                    <span class="stat-value" id="statPlayers">-</span>
+                    <span class="stat-label">Joueurs</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="statEnemies">-</span>
+                    <span class="stat-label">Ennemis</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="statBosses">-</span>
+                    <span class="stat-label">Boss</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="statWeapons">-</span>
+                    <span class="stat-label">Armes</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="statPhases">-</span>
+                    <span class="stat-label">Phases</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="statAssets">-</span>
+                    <span class="stat-label">Assets</span>
+                </div>
+            </div>
+
+            <!-- Module Cards Grid -->
+            <div class="cards-grid" id="moduleCards">
+                <div class="module-card disabled" data-module="players">
+                    <div class="card-icon">🧬</div>
+                    <h3 class="card-title">Joueurs</h3>
+                    <p class="card-desc">Gérer les personnages jouables</p>
+                    <span class="card-count" id="cardPlayers">-</span>
+                </div>
+                <div class="module-card disabled" data-module="enemies">
+                    <div class="card-icon">👾</div>
+                    <h3 class="card-title">Ennemis</h3>
+                    <p class="card-desc">Configurer les monstres</p>
+                    <span class="card-count" id="cardEnemies">-</span>
+                </div>
+                <div class="module-card disabled" data-module="bosses">
+                    <div class="card-icon">👹</div>
+                    <h3 class="card-title">Boss</h3>
+                    <p class="card-desc">Créer les boss de phase</p>
+                    <span class="card-count" id="cardBosses">-</span>
+                </div>
+                <div class="module-card disabled" data-module="weapons">
+                    <div class="card-icon">⚔️</div>
+                    <h3 class="card-title">Armes</h3>
+                    <p class="card-desc">Définir armes et projectiles</p>
+                    <span class="card-count" id="cardWeapons">-</span>
+                </div>
+                <div class="module-card disabled" data-module="phases">
+                    <div class="card-icon">🌍</div>
+                    <h3 class="card-title">Phases</h3>
+                    <p class="card-desc">Construire les niveaux</p>
+                    <span class="card-count" id="cardPhases">-</span>
+                </div>
+                <div class="module-card disabled" data-module="transitions">
+                    <div class="card-icon">📖</div>
+                    <h3 class="card-title">Transitions</h3>
+                    <p class="card-desc">Éditer les séquences narratives</p>
+                    <span class="card-count" id="cardTransitions">-</span>
+                </div>
+            </div>
+
+            <!-- Assets Preview -->
+            <div class="assets-section" id="assetsSection" style="display: none;">
+                <h3 class="subsection-title">📂 Assets Détectés</h3>
+                <div class="assets-grid" id="assetsGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Players Section (placeholder) -->
+        <section class="section" id="playersSection">
+            <div class="section-header">
+                <button class="btn btn-ghost back-btn" data-section="hub">
+                    <span>←</span> Retour au Hub
+                </button>
+                <h2 class="section-title">🧬 Éditeur de Joueurs</h2>
+            </div>
+            <div class="coming-soon">
+                <p>Module en cours de développement...</p>
+            </div>
+        </section>
+
+        <!-- Enemies Section (placeholder) -->
+        <section class="section" id="enemiesSection">
+            <div class="section-header">
+                <button class="btn btn-ghost back-btn" data-section="hub">
+                    <span>←</span> Retour au Hub
+                </button>
+                <h2 class="section-title">👾 Éditeur d'Ennemis</h2>
+            </div>
+            <div class="coming-soon">
+                <p>Module en cours de développement...</p>
+            </div>
+        </section>
+
+        <!-- Bosses Section (placeholder) -->
+        <section class="section" id="bossesSection">
+            <div class="section-header">
+                <button class="btn btn-ghost back-btn" data-section="hub">
+                    <span>←</span> Retour au Hub
+                </button>
+                <h2 class="section-title">👹 Éditeur de Boss</h2>
+            </div>
+            <div class="coming-soon">
+                <p>Module en cours de développement...</p>
+            </div>
+        </section>
+
+        <!-- Weapons Section (placeholder) -->
+        <section class="section" id="weaponsSection">
+            <div class="section-header">
+                <button class="btn btn-ghost back-btn" data-section="hub">
+                    <span>←</span> Retour au Hub
+                </button>
+                <h2 class="section-title">⚔️ Éditeur d'Armes</h2>
+            </div>
+            <div class="coming-soon">
+                <p>Module en cours de développement...</p>
+            </div>
+        </section>
+
+        <!-- Phases Section (placeholder) -->
+        <section class="section" id="phasesSection">
+            <div class="section-header">
+                <button class="btn btn-ghost back-btn" data-section="hub">
+                    <span>←</span> Retour au Hub
+                </button>
+                <h2 class="section-title">🌍 Éditeur de Phases</h2>
+            </div>
+            <div class="coming-soon">
+                <p>Module en cours de développement...</p>
+            </div>
+        </section>
+
+        <!-- Transitions Section (placeholder) -->
+        <section class="section" id="transitionsSection">
+            <div class="section-header">
+                <button class="btn btn-ghost back-btn" data-section="hub">
+                    <span>←</span> Retour au Hub
+                </button>
+                <h2 class="section-title">📖 Éditeur de Transitions</h2>
+            </div>
+            <div class="coming-soon">
+                <p>Module en cours de développement...</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Scripts -->
+    <script src="scripts/fileManager.js"></script>
+    <script src="scripts/assetScanner.js"></script>
+    <script src="scripts/app.js"></script>
+</body>
+</html>
