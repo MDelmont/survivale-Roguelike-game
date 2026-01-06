@@ -35,38 +35,6 @@
                     }
                 }
             }
-        },
-        "matthieu": {
-            "name": "Matthieu",
-            "speed": 280,
-            "hp": 80,
-            "maxHp": 80,
-            "fireRate": 250,
-            "damage": 12,
-            "projectileSpeed": 450,
-            "pickupRadius": 120,
-            "visuals": {
-                "type": "sprite",
-                "width": 64,
-                "angleOffset": 90,
-                "directionMode": "rotate",
-                "hitFlash": true,
-                "animations": {
-                    "idle": {
-                        "frames": [
-                            "assets/players/Spermateozoide-Anthony-1.png"
-                        ],
-                        "frameRate": 1
-                    },
-                    "walk": {
-                        "frames": [
-                            "assets/players/Spermateozoide-Anthony-1.png"
-                        ],
-                        "frameRate": 10,
-                        "loop": true
-                    }
-                }
-            }
         }
     }
 }

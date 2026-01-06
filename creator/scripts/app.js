@@ -7,6 +7,16 @@ class App {
         this.assetScanner = new AssetScanner(this.fileManager);
         this.currentSection = 'hub';
         this.gameData = null;
+        
+        // Modules
+        this.modules = {
+            players: null,
+            enemies: null,
+            bosses: null,
+            weapons: null,
+            phases: null,
+            transitions: null
+        };
 
         this.init();
     }
@@ -254,6 +264,26 @@ class App {
                 btn.classList.add('active');
             }
         });
+        
+        // Initialiser le module correspondant
+        this.initModule(sectionId);
+    }
+    
+    /**
+     * Initialise un module si nécessaire
+     */
+    initModule(moduleId) {
+        if (!this.gameData) return;
+        
+        switch(moduleId) {
+            case 'players':
+                if (!this.modules.players) {
+                    this.modules.players = new PlayersModule(this);
+                }
+                this.modules.players.init();
+                break;
+            // Les autres modules seront ajoutés plus tard
+        }
     }
 
     /**
