@@ -30,14 +30,19 @@
             "projectileVisuals": {
                 "type": "sprite",
                 "width": 16,
-                "directionMode": "none",
+                "directionMode": "rotate",
                 "animations": {
                     "idle": {
-                        "frames": [],
+                        "frames": [
+                            "assets/projectiles/capotes.png"
+                        ],
                         "frameRate": 10,
                         "loop": true
                     }
-                }
+                },
+                "path": "assets/projectiles/capotes.png",
+                "height": 16,
+                "angleOffset": 90
             }
         },
         "biberon_alpha": {

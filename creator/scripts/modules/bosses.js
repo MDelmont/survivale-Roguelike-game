@@ -392,9 +392,24 @@ class BossesModule {
                             </select>
                         </div>
                         <div class="form-group">
+                            <label class="form-label">Asset (Sprite)</label>
+                            <select class="form-select" id="projVisualPath">
+                                <option value="">-- Aucun --</option>
+                                ${projectileAssets.map(path => `<option value="${path}" ${b.projectileVisuals?.path === path ? 'selected' : ''}>${path.split('/').pop()}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
                             <label class="form-label">Largeur (px)</label>
                             <input type="number" class="form-input" id="projWidth" value="${b.projectileVisuals?.width || 16}">
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Hauteur (px)</label>
+                            <input type="number" class="form-input" id="projHeight" value="${b.projectileVisuals?.height || 16}">
+                        </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Direction Mode</label>
                             <select class="form-select" id="projDirMode">
@@ -402,9 +417,14 @@ class BossesModule {
                                 <option value="rotate" ${b.projectileVisuals?.directionMode === 'rotate' ? 'selected' : ''}>Rotate</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Angle Offset (°)</label>
+                            <input type="number" class="form-input" id="projAngleOffset" value="${b.projectileVisuals?.angleOffset || 0}">
+                        </div>
                     </div>
                     
-                    <h4 style="margin-top: var(--space-md); margin-bottom: var(--space-sm);">Animation du Projectile</h4>
+                    <h4 style="margin-top: var(--space-md); margin-bottom: var(--space-sm);">Animation avancée (Optionnel)</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: var(--space-sm);">Si vous définissez une animation ci-dessous, elle remplacera l'asset sélectionné plus haut.</p>
                     <div id="projAnimationsContainer">
                         ${this.renderProjectileAnimation(b.projectileVisuals?.animations, projectileAssets)}
                     </div>
@@ -734,9 +754,25 @@ class BossesModule {
         // Projectile visuals
         if (!b.projectileVisuals) b.projectileVisuals = {};
         b.projectileVisuals.type = document.getElementById('projVisualType')?.value || 'sprite';
+        const pPath = document.getElementById('projVisualPath')?.value;
+        b.projectileVisuals.path = pPath;
         b.projectileVisuals.width = parseInt(document.getElementById('projWidth')?.value) || 16;
+        b.projectileVisuals.height = parseInt(document.getElementById('projHeight')?.value) || 16;
         b.projectileVisuals.directionMode = document.getElementById('projDirMode')?.value || 'rotate';
-        b.projectileVisuals.animations = this.collectAnimations('proj');
+        b.projectileVisuals.angleOffset = parseInt(document.getElementById('projAngleOffset')?.value) || 0;
+        
+        const projAnimations = this.collectAnimations('proj');
+        
+        // Si l'utilisateur n'a pas défini d'animation manuellement mais a choisi un asset
+        if ((!projAnimations.idle || !projAnimations.idle.frames || projAnimations.idle.frames.length === 0) && pPath) {
+            projAnimations.idle = {
+                frames: [pPath],
+                frameRate: 10,
+                loop: true
+            };
+        }
+        
+        b.projectileVisuals.animations = projAnimations;
 
         this.updateJsonPreview();
     }
@@ -978,15 +1014,21 @@ class BossesModule {
         if (!canvas || !this.currentBoss) return;
 
         const projVisuals = this.currentBoss.projectileVisuals;
-        if (!projVisuals?.animations?.idle?.frames?.length) {
+        
+        // Priorité : frames de l'animation idle, sinon le path direct
+        const path = projVisuals?.animations?.idle?.frames?.[0] || projVisuals?.path;
+        
+        if (!path) {
             canvas.innerHTML = '<span style="color: var(--text-muted); font-size: 0.8rem;">Aucun</span>';
             return;
         }
 
-        const url = await this.app.assetScanner.getAssetURL(projVisuals.animations.idle.frames[0]);
+        const url = await this.app.assetScanner.getAssetURL(path);
         if (url) {
             const width = projVisuals.width || 16;
-            canvas.innerHTML = `<img src="${url}" alt="projectile" style="width: ${width * 2}px; height: ${width * 2}px; image-rendering: pixelated;">`;
+            const height = projVisuals.height || width;
+            const angle = projVisuals.angleOffset || 0;
+            canvas.innerHTML = `<img src="${url}" alt="projectile" style="width: ${width * 2}px; height: ${height * 2}px; transform: rotate(${angle}deg); image-rendering: pixelated;">`;
         }
     }
 

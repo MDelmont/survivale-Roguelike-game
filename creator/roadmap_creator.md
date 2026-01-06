@@ -186,7 +186,7 @@ creator/
 
 ---
 
-### � ÉTAPE 5 : Module Boss (Boss Editor) - EN COURS
+### 🔷 ÉTAPE 5 : Module Boss (Boss Editor)
 **Durée estimée : 1 session**
 
 #### À développer
@@ -201,12 +201,12 @@ creator/
 #### Fichiers à créer/modifier
 - `scripts/modules/bosses.js`
 
-#### ✅ Critères de validation (À TESTER)
-- [ ] Les 3 boss existants s'affichent
-- [ ] Les dropdowns `attackPattern` et `movePattern` proposent les bonnes valeurs
-- [ ] On peut définir un `projectileVisuals` séparé
-- [ ] L'animation du boss ET du projectile peuvent être prévisualisées
-- [ ] Sauvegarder écrit correctement dans `bosses.json`
+#### ✅ Critères de validation (TERMINÉ)
+- [x] Les 3 boss existants s'affichent
+- [x] Les dropdowns `attackPattern` et `movePattern` proposent les bonnes valeurs
+- [x] On peut définir un `projectileVisuals` séparé
+- [x] L'animation du boss ET du projectile peuvent être prévisualisées
+- [x] Sauvegarder écrit correctement dans `bosses.json`
 
 ---
 
@@ -227,17 +227,17 @@ creator/
 #### Fichiers à créer/modifier
 - `scripts/modules/weapons.js`
 
-#### ✅ Critères de validation (À TESTER)
-- [ ] Toutes les armes s'affichent avec leur type
-- [ ] Changer le type modifie les champs visibles
-- [ ] Les upgrades s'affichent sous forme de liste
-- [ ] Ajouter une upgrade à une arme fonctionne
-- [ ] Modifier les stats d'une upgrade met à jour le JSON
-- [ ] Sauvegarder écrit correctement dans `weapons.json`
+#### ✅ Critères de validation (TERMINÉ)
+- [x] Toutes les armes s'affichent avec leur type
+- [x] Changer le type modifie les champs visibles
+- [x] Les upgrades s'affichent sous forme de liste
+- [x] Ajouter une upgrade à une arme fonctionne
+- [x] Modifier les stats d'une upgrade met à jour le JSON
+- [x] Sauvegarder écrit correctement dans `weapons.json`
 
 ---
 
-### 🔷 ÉTAPE 7 : Module Phases (Phase Editor)
+### 🔷 ÉTAPE 7 : Module Phases (Phase Editor) - EN COURS
 **Durée estimée : 2 sessions**
 
 #### À développer
@@ -258,13 +258,13 @@ creator/
 - `scripts/modules/phases.js`
 - `scripts/dataValidator.js`
 
-#### ✅ Critères de validation (À TESTER)
-- [ ] Les 6 phases existantes s'affichent dans l'ordre
-- [ ] Les dropdowns affichent les données des autres fichiers JSON
-- [ ] Le système de chips permet d'ajouter/retirer des ennemis
-- [ ] L'éditeur story_intro permet d'ajouter plusieurs pages
-- [ ] Un avertissement s'affiche si un ID référencé n'existe pas
-- [ ] Sauvegarder écrit correctement dans `phases.json`
+#### ✅ Critères de validation (TERMINÉ)
+- [x] Les 6 phases existantes s'affichent dans l'ordre
+- [x] Les dropdowns affichent les données des autres fichiers JSON (Players, Bosses, Weapons)
+- [x] Le système de chips permet d'ajouter/retirer des ennemis et armes de loot
+- [x] L'éditeur story_intro/outro permet d'ajouter plusieurs pages
+- [ ] Un avertissement s'affiche si un ID référencé n'existe pas (À faire)
+- [x] Sauvegarder écrit correctement dans `phases.json`
 
 ---
 

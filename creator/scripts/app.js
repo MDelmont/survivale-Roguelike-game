@@ -294,6 +294,18 @@ class App {
                 }
                 this.modules.bosses.init();
                 break;
+            case 'weapons':
+                if (!this.modules.weapons) {
+                    this.modules.weapons = new WeaponsModule(this);
+                }
+                this.modules.weapons.init();
+                break;
+            case 'phases':
+                if (!this.modules.phases) {
+                    this.modules.phases = new PhasesModule(this);
+                }
+                this.modules.phases.init();
+                break;
             // Les autres modules seront ajoutés plus tard
         }
     }

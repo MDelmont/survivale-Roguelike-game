@@ -448,6 +448,9 @@ class Game {
 
         this.input.draw(this.ctx);
 
+        if (this.state === GameState.STORY) this.drawStory();
+        if (this.state === GameState.UPGRADE) this.drawChoiceMenu('AMÉLIORATION DISPONIBLE', '#fbbf24', 80);
+        if (this.state === GameState.WEAPON_MENU) this.drawChoiceMenu('NOUVELLE ARME', '#3b82f6', 100);
         if (this.state === GameState.VICTORY) this.drawEndScreen('VICTOIRE !', '#0f0');
         if (this.state === GameState.GAMEOVER) this.drawEndScreen('GAME OVER', '#f00');
 
@@ -650,7 +653,7 @@ class Game {
 
         const menuWidth = 400;
         const startX = w / 2 - menuWidth / 2;
-        const startY = 180;
+        const startY = 150;
 
         this.upgradeOptions.forEach((opt, i) => {
             const optY = startY + i * (optionHeight + 20);
