@@ -295,6 +295,26 @@
     margin-bottom: var(--space-md);
 }
 
+.search-box {
+    margin-bottom: var(--space-md);
+    padding: 0 var(--space-xs);
+}
+
+.search-box .form-input {
+    width: 100%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.85rem;
+}
+
+.search-box .form-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
 .search-input {
     width: 100%;
     padding: var(--space-sm) var(--space-md);
@@ -323,6 +343,36 @@
     transform: translateY(-50%);
     font-size: 0.9rem;
     opacity: 0.5;
+}
+
+/* ---------- Color Input ---------- */
+.color-input-group {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+.form-color {
+    width: 40px;
+    height: 38px;
+    padding: 2px;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    cursor: pointer;
+}
+
+.form-color::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.form-color::-webkit-color-swatch {
+    border: none;
+    border-radius: var(--radius-sm);
+}
+
+.color-input-group .form-input {
+    flex: 1;
 }
 
 /* ---------- Responsive ---------- */

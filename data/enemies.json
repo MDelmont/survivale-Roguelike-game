@@ -17,13 +17,14 @@
                 "animations": {
                     "walk": {
                         "frames": [
-                            "assets/monster/sperm_monster_1_v1.png",
-                            "assets/monster/sperm_monster_1_v2.png"
+                            "assets/monster/sperm_monster_1_v2.png",
+                            "assets/monster/sperm_monster_2_v2.png"
                         ],
                         "frameRate": 8,
                         "loop": true
                     }
-                }
+                },
+                "angleOffset": 0
             }
         },
         "fast_cell": {
@@ -212,22 +213,6 @@
             "xpValue": 1000,
             "radius": 45,
             "color": "#4b0082"
-        }
-    },
-    "new_enemy_1767689085676": {
-        "name": "Nouvel Ennemi",
-        "hp": 100,
-        "speed": 200,
-        "damage": 10,
-        "xpValue": 5,
-        "radius": 20,
-        "visuals": {
-            "type": "sprite",
-            "animations": {
-                "idle": {
-                    "frames": []
-                }
-            }
         }
     }
 }

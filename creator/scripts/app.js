@@ -282,6 +282,12 @@ class App {
                 }
                 this.modules.players.init();
                 break;
+            case 'enemies':
+                if (!this.modules.enemies) {
+                    this.modules.enemies = new EnemiesModule(this);
+                }
+                this.modules.enemies.init();
+                break;
             // Les autres modules seront ajoutés plus tard
         }
     }

@@ -93,12 +93,12 @@ creator/
 - `scripts/fileManager.js`
 - `scripts/assetScanner.js`
 
-#### ✅ Critères de validation (À TESTER)
-- [ ] L'interface s'affiche correctement avec le design dark mode
-- [ ] Le bouton "Connecter Projet" ouvre le sélecteur de dossier
-- [ ] Après connexion, le statut passe à "Connecté" avec le nom du dossier
-- [ ] La liste des assets (images) s'affiche dans la console ou dans l'interface
-- [ ] La liste des fichiers JSON existants est détectée
+#### ✅ Critères de validation (TERMINÉ)
+- [x] L'interface s'affiche correctement avec le design dark mode
+- [x] Le bouton "Connecter Projet" ouvre le sélecteur de dossier
+- [x] Après connexion, le statut passe à "Connecté" avec le nom du dossier
+- [x] La liste des assets (images) s'affiche dans la console ou dans l'interface
+- [x] La liste des fichiers JSON existants est détectée
 
 ---
 
@@ -121,12 +121,12 @@ creator/
 - `styles/components.css`
 - `scripts/app.js` (router SPA)
 
-#### ✅ Critères de validation (À TESTER)
-- [ ] 6 cartes s'affichent sur le hub avec icônes et titres
-- [ ] Au survol, les cartes ont un effet visuel (hover)
-- [ ] Cliquer sur une carte affiche la section correspondante
-- [ ] Un bouton "Retour au Hub" permet de revenir à l'accueil
-- [ ] Le compteur affiche le bon nombre d'éléments (ex: "3 Boss")
+#### ✅ Critères de validation (TERMINÉ)
+- [x] 6 cartes s'affichent sur le hub avec icônes et titres
+- [x] Au survol, les cartes ont un effet visuel (hover)
+- [x] Cliquer sur une carte affiche la section correspondante
+- [x] Un bouton "Retour au Hub" permet de revenir à l'accueil
+- [x] Le compteur affiche le bon nombre d'éléments (ex: "3 Boss")
 
 ---
 
@@ -150,19 +150,19 @@ creator/
 - `scripts/animationPlayer.js`
 - `styles/components.css`
 
-#### ✅ Critères de validation (À TESTER)
-- [ ] La liste affiche "anthony" et "matthieu"
-- [ ] Sélectionner un joueur remplit le formulaire avec ses données
-- [ ] Modifier un champ met à jour le JSON Preview en temps réel
-- [ ] Le sélecteur d'assets liste bien les fichiers de `assets/players/`
-- [ ] Choisir une image affiche la prévisualisation
-- [ ] Le bouton "Play Animation" joue les frames de walk
-- [ ] Ajouter un nouveau joueur fonctionne
-- [ ] Sauvegarder écrit correctement dans `player.json`
+#### ✅ Critères de validation (TERMINÉ)
+- [x] La liste affiche "anthony" et "matthieu"
+- [x] Sélectionner un joueur remplit le formulaire avec ses données
+- [x] Modifier un champ met à jour le JSON Preview en temps réel
+- [x] Le sélecteur d'assets liste bien les fichiers de `assets/players/`
+- [x] Choisir une image affiche la prévisualisation
+- [x] Le bouton "Play Animation" joue les frames de walk
+- [x] Ajouter un nouveau joueur fonctionne
+- [x] Sauvegarder écrit correctement dans `player.json`
 
 ---
 
-### 🔷 ÉTAPE 4 : Module Ennemis (Enemy Editor)
+### � ÉTAPE 4 : Module Ennemis (Enemy Editor) - EN COURS
 **Durée estimée : 1-2 sessions**
 
 #### À développer
@@ -177,12 +177,12 @@ creator/
 - `scripts/modules/enemies.js`
 
 #### ✅ Critères de validation (À TESTER)
-- [ ] La liste affiche tous les ennemis (basic_cell, fast_cell, etc.)
-- [ ] La barre de recherche filtre les ennemis par nom
-- [ ] Modifier un ennemi met à jour le JSON Preview
-- [ ] Les ennemis sans `visuals` affichent leur couleur de fallback
-- [ ] Ajouter et supprimer un ennemi fonctionne
-- [ ] Sauvegarder écrit correctement dans `enemies.json`
+- [x] La liste affiche tous les ennemis (basic_cell, fast_cell, etc.)
+- [x] La barre de recherche filtre les ennemis par nom
+- [x] Modifier un ennemi met à jour le JSON Preview
+- [x] Les ennemis sans `visuals` affichent leur couleur de fallback
+- [x] Ajouter et supprimer un ennemi fonctionne
+- [ ] Sauvegarder écrit correctement dans `enemies.json` (À TESTER)
 
 ---
 
