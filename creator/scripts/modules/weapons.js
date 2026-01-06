@@ -212,15 +212,18 @@ class WeaponsModule {
                         </div>
                         <div class="form-group">
                             <label class="form-label">Hauteur (px)</label>
-                            <input type="number" class="form-input" id="weaponVisualHeight" value="${w.visuals?.height || 20}">
+                            <input type="number" class="form-input" id="weaponVisualHeight" value="${w.visuals?.height || ''}">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label form-check">
-                                <input type="checkbox" id="weaponVisualRotate" ${w.visuals?.rotateWithVelocity ? 'checked' : ''}>
-                                Rotation selon vitesse
-                            </label>
+                            <label class="form-label">Direction Mode</label>
+                            <select class="form-select" id="weaponDirMode">
+                                <option value="none" ${w.visuals?.directionMode === 'none' ? 'selected' : ''}>None (Fixe)</option>
+                                <option value="rotate" ${w.visuals?.directionMode === 'rotate' || (!w.visuals?.directionMode && w.visuals?.rotateWithVelocity) ? 'selected' : ''}>Rotate (Orienté)</option>
+                                <option value="flip" ${w.visuals?.directionMode === 'flip' ? 'selected' : ''}>Flip (Miroir)</option>
+                                <option value="4_way" ${w.visuals?.directionMode === '4_way' ? 'selected' : ''}>4-Way</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Angle Offset (°)</label>
@@ -517,12 +520,13 @@ class WeaponsModule {
         const path = document.getElementById('weaponVisualPath').value;
         w.visuals.path = path; // Key for the dropdown to persist selection
         w.visuals.width = parseInt(document.getElementById('weaponVisualWidth').value) || 20;
-        w.visuals.height = parseInt(document.getElementById('weaponVisualHeight').value) || 20;
-        w.visuals.rotateWithVelocity = document.getElementById('weaponVisualRotate').checked;
-        w.visuals.angleOffset = parseInt(document.getElementById('weaponVisualAngleOffset').value) || 0;
+        const vHeight = document.getElementById('weaponVisualHeight').value;
+        if (vHeight) w.visuals.height = parseInt(vHeight);
+        else delete w.visuals.height;
         
-        // Auto-generate animation for Animator.js compatibility
-        w.visuals.directionMode = w.visuals.rotateWithVelocity ? 'rotate' : 'none';
+        const dirMode = document.getElementById('weaponDirMode').value;
+        w.visuals.directionMode = dirMode;
+        w.visuals.rotateWithVelocity = (dirMode === 'rotate'); // Backward compatibility
         w.visuals.animations = {
             idle: {
                 frames: path ? [path] : [],
@@ -609,7 +613,9 @@ class WeaponsModule {
 
         const url = await this.app.assetScanner.getAssetURL(visuals.path);
         if (url) {
-            canvas.innerHTML = `<img src="${url}" style="width: ${visuals.width}px; height: ${visuals.height}px; transform: rotate(${visuals.angleOffset}deg)">`;
+            const rotation = (visuals.directionMode === 'rotate' || visuals.rotateWithVelocity) ? visuals.angleOffset : 0;
+            const hStyle = visuals.height ? `height: ${visuals.height}px;` : '';
+            canvas.innerHTML = `<img src="${url}" style="width: ${visuals.width}px; ${hStyle} transform: rotate(${rotation}deg)">`;
         } else {
             canvas.innerHTML = '<span style="color: var(--text-danger)">Asset non trouvé</span>';
         }

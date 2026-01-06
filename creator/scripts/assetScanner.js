@@ -9,6 +9,7 @@ class AssetScanner {
             monster: [],
             boss: [],
             projectile: [],
+            fond: [],
             other: []
         };
         this.assetURLs = new Map(); // Cache des URLs d'assets
@@ -28,6 +29,7 @@ class AssetScanner {
             monster: [],
             boss: [],
             projectile: [],
+            fond: [],
             other: []
         };
 
@@ -63,6 +65,8 @@ class AssetScanner {
                         this.assets.boss.push(assetInfo);
                     } else if (path.includes('projectile')) {
                         this.assets.projectile.push(assetInfo);
+                    } else if (path.includes('fond')) {
+                        this.assets.fond.push(assetInfo);
                     } else {
                         this.assets.other.push(assetInfo);
                     }
@@ -80,6 +84,7 @@ class AssetScanner {
             ...this.assets.monster,
             ...this.assets.boss,
             ...this.assets.projectile,
+            ...this.assets.fond,
             ...this.assets.other
         ];
     }

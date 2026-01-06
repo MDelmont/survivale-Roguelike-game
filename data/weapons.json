@@ -8,7 +8,14 @@
                 "damage": 10,
                 "fireRate": 500,
                 "projectileSpeed": 400,
-                "projectileCount": 1
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500
             },
             "upgrades": [
                 {
@@ -24,7 +31,24 @@
                         "slowMultiplier": 0.4
                     }
                 }
-            ]
+            ],
+            "visuals": {
+                "path": "assets/projectiles/capotes.png",
+                "width": 20,
+                "height": 20,
+                "rotateWithVelocity": true,
+                "angleOffset": 180,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/capotes.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            }
         },
         {
             "id": "poison_shot",

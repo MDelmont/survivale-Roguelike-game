@@ -8,7 +8,7 @@
                 "basic_cell",
                 "fast_cell"
             ],
-            "player_id": "anthony",
+            "player_id": "",
             "spawn_rate": 1500,
             "default_weapon": "basic_shot",
             "available_weapons": [
@@ -22,15 +22,18 @@
             "story_intro": [
                 {
                     "title": "L'Étincelle de Vie",
-                    "text": "Dans l'obscurité primordiale, une course contre la montre commence. Anthony, un spermatozoïde pas comme les autres, doit se frayer un chemin parmi ses semblables pour atteindre l'objectif ultime."
+                    "text": "Dans l'obscurité primordiale, une course contre la montre commence. Anthony, un spermatozoïde pas comme les autres, doit se frayer un chemin parmi ses semblables pour atteindre l'objectif ultime.",
+                    "image": ""
                 }
             ],
             "story_outro": [
                 {
                     "title": "La Premier Passage",
-                    "text": "L'ovule est en vue ! Malgré les obstacles, Anthony a réussi à percer les premières défenses. Mais ce n'est que le début d'une longue aventure vers la maturité."
+                    "text": "L'ovule est en vue ! Malgré les obstacles, Anthony a réussi à percer les premières défenses. Mais ce n'est que le début d'une longue aventure vers la maturité.",
+                    "image": ""
                 }
-            ]
+            ],
+            "background_image": "assets/fond/fond-ovule.png"
         },
         {
             "id": 2,

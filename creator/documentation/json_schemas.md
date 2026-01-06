@@ -126,6 +126,7 @@ Structure du déroulement d'un niveau.
 | `enemy_types` | Array | Liste des IDs d'ennemis présents. |
 | `player_id` | String | ID du joueur à utiliser (configuré dans `player.json`). |
 | `boss_id` | String | ID du boss final. |
+| `background_image`| String | Chemin de l'image de fond de la phase. |
 | `story_intro` | Array | Liste de pages de texte affichées **avant** le début de la phase. |
 | `story_outro` | Array | Liste de pages de texte affichées **après** la victoire (mort du boss). |
 

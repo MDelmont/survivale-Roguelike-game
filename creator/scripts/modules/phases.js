@@ -162,6 +162,13 @@ class PhasesModule {
                             <label class="form-label">Nom de la Zone</label>
                             <input type="text" class="form-input" id="phaseName" value="${p.name || ''}">
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Image de Fond</label>
+                            <select class="form-select" id="phaseBackground">
+                                <option value="">-- Par défaut --</option>
+                                ${this.app.assetScanner.getAssetPathsForSelect('fond').map(path => `<option value="${path}" ${p.background_image === path ? 'selected' : ''}>${path.split('/').pop()}</option>`).join('')}
+                            </select>
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -289,6 +296,13 @@ class PhasesModule {
                         <label class="form-label">Texte</label>
                         <textarea class="form-input story-text" rows="3">${page.text || ''}</textarea>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Illustration (Image)</label>
+                        <select class="form-select story-image">
+                            <option value="">-- Aucune --</option>
+                            ${this.app.assetScanner.getAssetPathsForSelect().map(path => `<option value="${path}" ${page.image === path ? 'selected' : ''}>${path.split('/').pop()}</option>`).join('')}
+                        </select>
+                    </div>
                 </div>
             </div>
         `).join('');
@@ -371,6 +385,7 @@ class PhasesModule {
         p.player_id = document.getElementById('phasePlayer').value;
         p.boss_id = document.getElementById('phaseBoss').value;
         p.default_weapon = document.getElementById('phaseDefaultWeapon').value;
+        p.background_image = document.getElementById('phaseBackground').value;
 
         // Chips -> Arrays
         p.enemy_types = Array.from(document.querySelectorAll('.chip[data-type="enemy"].active'))
@@ -383,14 +398,16 @@ class PhasesModule {
         p.story_intro = Array.from(document.querySelectorAll('.story-page-item[data-prefix="intro"]'))
             .map(item => ({
                 title: item.querySelector('.story-title').value,
-                text: item.querySelector('.story-text').value
+                text: item.querySelector('.story-text').value,
+                image: item.querySelector('.story-image').value
             }));
 
         // Story Outro
         p.story_outro = Array.from(document.querySelectorAll('.story-page-item[data-prefix="outro"]'))
             .map(item => ({
                 title: item.querySelector('.story-title').value,
-                text: item.querySelector('.story-text').value
+                text: item.querySelector('.story-text').value,
+                image: item.querySelector('.story-image').value
             }));
 
         this.updateJsonPreview();
@@ -434,6 +451,7 @@ class PhasesModule {
             default_weapon: this.app.gameData.weapons[0]?.id || '',
             available_weapons: [],
             boss_id: this.app.gameData.bosses[0]?.id || '',
+            background_image: '',
             story_intro: [],
             story_outro: []
         };
