@@ -14,7 +14,7 @@
             "xpNextLevel": 50,
             "visuals": {
                 "type": "sprite",
-                "width": 64,
+                "width": 30,
                 "angleOffset": 90,
                 "directionMode": "rotate",
                 "hitFlash": true,
