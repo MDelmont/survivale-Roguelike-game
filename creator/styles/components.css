@@ -326,6 +326,15 @@
     color: var(--text-muted);
 }
 
+/* Sprite thumbnail in list */
+.list-item-sprite {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    border-radius: var(--radius-sm);
+}
+
 /* ---------- Panels ---------- */
 .panel {
     background: var(--bg-card);

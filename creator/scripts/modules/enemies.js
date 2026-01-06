@@ -87,6 +87,15 @@ class EnemiesModule {
                                     <span style="color: var(--text-muted)">Aucun sprite</span>
                                 </div>
                                 <div class="preview-controls">
+                                    <div class="preview-direction-selector" style="margin-bottom: var(--space-sm);">
+                                        <select class="form-select form-input-sm" id="previewDirection" title="Direction de test">
+                                            <option value="down">↓ Bas</option>
+                                            <option value="up">↑ Haut</option>
+                                            <option value="left">← Gauche</option>
+                                            <option value="right">→ Droite</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-sm btn-secondary" id="playIdleBtn" disabled>▶ Idle</button>
                                     <button class="btn btn-sm btn-secondary" id="playWalkBtn" disabled>▶ Walk</button>
                                     <button class="btn btn-sm btn-danger" id="stopAnimBtn" disabled>⏹ Stop</button>
                                 </div>
@@ -114,7 +123,7 @@ class EnemiesModule {
     /**
      * Charge la liste des ennemis
      */
-    loadEnemiesList() {
+    async loadEnemiesList() {
         const list = document.getElementById('enemiesList');
         if (!list || !this.app.gameData) return;
 
@@ -134,14 +143,21 @@ class EnemiesModule {
             item.className = 'list-item';
             item.dataset.enemyId = id;
 
-            // Prévisualisation couleur ou icône
-            const colorPreview = enemy.color ? 
-                `<div style="width: 24px; height: 24px; border-radius: 50%; background: ${enemy.color}; border: 2px solid rgba(255,255,255,0.2);"></div>` :
-                '<span style="font-size: 1.5rem;">👾</span>';
+            // Récupérer la première frame de walk ou idle pour la prévisualisation
+            const spriteUrl = await this.getEntityThumbnail(enemy);
+            
+            let iconHtml;
+            if (spriteUrl) {
+                iconHtml = `<img src="${spriteUrl}" alt="${enemy.name}" class="list-item-sprite">`;
+            } else if (enemy.color) {
+                iconHtml = `<div style="width: 32px; height: 32px; border-radius: 50%; background: ${enemy.color}; border: 2px solid rgba(255,255,255,0.2);"></div>`;
+            } else {
+                iconHtml = '<span style="font-size: 1.5rem;">👾</span>';
+            }
 
             item.innerHTML = `
                 <div class="list-item-icon">
-                    ${colorPreview}
+                    ${iconHtml}
                 </div>
                 <div class="list-item-info">
                     <div class="list-item-name">${enemy.name || id}</div>
@@ -157,6 +173,32 @@ class EnemiesModule {
         if (filteredEntries.length === 0) {
             list.innerHTML = '<div style="padding: var(--space-md); color: var(--text-muted); text-align: center;">Aucun ennemi trouvé</div>';
         }
+    }
+
+    /**
+     * Récupère l'URL du sprite de prévisualisation pour une entité
+     */
+    async getEntityThumbnail(entity) {
+        const visuals = entity.visuals;
+        if (!visuals || !visuals.animations) return null;
+
+        const animations = visuals.animations;
+        // Priorité : walk (plus commun pour les ennemis), puis idle, puis la première animation
+        const animOrder = ['walk', 'idle', ...Object.keys(animations)];
+        
+        for (const animName of animOrder) {
+            const anim = animations[animName];
+            if (!anim) continue;
+            
+            // Gérer mode 4_way (prendre 'down' par défaut)
+            if (anim.down?.frames?.length > 0) {
+                return await this.app.assetScanner.getAssetURL(anim.down.frames[0]);
+            } else if (anim.frames?.length > 0) {
+                return await this.app.assetScanner.getAssetURL(anim.frames[0]);
+            }
+        }
+        
+        return null;
     }
 
     /**
@@ -788,6 +830,41 @@ class EnemiesModule {
     }
 
     /**
+     * Helper pour récupérer les données d'animation selon le mode et la direction
+     */
+    getAnimationParams(animName) {
+        if (!this.currentEnemy?.visuals?.animations) return null;
+        
+        const visuals = this.currentEnemy.visuals;
+        const animations = visuals.animations;
+        const dirMode = visuals.directionMode;
+        const direction = document.getElementById('previewDirection')?.value || 'down';
+        
+        let animData = animations[animName];
+        if (!animData) return null;
+        
+        // Mode 4_way : on cherche la sous-direction
+        if (dirMode === '4_way' && animData[direction]) {
+            animData = animData[direction];
+        }
+        
+        const frames = animData.frames || [];
+        const frameRate = animData.frameRate || 10;
+        
+        // Calcul de la transformation CSS
+        let transform = '';
+        if (dirMode === 'flip' && direction === 'left') {
+            transform = 'scaleX(-1)';
+        } else if (dirMode === 'rotate') {
+            const angles = { right: 0, down: 90, left: 180, up: 270 };
+            const angle = (angles[direction] || 0) + (visuals.angleOffset || 0);
+            transform = `rotate(${angle}deg)`;
+        }
+        
+        return { frames, frameRate, transform };
+    }
+
+    /**
      * Charge la prévisualisation
      */
     async loadPreview() {
@@ -806,34 +883,22 @@ class EnemiesModule {
             return;
         }
 
-        // Chercher une frame à afficher
-        const animations = visuals.animations || {};
-        const animNames = ['walk', 'idle', Object.keys(animations)[0]].filter(Boolean);
+        // Utiliser getAnimationParams pour récupérer les données avec la bonne direction
+        const walkParams = this.getAnimationParams('walk');
+        const idleParams = this.getAnimationParams('idle');
         
-        let framePath = null;
-        for (const animName of animNames) {
-            const anim = animations[animName];
-            if (!anim) continue;
-            
-            // Gérer mode 4_way
-            if (anim.down?.frames?.length > 0) {
-                framePath = anim.down.frames[0];
-                break;
-            } else if (anim.frames?.length > 0) {
-                framePath = anim.frames[0];
-                break;
-            }
-        }
+        const params = (walkParams?.frames?.length > 0) ? walkParams : idleParams;
 
-        if (framePath) {
-            const url = await this.app.assetScanner.getAssetURL(framePath);
+        if (params?.frames?.length > 0) {
+            const url = await this.app.assetScanner.getAssetURL(params.frames[0]);
             if (url) {
                 const width = visuals.width || 48;
                 const height = visuals.height || width;
-                canvas.innerHTML = `<img src="${url}" alt="preview" style="width: ${width}px; height: ${height}px; image-rendering: pixelated;">`;
+                canvas.innerHTML = `<img src="${url}" alt="preview" style="width: ${width}px; height: ${height}px; image-rendering: pixelated; transform: ${params.transform}">`;
                 
                 // Activer les contrôles d'animation
-                document.getElementById('playWalkBtn').disabled = false;
+                document.getElementById('playIdleBtn').disabled = !idleParams || idleParams.frames.length === 0;
+                document.getElementById('playWalkBtn').disabled = !walkParams || walkParams.frames.length === 0;
                 document.getElementById('stopAnimBtn').disabled = false;
                 return;
             }
@@ -850,42 +915,33 @@ class EnemiesModule {
     /**
      * Joue une animation
      */
-    playAnimation(animName) {
+    async playAnimation(animName) {
         this.stopAnimation();
 
+        const params = this.getAnimationParams(animName);
+        if (!params || params.frames.length === 0) return;
+
         const canvas = document.getElementById('enemyPreviewCanvas');
-        if (!canvas || !this.currentEnemy?.visuals?.animations) return;
+        if (!canvas) return;
 
-        const animations = this.currentEnemy.visuals.animations;
-        let animData = animations[animName];
-        
-        if (!animData) return;
+        const width = this.currentEnemy.visuals?.width || 48;
+        const height = this.currentEnemy.visuals?.height || width;
 
-        // Gérer mode 4_way
-        if (animData.down) {
-            animData = animData.down;
+        // Précharger les URLs
+        const urls = [];
+        for (const frame of params.frames) {
+            const url = await this.app.assetScanner.getAssetURL(frame);
+            if (url) urls.push(url);
         }
 
-        const frames = animData.frames || [];
-        if (frames.length === 0) return;
-
-        const frameRate = animData.frameRate || 10;
-        const width = this.currentEnemy.visuals.width || 48;
-        const height = this.currentEnemy.visuals.height || width;
+        if (urls.length === 0) return;
 
         this.currentFrameIndex = 0;
 
-        const showFrame = async () => {
-            const framePath = frames[this.currentFrameIndex];
-            const url = await this.app.assetScanner.getAssetURL(framePath);
-            if (url) {
-                canvas.innerHTML = `<img src="${url}" alt="frame" style="width: ${width}px; height: ${height}px; image-rendering: pixelated;">`;
-            }
-            this.currentFrameIndex = (this.currentFrameIndex + 1) % frames.length;
-        };
-
-        showFrame();
-        this.animationInterval = setInterval(showFrame, 1000 / frameRate);
+        this.animationInterval = setInterval(() => {
+            canvas.innerHTML = `<img src="${urls[this.currentFrameIndex]}" alt="frame" style="width: ${width}px; height: ${height}px; image-rendering: pixelated; transform: ${params.transform}">`;
+            this.currentFrameIndex = (this.currentFrameIndex + 1) % urls.length;
+        }, 1000 / params.frameRate);
     }
 
     /**
@@ -1048,8 +1104,15 @@ class EnemiesModule {
         });
 
         // Boutons animation
+        document.getElementById('playIdleBtn')?.addEventListener('click', () => this.playAnimation('idle'));
         document.getElementById('playWalkBtn')?.addEventListener('click', () => this.playAnimation('walk'));
         document.getElementById('stopAnimBtn')?.addEventListener('click', () => {
+            this.stopAnimation();
+            this.loadPreview();
+        });
+
+        // Changement de direction - recharger la preview
+        document.getElementById('previewDirection')?.addEventListener('change', () => {
             this.stopAnimation();
             this.loadPreview();
         });

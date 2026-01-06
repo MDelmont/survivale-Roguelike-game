@@ -288,6 +288,12 @@ class App {
                 }
                 this.modules.enemies.init();
                 break;
+            case 'bosses':
+                if (!this.modules.bosses) {
+                    this.modules.bosses = new BossesModule(this);
+                }
+                this.modules.bosses.init();
+                break;
             // Les autres modules seront ajoutés plus tard
         }
     }

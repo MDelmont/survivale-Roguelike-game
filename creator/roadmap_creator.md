@@ -176,17 +176,17 @@ creator/
 #### Fichiers à créer/modifier
 - `scripts/modules/enemies.js`
 
-#### ✅ Critères de validation (À TESTER)
+#### ✅ Critères de validation (TERMINÉ)
 - [x] La liste affiche tous les ennemis (basic_cell, fast_cell, etc.)
 - [x] La barre de recherche filtre les ennemis par nom
 - [x] Modifier un ennemi met à jour le JSON Preview
 - [x] Les ennemis sans `visuals` affichent leur couleur de fallback
 - [x] Ajouter et supprimer un ennemi fonctionne
-- [ ] Sauvegarder écrit correctement dans `enemies.json` (À TESTER)
+- [x] Sauvegarder écrit correctement dans `enemies.json`
 
 ---
 
-### 🔷 ÉTAPE 5 : Module Boss (Boss Editor)
+### � ÉTAPE 5 : Module Boss (Boss Editor) - EN COURS
 **Durée estimée : 1 session**
 
 #### À développer

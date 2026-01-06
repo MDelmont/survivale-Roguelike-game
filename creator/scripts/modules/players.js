@@ -108,7 +108,7 @@ class PlayersModule {
     /**
      * Charge la liste des joueurs
      */
-    loadPlayersList() {
+    async loadPlayersList() {
         const list = document.getElementById('playersList');
         if (!list || !this.app.gameData) return;
 
@@ -120,9 +120,16 @@ class PlayersModule {
             item.className = 'list-item';
             item.dataset.playerId = id;
 
+            // Récupérer la première frame de idle ou walk pour la prévisualisation
+            const spriteUrl = await this.getEntityThumbnail(player);
+            
+            const iconHtml = spriteUrl 
+                ? `<img src="${spriteUrl}" alt="${player.name}" class="list-item-sprite">`
+                : '<span style="font-size: 1.5rem;">🧬</span>';
+
             item.innerHTML = `
                 <div class="list-item-icon">
-                    <span style="font-size: 1.5rem;">🧬</span>
+                    ${iconHtml}
                 </div>
                 <div class="list-item-info">
                     <div class="list-item-name">${player.name || id}</div>
@@ -133,6 +140,32 @@ class PlayersModule {
             item.addEventListener('click', () => this.selectPlayer(id));
             list.appendChild(item);
         }
+    }
+
+    /**
+     * Récupère l'URL du sprite de prévisualisation pour une entité
+     */
+    async getEntityThumbnail(entity) {
+        const visuals = entity.visuals;
+        if (!visuals || !visuals.animations) return null;
+
+        const animations = visuals.animations;
+        // Priorité : idle, puis walk, puis la première animation disponible
+        const animOrder = ['idle', 'walk', ...Object.keys(animations)];
+        
+        for (const animName of animOrder) {
+            const anim = animations[animName];
+            if (!anim) continue;
+            
+            // Gérer mode 4_way (prendre 'down' par défaut)
+            if (anim.down?.frames?.length > 0) {
+                return await this.app.assetScanner.getAssetURL(anim.down.frames[0]);
+            } else if (anim.frames?.length > 0) {
+                return await this.app.assetScanner.getAssetURL(anim.frames[0]);
+            }
+        }
+        
+        return null;
     }
 
     /**

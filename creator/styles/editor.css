@@ -255,6 +255,31 @@
     image-rendering: pixelated;
 }
 
+/* Small Preview (for projectiles) */
+.preview-container-sm {
+    text-align: center;
+    padding: var(--space-sm);
+}
+
+.preview-canvas-sm {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-canvas-sm img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
 /* ---------- JSON Preview ---------- */
 .json-preview-content {
     max-height: 300px;
