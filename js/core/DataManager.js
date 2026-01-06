@@ -75,8 +75,10 @@ export class DataManager {
         findAndLoad(this.data);
     }
 
-    getPlayerData() {
-        return this.data.player.baseStats;
+    getPlayerData(id) {
+        if (!this.data.player) return null;
+        const players = this.data.player.players || {};
+        return players[id] || players['anthony'] || Object.values(players)[0] || this.data.player.baseStats;
     }
 
     getEnemyData(type) {

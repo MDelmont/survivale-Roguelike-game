@@ -82,7 +82,7 @@ class Game {
         this.boss = null;
 
         if (!this.player) {
-            const playerStats = this.dataManager.getPlayerData();
+            const playerStats = this.dataManager.getPlayerData(this.currentPhase.player_id);
             this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, playerStats, this.dataManager.assetManager);
         } else {
             this.player.x = this.canvas.width / 2;
