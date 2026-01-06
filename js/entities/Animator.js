@@ -45,8 +45,13 @@ export class Animator {
             if (this.isHurt && this.visuals.animations['hurt']) {
                 newState = 'hurt';
             } else if (velocity && (Math.abs(velocity.x) > 0.1 || Math.abs(velocity.y) > 0.1)) {
-                newState = 'walk';
+                newState = (this.visuals.animations['walk']) ? 'walk' : 'idle';
             }
+        }
+
+        // Fallback si l'état demandé n'existe pas du tout
+        if (!this.visuals.animations[newState]) {
+            newState = 'idle';
         }
 
         // Si l'animation change, on reset le timer
@@ -123,11 +128,21 @@ export class Animator {
         
         if (!img) return;
 
-        // Calcul dynamique des dimensions pour garder l'aspect ratio
+        // Calcul dynamique des dimensions pour garder l'aspect ratio (Bounding Box)
         let drawW = this.width;
         let drawH = this.height;
 
-        if (drawW && !drawH) {
+        if (drawW && drawH) {
+            const imgRatio = img.width / img.height;
+            const targetRatio = drawW / drawH;
+            if (imgRatio > targetRatio) {
+                // L'image est plus large que la zone cible, on réduit la hauteur
+                drawH = drawW / imgRatio;
+            } else {
+                // L'image est plus haute que la zone cible, on réduit la largeur
+                drawW = drawH * imgRatio;
+            }
+        } else if (drawW && !drawH) {
             drawH = (img.height / img.width) * drawW;
         } else if (!drawW && drawH) {
             drawW = (img.width / img.height) * drawH;

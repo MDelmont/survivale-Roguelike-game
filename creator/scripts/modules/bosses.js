@@ -757,7 +757,9 @@ class BossesModule {
         const pPath = document.getElementById('projVisualPath')?.value;
         b.projectileVisuals.path = pPath;
         b.projectileVisuals.width = parseInt(document.getElementById('projWidth')?.value) || 16;
-        b.projectileVisuals.height = parseInt(document.getElementById('projHeight')?.value) || 16;
+        const pHeight = document.getElementById('projHeight')?.value;
+        if (pHeight) b.projectileVisuals.height = parseInt(pHeight);
+        else delete b.projectileVisuals.height;
         b.projectileVisuals.directionMode = document.getElementById('projDirMode')?.value || 'rotate';
         b.projectileVisuals.angleOffset = parseInt(document.getElementById('projAngleOffset')?.value) || 0;
         

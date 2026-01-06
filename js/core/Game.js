@@ -323,7 +323,7 @@ class Game {
 
         // Boss
         if (this.boss) {
-            this.boss.update(deltaTime, this.player, (x, y, dx, dy) => this.spawnEnemyProjectile(x, y, dx, dy));
+            this.boss.update(deltaTime, this.player, (x, y, dx, dy, stats) => this.spawnEnemyProjectile(x, y, dx, dy, stats));
             if (this.player && CombatSystem.checkCollision(this.player, this.boss)) this.player.takeDamage(this.boss.damage * (deltaTime / 1000));
             if (this.boss.hp <= 0) { 
                 this.killCount++; 

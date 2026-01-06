@@ -41,8 +41,7 @@
                     }
                 },
                 "path": "assets/projectiles/capotes.png",
-                "height": 16,
-                "angleOffset": 90
+                "angleOffset": 180
             }
         },
         "biberon_alpha": {

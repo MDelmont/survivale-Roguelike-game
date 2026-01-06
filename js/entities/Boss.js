@@ -110,47 +110,59 @@ export class Boss extends Enemy {
     }
 
     executePattern(onShoot, player) {
+        const stats = this.getProjectileStats();
         switch (this.pattern) {
-            case 'circle': this.shootCircle(onShoot); break;
-            case 'spiral': this.shootSpiral(onShoot); break;
-            case 'double_spiral': this.shootDoubleSpiral(onShoot); break;
-            case 'spray': this.shootSpray(onShoot, player); break;
-            case 'wave_spray': this.shootWaveSpray(onShoot, player); break;
-            case 'cross': this.shootCross(onShoot); break;
-            case 'vortex': this.shootVortex(onShoot); break;
-            case 'flower': this.shootFlower(onShoot); break;
-            case 'barrage': this.shootBarrage(onShoot); break;
-            case 'star': this.shootStar(onShoot); break;
-            case 'oscillator': this.shootOscillator(onShoot); break;
-            case 'wall': this.shootWall(onShoot); break;
-            case 'web': this.shootWeb(onShoot); break;
-            default: this.shootCircle(onShoot);
+            case 'circle': this.shootCircle(onShoot, stats); break;
+            case 'spiral': this.shootSpiral(onShoot, stats); break;
+            case 'double_spiral': this.shootDoubleSpiral(onShoot, stats); break;
+            case 'spray': this.shootSpray(onShoot, player, stats); break;
+            case 'wave_spray': this.shootWaveSpray(onShoot, player, stats); break;
+            case 'cross': this.shootCross(onShoot, stats); break;
+            case 'vortex': this.shootVortex(onShoot, stats); break;
+            case 'flower': this.shootFlower(onShoot, stats); break;
+            case 'barrage': this.shootBarrage(onShoot, stats); break;
+            case 'star': this.shootStar(onShoot, stats); break;
+            case 'oscillator': this.shootOscillator(onShoot, stats); break;
+            case 'wall': this.shootWall(onShoot, stats); break;
+            case 'web': this.shootWeb(onShoot, stats); break;
+            default: this.shootCircle(onShoot, stats);
         }
     }
 
-    shootCircle(onShoot) {
+    getProjectileStats(extraStats = {}) {
+        const stats = {
+            damage: this.damage,
+            projectileSpeed: 200,
+            color: this.color || '#f00',
+            ...extraStats
+        };
+        if (this.stats.projectileVisuals) {
+            stats.visuals = this.stats.projectileVisuals;
+        }
+        return stats;
+    }
+
+    shootCircle(onShoot, stats) {
         const bulletCount = 12;
-        const projectileStats = this.stats.projectileVisuals ? { visuals: this.stats.projectileVisuals } : null;
         for (let i = 0; i < bulletCount; i++) {
             const angle = (i / bulletCount) * Math.PI * 2;
-            onShoot(this.x, this.y, Math.cos(angle), Math.sin(angle), projectileStats);
+            onShoot(this.x, this.y, Math.cos(angle), Math.sin(angle), stats);
         }
     }
 
-    shootSpiral(onShoot) {
+    shootSpiral(onShoot, stats) {
         this.angle += 0.2;
-        const projectileStats = this.stats.projectileVisuals ? { visuals: this.stats.projectileVisuals } : null;
-        onShoot(this.x, this.y, Math.cos(this.angle), Math.sin(this.angle), projectileStats);
-        onShoot(this.x, this.y, Math.cos(this.angle + Math.PI), Math.sin(this.angle + Math.PI), projectileStats);
+        onShoot(this.x, this.y, Math.cos(this.angle), Math.sin(this.angle), stats);
+        onShoot(this.x, this.y, Math.cos(this.angle + Math.PI), Math.sin(this.angle + Math.PI), stats);
     }
 
-    shootDoubleSpiral(onShoot) {
+    shootDoubleSpiral(onShoot, stats) {
         this.angle += 0.15;
-        onShoot(this.x, this.y, Math.cos(this.angle), Math.sin(this.angle));
-        onShoot(this.x, this.y, Math.cos(-this.angle), Math.sin(-this.angle));
+        onShoot(this.x, this.y, Math.cos(this.angle), Math.sin(this.angle), stats);
+        onShoot(this.x, this.y, Math.cos(-this.angle), Math.sin(-this.angle), stats);
     }
 
-    shootSpray(onShoot, player) {
+    shootSpray(onShoot, player, stats) {
         if (!player) return;
         const dx = player.x - this.x;
         const dy = player.y - this.y;
@@ -159,95 +171,92 @@ export class Boss extends Enemy {
         const spread = 0.5;
         for (let i = 0; i < count; i++) {
             const a = baseAngle - spread / 2 + (i / (count - 1)) * spread;
-            onShoot(this.x, this.y, Math.cos(a), Math.sin(a));
+            onShoot(this.x, this.y, Math.cos(a), Math.sin(a), stats);
         }
     }
 
-    shootWaveSpray(onShoot, player) {
+    shootWaveSpray(onShoot, player, stats) {
         if (!player) return;
         const dx = player.x - this.x;
         const dy = player.y - this.y;
         const baseAngle = Math.atan2(dy, dx);
         const wave = Math.sin(this.time / 200) * 0.8;
-        onShoot(this.x, this.y, Math.cos(baseAngle + wave), Math.sin(baseAngle + wave));
+        onShoot(this.x, this.y, Math.cos(baseAngle + wave), Math.sin(baseAngle + wave), stats);
     }
 
-    shootCross(onShoot) {
+    shootCross(onShoot, stats) {
         const a = (Math.floor(this.time / 1000) % 2 === 0) ? 0 : Math.PI / 4;
         for (let i = 0; i < 4; i++) {
             const ang = a + (i / 4) * Math.PI * 2;
-            onShoot(this.x, this.y, Math.cos(ang), Math.sin(ang));
+            onShoot(this.x, this.y, Math.cos(ang), Math.sin(ang), stats);
         }
     }
 
-    shootVortex(onShoot) {
+    shootVortex(onShoot, stats) {
         const count = 3;
         this.angle += 0.5;
         for (let i = 0; i < count; i++) {
             const a = this.angle + (i / count) * Math.PI * 2;
-            onShoot(this.x, this.y, Math.cos(a), Math.sin(a), { projectileSpeed: 150 });
+            onShoot(this.x, this.y, Math.cos(a), Math.sin(a), { ...stats, projectileSpeed: 150 });
         }
     }
 
-    shootFlower(onShoot) {
+    shootFlower(onShoot, stats) {
         const petals = 8;
         for (let i = 0; i < petals; i++) {
             const a = (i / petals) * Math.PI * 2;
-            onShoot(this.x, this.y, Math.cos(a), Math.sin(a), { projectileSpeed: 200 });
-            onShoot(this.x, this.y, Math.cos(a), Math.sin(a), { projectileSpeed: 350 });
+            onShoot(this.x, this.y, Math.cos(a), Math.sin(a), { ...stats, projectileSpeed: 200 });
+            onShoot(this.x, this.y, Math.cos(a), Math.sin(a), { ...stats, projectileSpeed: 350 });
         }
     }
 
-    shootBarrage(onShoot) {
+    shootBarrage(onShoot, stats) {
         for (let i = 0; i < 3; i++) {
             const a = Math.random() * Math.PI * 2;
             const speed = 100 + Math.random() * 300;
-            onShoot(this.x, this.y, Math.cos(a), Math.sin(a), { projectileSpeed: speed });
+            onShoot(this.x, this.y, Math.cos(a), Math.sin(a), { ...stats, projectileSpeed: speed });
         }
     }
 
-    shootStar(onShoot) {
+    shootStar(onShoot, stats) {
         const branches = 5;
         const perBranch = 4;
         for (let i = 0; i < branches; i++) {
             const baseA = (i / branches) * Math.PI * 2;
             for (let j = 0; j < perBranch; j++) {
-                onShoot(this.x, this.y, Math.cos(baseA), Math.sin(baseA), { projectileSpeed: 150 + j * 60 });
+                onShoot(this.x, this.y, Math.cos(baseA), Math.sin(baseA), { ...stats, projectileSpeed: 150 + j * 60 });
             }
         }
     }
 
-    shootOscillator(onShoot) {
+    shootOscillator(onShoot, stats) {
         const count = 4;
         for (let i = 0; i < count; i++) {
             const baseA = (i / count) * Math.PI * 2;
             const offset = Math.sin(this.time / 500) * 0.8;
-            onShoot(this.x, this.y, Math.cos(baseA + offset), Math.sin(baseA + offset));
+            onShoot(this.x, this.y, Math.cos(baseA + offset), Math.sin(baseA + offset), stats);
         }
     }
 
-    shootWall(onShoot) {
-        const count = 12; // Plus de projectiles pour une vraie muraille
+    shootWall(onShoot, stats) {
+        const count = 12;
         const spacing = 40;
-        // On utilise le temps pour alterner horizontal/vertical de façon prévisible
         const isVertical = (Math.floor(this.time / this.fireRate) % 2 === 0);
 
         for (let i = 0; i < count; i++) {
             const offset = (i - count / 2) * spacing;
             if (isVertical) {
-                // Muraille verticale qui descend
-                onShoot(this.x + offset, this.y, 0, 1, { projectileSpeed: 180 });
+                onShoot(this.x + offset, this.y, 0, 1, { ...stats, projectileSpeed: 180 });
             } else {
-                // Muraille horizontale qui va vers la droite (ou la gauche si on veut varier)
-                onShoot(this.x, this.y + offset, 1, 0, { projectileSpeed: 180 });
+                onShoot(this.x, this.y + offset, 1, 0, { ...stats, projectileSpeed: 180 });
             }
         }
     }
 
-    shootWeb(onShoot) {
+    shootWeb(onShoot, stats) {
         this.angle += 0.3;
         const speed = 150 + Math.sin(this.angle * 2) * 70;
-        onShoot(this.x, this.y, Math.cos(this.angle), Math.sin(this.angle), { projectileSpeed: speed });
+        onShoot(this.x, this.y, Math.cos(this.angle), Math.sin(this.angle), { ...stats, projectileSpeed: speed });
     }
 
     draw(ctx) {
