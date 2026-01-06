@@ -92,7 +92,7 @@ class Game {
 
         if (this.currentPhase.default_weapon) {
             const weaponData = this.dataManager.getWeaponData(this.currentPhase.default_weapon);
-            this.player.addWeapon(WeaponFactory.create(weaponData));
+            this.player.addWeapon(WeaponFactory.create(weaponData, this.dataManager.assetManager));
         }
     }
 
@@ -123,7 +123,7 @@ class Game {
                     if (weapon) weapon.upgrade();
                 } else {
                     // Ajout d'une nouvelle arme à l'arsenal
-                    this.player.addWeapon(WeaponFactory.create(choice));
+                    this.player.addWeapon(WeaponFactory.create(choice, this.dataManager.assetManager));
                 }
                 this.player.pendingWeaponUpgrade = false;
                 this.state = GameState.PLAYING;
@@ -339,9 +339,12 @@ class Game {
         this.enemies.push(new Enemy(x, y, enemyData, this.dataManager.assetManager));
     }
 
-    spawnLoot(x, y, v, t) { this.loots.push(new Loot(x, y, v, t)); }
+    spawnLoot(x, y, v, t) { this.loots.push(new Loot(x, y, v, t, this.dataManager.assetManager)); }
     spawnProjectile(x, y, dx, dy, s) { this.projectiles.push(new Projectile(x, y, dx, dy, s, this.dataManager.assetManager)); }
-    spawnEnemyProjectile(x, y, dx, dy) { this.enemyProjectiles.push(new Projectile(x, y, dx, dy, { projectileSpeed: 200, damage: 10, color: '#f0f' }, this.dataManager.assetManager)); }
+    spawnEnemyProjectile(x, y, dx, dy, s = null) { 
+        const stats = s || { projectileSpeed: 200, damage: 10, color: '#f0f' };
+        this.enemyProjectiles.push(new Projectile(x, y, dx, dy, stats, this.dataManager.assetManager)); 
+    }
 
     draw() {
         this.ctx.fillStyle = '#0a0a1a';

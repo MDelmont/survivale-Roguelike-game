@@ -1,9 +1,11 @@
+import { Animator } from './Animator.js';
+
 /**
  * Loot Class
  * Représente un objet collectable à l'écran (XP, bonus).
  */
 export class Loot {
-    constructor(x, y, value, type = 'xp') {
+    constructor(x, y, value, type = 'xp', assetManager = null, visuals = null) {
         this.x = x;
         this.y = y;
         this.value = value;
@@ -16,6 +18,10 @@ export class Loot {
         this.followSpeed = 500;
 
         this.color = (type === 'xp') ? '#0f0' : '#ffd700';
+
+        // Système d'animation
+        this.visuals = visuals;
+        this.animator = (visuals && assetManager) ? new Animator(visuals, assetManager) : null;
     }
 
     update(deltaTime, playerPos) {
@@ -32,29 +38,37 @@ export class Loot {
                 this.toRemove = true; // Collecté
             }
         }
+
+        if (this.animator) {
+            this.animator.update(deltaTime, { velocity: { x: 0, y: 0 } });
+        }
     }
 
     draw(ctx) {
-        if (this.type === 'xp') {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
-            ctx.fill();
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 1;
-            ctx.stroke();
+        if (this.animator) {
+            this.animator.draw(ctx, this.x, this.y);
         } else {
-            // Dessin d'une étoile pour le butin rare
-            this.drawStar(ctx, this.x, this.y, 5, this.radius, this.radius / 2);
-            ctx.fillStyle = this.color;
-            ctx.fill();
+            if (this.type === 'xp') {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            } else {
+                // Dessin d'une étoile pour le butin rare
+                this.drawStar(ctx, this.x, this.y, 5, this.radius, this.radius / 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
 
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = '#ffd700';
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.shadowBlur = 0;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#ffd700';
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
         }
     }
 
@@ -81,3 +95,4 @@ export class Loot {
         ctx.closePath();
     }
 }
+

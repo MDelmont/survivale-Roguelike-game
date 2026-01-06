@@ -5,7 +5,7 @@ import { ProjectileWeapon, OrbitalWeapon, AreaWeapon } from '../entities/Weapon.
  * Crée des instances d'armes à partir des données JSON.
  */
 export class WeaponFactory {
-    static create(weaponData) {
+    static create(weaponData, assetManager) {
         if (!weaponData) return null;
 
         const { id, name, type, stats, upgrades, visuals } = weaponData;
@@ -14,13 +14,14 @@ export class WeaponFactory {
             case 'attack':
                 return new ProjectileWeapon(id, name, stats, upgrades, visuals);
             case 'defense':
-                return new OrbitalWeapon(id, name, stats, upgrades, visuals);
+                return new OrbitalWeapon(id, name, stats, upgrades, visuals, assetManager);
             case 'aoe':
-                return new AreaWeapon(id, name, stats, upgrades, visuals);
+                return new AreaWeapon(id, name, stats, upgrades, visuals, assetManager);
             default:
                 console.warn(`Type d'arme inconnu : ${type}`);
                 return null;
         }
     }
 }
+
 

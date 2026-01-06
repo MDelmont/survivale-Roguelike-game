@@ -130,16 +130,18 @@ export class Boss extends Enemy {
 
     shootCircle(onShoot) {
         const bulletCount = 12;
+        const projectileStats = this.stats.projectileVisuals ? { visuals: this.stats.projectileVisuals } : null;
         for (let i = 0; i < bulletCount; i++) {
             const angle = (i / bulletCount) * Math.PI * 2;
-            onShoot(this.x, this.y, Math.cos(angle), Math.sin(angle));
+            onShoot(this.x, this.y, Math.cos(angle), Math.sin(angle), projectileStats);
         }
     }
 
     shootSpiral(onShoot) {
         this.angle += 0.2;
-        onShoot(this.x, this.y, Math.cos(this.angle), Math.sin(this.angle));
-        onShoot(this.x, this.y, Math.cos(this.angle + Math.PI), Math.sin(this.angle + Math.PI));
+        const projectileStats = this.stats.projectileVisuals ? { visuals: this.stats.projectileVisuals } : null;
+        onShoot(this.x, this.y, Math.cos(this.angle), Math.sin(this.angle), projectileStats);
+        onShoot(this.x, this.y, Math.cos(this.angle + Math.PI), Math.sin(this.angle + Math.PI), projectileStats);
     }
 
     shootDoubleSpiral(onShoot) {
