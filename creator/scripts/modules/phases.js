@@ -140,7 +140,7 @@ class PhasesModule {
         const p = this.currentPhase;
         
         // Données pour les dropdowns
-        const players = this.app.gameData.player?.players || {};
+        const players = this.app.gameData.players || {};
         const enemiesObj = this.app.gameData.enemies || {};
         const bossesObj = this.app.gameData.bosses || {};
         const weapons = this.app.gameData.weapons || [];
@@ -446,7 +446,7 @@ class PhasesModule {
             name: 'Nouvelle Phase',
             duration_before_boss: 60,
             enemy_types: [],
-            player_id: Object.keys(this.app.gameData.player?.players || {})[0] || '',
+            player_id: Object.keys(this.app.gameData.players || {})[0] || '',
             spawn_rate: 1000,
             default_weapon: this.app.gameData.weapons[0]?.id || '',
             available_weapons: [],

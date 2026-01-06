@@ -541,6 +541,18 @@ class Game {
     }
 
     drawBackground() {
+        // Dessiner l'image de fond si elle existe
+        if (this.currentPhase && this.currentPhase.background_image) {
+            const img = this.dataManager.assetManager.getImage(this.currentPhase.background_image);
+            if (img) {
+                // On dessine l'image en pattern ou scale ? 
+                // Pour un roguelike, souvent on veut qu'elle couvre tout ou se répète.
+                // Ici on va la dessiner pour couvrir tout le rectangle logique.
+                this.ctx.drawImage(img, 0, 0, this.logicalWidth, this.logicalHeight);
+                return; // On ne dessine pas la grille si on a une image de fond
+            }
+        }
+
         this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
         this.ctx.lineWidth = 1;
         const spacing = 100;
