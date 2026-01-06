@@ -12,7 +12,7 @@
             "color": "#fff",
             "visuals": {
                 "type": "sprite",
-                "width": 128,
+                "width": 250,
                 "directionMode": "none",
                 "angleOffset": 0,
                 "hitFlash": false,
@@ -24,7 +24,8 @@
                         "frameRate": 10,
                         "loop": true
                     }
-                }
+                },
+                "pixelPerfect": false
             },
             "projectileVisuals": {
                 "type": "sprite",

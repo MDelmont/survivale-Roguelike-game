@@ -63,6 +63,12 @@ class Game {
         this.storyPageIndex = 0;
         this.onStoryComplete = null;
 
+        // Système de Résolution Logique
+        this.baseWidth = 1600; // Largeur de référence fixe
+        this.logicalWidth = this.baseWidth;
+        this.logicalHeight = 900;
+        this.scale = 1;
+
         this.init();
     }
 
@@ -116,20 +122,28 @@ class Game {
     handleResize() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+        
+        // Calcul du scale basé sur la largeur de référence
+        this.scale = window.innerWidth / this.baseWidth;
+        
+        // Mise à jour des dimensions logiques (l'espace de jeu interne)
+        this.logicalWidth = this.baseWidth;
+        this.logicalHeight = window.innerHeight / this.scale;
     }
 
     handleCanvasClick(e) {
         const rect = this.canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
+        // Conversion des coordonnées écran -> coordonnées logiques
+        const mouseX = (e.clientX - rect.left) / this.scale;
+        const mouseY = (e.clientY - rect.top) / this.scale;
 
         if (this.state === GameState.MENU) {
             const btnW = 250;
             const btnH = 60;
-            const centerX = this.canvas.width / 2;
+            const centerX = this.logicalWidth / 2;
             
             // Check Nouvelle Partie
-            const npY = this.canvas.height / 2 + 50;
+            const npY = this.logicalHeight / 2 + 50;
             if (mouseX >= centerX - btnW/2 && mouseX <= centerX + btnW/2 &&
                 mouseY >= npY - btnH/2 && mouseY <= npY + btnH/2) {
                 this.startNewGame();
@@ -138,7 +152,7 @@ class Game {
 
             // Check Continuer
             if (this.saveSystem.getProgress() > 0) {
-                const cY = this.canvas.height / 2 + 130;
+                const cY = this.logicalHeight / 2 + 130;
                 if (mouseX >= centerX - btnW/2 && mouseX <= centerX + btnW/2 &&
                     mouseY >= cY - btnH/2 && mouseY <= cY + btnH/2) {
                     this.continueGame();
@@ -156,11 +170,9 @@ class Game {
         } else if (this.state === GameState.WEAPON_MENU) {
             this.handleChoiceMenuClick(mouseX, mouseY, 100, (choice) => {
                 if (choice.type === 'upgrade') {
-                    // Amélioration d'une arme existante spécifique
                     const weapon = this.player.weapons.find(w => w.id === choice.weaponId);
                     if (weapon) weapon.upgrade();
                 } else {
-                    // Ajout d'une nouvelle arme à l'arsenal
                     this.player.addWeapon(WeaponFactory.create(choice, this.dataManager.assetManager));
                 }
                 this.player.pendingWeaponUpgrade = false;
@@ -173,7 +185,7 @@ class Game {
 
     handleChoiceMenuClick(mouseX, mouseY, optionHeight, callback) {
         const menuWidth = 400;
-        const startX = this.canvas.width / 2 - menuWidth / 2;
+        const startX = this.logicalWidth / 2 - menuWidth / 2;
         const startY = 150;
         for (let i = 0; i < this.upgradeOptions.length; i++) {
             const optY = startY + i * (optionHeight + 20);
@@ -251,8 +263,8 @@ class Game {
 
     constrainPlayer() {
         const p = this.player;
-        p.x = Math.max(p.radius, Math.min(this.canvas.width - p.radius, p.x));
-        p.y = Math.max(p.radius, Math.min(this.canvas.height - p.radius, p.y));
+        p.x = Math.max(p.radius, Math.min(this.logicalWidth - p.radius, p.x));
+        p.y = Math.max(p.radius, Math.min(this.logicalHeight - p.radius, p.y));
     }
 
     updateGameEntities(deltaTime) {
@@ -269,10 +281,10 @@ class Game {
                 }
             }
 
-            if (p.isOutOfBounds(this.canvas.width, this.canvas.height) || p.toRemove) this.projectiles.splice(i, 1);
+            if (p.isOutOfBounds(this.logicalWidth, this.logicalHeight) || p.toRemove) this.projectiles.splice(i, 1);
         }
 
-        // Projectiles ennemis (Simplifié pour le moment)
+        // Projectiles ennemis
         for (let i = this.enemyProjectiles.length - 1; i >= 0; i--) {
             const ep = this.enemyProjectiles[i];
             ep.update(deltaTime);
@@ -280,7 +292,7 @@ class Game {
                 this.player.takeDamage(ep.damage);
                 ep.toRemove = true;
             }
-            if (ep.isOutOfBounds(this.canvas.width, this.canvas.height) || ep.toRemove) this.enemyProjectiles.splice(i, 1);
+            if (ep.isOutOfBounds(this.logicalWidth, this.logicalHeight) || ep.toRemove) this.enemyProjectiles.splice(i, 1);
         }
 
         // Loots
@@ -379,10 +391,10 @@ class Game {
         const type = this.currentPhase.enemy_types[Math.floor(Math.random() * this.currentPhase.enemy_types.length)];
         const side = Math.floor(Math.random() * 4);
         let x, y;
-        if (side === 0) { x = Math.random() * this.canvas.width; y = -50; }
-        else if (side === 1) { x = Math.random() * this.canvas.width; y = this.canvas.height + 50; }
-        else if (side === 2) { x = -50; y = Math.random() * this.canvas.height; }
-        else { x = this.canvas.width + 50; y = Math.random() * this.canvas.height; }
+        if (side === 0) { x = Math.random() * this.logicalWidth; y = -50; }
+        else if (side === 1) { x = Math.random() * this.logicalWidth; y = this.logicalHeight + 50; }
+        else if (side === 2) { x = -50; y = Math.random() * this.logicalHeight; }
+        else { x = this.logicalWidth + 50; y = Math.random() * this.logicalHeight; }
         const enemyData = this.dataManager.getEnemyData(type);
         if (!enemyData) {
             console.error(`Type d'ennemi inconnu : ${type}`);
@@ -402,10 +414,14 @@ class Game {
         this.ctx.fillStyle = '#0a0a1a';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Background Particles (Subtle Grid or Stars)
+        // Application de la mise à l'échelle logique
+        this.ctx.save();
+        this.ctx.scale(this.scale, this.scale);
+
+        // Background Particles
         this.drawBackground();
 
-        if (this.state === GameState.MENU) { this.drawMenu(); return; }
+        if (this.state === GameState.MENU) { this.drawMenu(); this.ctx.restore(); return; }
 
         this.loots.forEach(l => l.draw(this.ctx));
         this.projectiles.forEach(p => p.draw(this.ctx));
@@ -432,17 +448,16 @@ class Game {
 
         this.input.draw(this.ctx);
 
-        if (this.state === GameState.UPGRADE) this.drawChoiceMenu('AMÉLIORATION DISPONIBLE !', '#0af');
-        if (this.state === GameState.WEAPON_MENU) this.drawChoiceMenu('CHOISIS TON ARME !', '#ffd700', 100);
-        if (this.state === GameState.STORY) this.drawStory();
         if (this.state === GameState.VICTORY) this.drawEndScreen('VICTOIRE !', '#0f0');
         if (this.state === GameState.GAMEOVER) this.drawEndScreen('GAME OVER', '#f00');
+
+        this.ctx.restore();
     }
 
     drawStory() {
         const ctx = this.ctx;
-        const w = this.canvas.width;
-        const h = this.canvas.height;
+        const w = this.logicalWidth;
+        const h = this.logicalHeight;
         const page = this.storyQueue[this.storyPageIndex];
 
         // Background dark overlay
@@ -526,18 +541,18 @@ class Game {
         this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
         this.ctx.lineWidth = 1;
         const spacing = 100;
-        for (let x = 0; x < this.canvas.width; x += spacing) {
-            this.ctx.beginPath(); this.ctx.moveTo(x, 0); this.ctx.lineTo(x, this.canvas.height); this.ctx.stroke();
+        for (let x = 0; x < this.logicalWidth; x += spacing) {
+            this.ctx.beginPath(); this.ctx.moveTo(x, 0); this.ctx.lineTo(x, this.logicalHeight); this.ctx.stroke();
         }
-        for (let y = 0; y < this.canvas.height; y += spacing) {
-            this.ctx.beginPath(); this.ctx.moveTo(0, y); this.ctx.lineTo(this.canvas.width, y); this.ctx.stroke();
+        for (let y = 0; y < this.logicalHeight; y += spacing) {
+            this.ctx.beginPath(); this.ctx.moveTo(0, y); this.ctx.lineTo(this.logicalWidth, y); this.ctx.stroke();
         }
     }
 
     drawMenu() {
         const ctx = this.ctx;
-        const w = this.canvas.width;
-        const h = this.canvas.height;
+        const w = this.logicalWidth;
+        const h = this.logicalHeight;
 
         // Title with glow
         ctx.shadowBlur = 20;
@@ -581,8 +596,8 @@ class Game {
         // HUD Bottom: HP
         const hpW = 300;
         const hpH = 30;
-        const hpX = this.canvas.width / 2 - hpW / 2;
-        const hpY = this.canvas.height - 60;
+        const hpX = this.logicalWidth / 2 - hpW / 2;
+        const hpY = this.logicalHeight - 60;
 
         ctx.fillStyle = 'rgba(0,0,0,0.5)';
         ctx.fillRect(hpX, hpY, hpW, hpH);
@@ -596,7 +611,7 @@ class Game {
         ctx.strokeRect(hpX, hpY, hpW, hpH);
 
         // XP Top
-        const xpW = this.canvas.width - 100;
+        const xpW = this.logicalWidth - 100;
         const xpH = 10;
         ctx.fillStyle = 'rgba(255,255,255,0.1)';
         ctx.fillRect(50, 20, xpW, xpH);
@@ -614,15 +629,15 @@ class Game {
         if (this.player.weapons.length > 0) {
             ctx.textAlign = 'right';
             this.player.weapons.forEach((w, i) => {
-                ctx.fillText(`${w.name} (LVL ${w.level})`, this.canvas.width - 50, 50 + i * 20);
+                ctx.fillText(`${w.name} (LVL ${w.level})`, this.logicalWidth - 50, 50 + i * 20);
             });
         }
     }
 
     drawChoiceMenu(title, color, optionHeight = 80) {
         const ctx = this.ctx;
-        const w = this.canvas.width;
-        const h = this.canvas.height;
+        const w = this.logicalWidth;
+        const h = this.logicalHeight;
 
         // Overlay transparent
         ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
@@ -666,17 +681,17 @@ class Game {
     drawEndScreen(text, color) {
         const ctx = this.ctx;
         ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.fillRect(0, 0, this.logicalWidth, this.logicalHeight);
 
         ctx.fillStyle = color;
         ctx.font = 'bold 80px Inter, Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(text, this.canvas.width / 2, this.canvas.height / 2 - 50);
+        ctx.fillText(text, this.logicalWidth / 2, this.logicalHeight / 2 - 50);
 
         ctx.fillStyle = 'white';
         ctx.font = '24px Inter, Arial';
-        ctx.fillText(`KILLS: ${this.killCount}`, this.canvas.width / 2, this.canvas.height / 2 + 20);
-        ctx.fillText('CLIQUE POUR RECOMMENCER', this.canvas.width / 2, this.canvas.height / 2 + 100);
+        ctx.fillText(`KILLS: ${this.killCount}`, this.logicalWidth / 2, this.logicalHeight / 2 + 20);
+        ctx.fillText('CLIQUE POUR RECOMMENCER', this.logicalWidth / 2, this.logicalHeight / 2 + 100);
     }
 
     updateFPS(dt) {
