@@ -787,6 +787,8 @@ class BossesModule {
         b.projectileVisuals.animations = projAnimations;
 
         this.updateJsonPreview();
+        this.loadPreview();
+        this.loadProjectilePreview();
     }
 
     /**

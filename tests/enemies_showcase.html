@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bestiaire des Horreurs - EVG Anthony</title>
+    <style>
+        body {
+            background: #0f140f;
+            color: #cfc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #3f3;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .test-card {
+            background: linear-gradient(145deg, #1d251d, #0f140f);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #2a3a2a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .test-card:hover {
+            transform: scale(1.02);
+            border-color: #3f3;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .test-card h2 {
+            margin-top: 0;
+            color: #3f3;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(63, 255, 51, 0.2);
+            width: 100%;
+            text-align: center;
+            padding-bottom: 10px;
+        }
+
+        .canvas-container {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #1a2a1a 0%, #050a05 100%);
+            border-radius: 50%;
+            border: 4px solid #2a3a2a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 255, 0, 0.1);
+            animation: scan 3s linear infinite;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .stats {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #8f8;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-val {
+            color: #3f3;
+            font-weight: bold;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #050a05;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: #3f3;
+        }
+
+        .loader {
+            border: 5px solid #1a2a1a;
+            border-top: 5px solid #3f3;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-idle { background: #2a3a2a; color: #fff; }
+        .btn-walk { background: #3f3; color: #000; }
+        .btn-walk:hover { background: #2ecc71; }
+    </style>
+</head>
+
+<body>
+    <div id="loader" class="loading-overlay">
+        <div class="loader"></div>
+        <p>Analyse des spécimens en cours...</p>
+    </div>
+
+    <h1>☣️ Bestiaire des Mutants ☣️</h1>
+    <div class="grid" id="test-grid"></div>
+
+    <script type="module">
+        import { Enemy } from '../js/entities/Enemy.js';
+        import { AssetManager } from '../js/core/AssetManager.js';
+
+        const assetManager = new AssetManager();
+
+        async function init() {
+            try {
+                const res = await fetch('../data/enemies.json');
+                const data = await res.json();
+
+                // Collect Assets
+                function collectAssets(obj) {
+                    const paths = [];
+                    const find = (o) => {
+                        if (!o || typeof o !== 'object') return;
+                        if (o.frames && Array.isArray(o.frames)) {
+                            o.frames.forEach(p => paths.push(p));
+                        }
+                        Object.values(o).forEach(find);
+                    };
+                    find(obj);
+                    return paths;
+                }
+
+                const assetsToLoad = collectAssets(data);
+
+                // Patch AssetManager
+                assetManager.loadImage = (originalPath) => {
+                    const modifiedPath = originalPath.startsWith('assets/') ? '../' + originalPath : originalPath;
+                    const promise = new Promise((resolve) => {
+                        const img = new Image();
+                        img.src = modifiedPath;
+                        img.onload = () => { assetManager.images.set(originalPath, img); resolve(img); };
+                        img.onerror = () => resolve(null);
+                    });
+                    assetManager.loadingPromises.push(promise);
+                    return promise;
+                };
+
+                assetsToLoad.forEach(p => assetManager.loadImage(p));
+                await assetManager.waitForAll();
+                document.getElementById('loader').style.display = 'none';
+
+                class EnemyShowcase {
+                    constructor(id, stats, container) {
+                        this.id = id;
+                        this.stats = stats;
+                        this.canvas = document.createElement('canvas');
+                        this.canvas.width = 300;
+                        this.canvas.height = 300;
+                        container.appendChild(this.canvas);
+                        this.ctx = this.canvas.getContext('2d');
+                        
+                        this.enemy = new Enemy(150, 150, stats, assetManager);
+                        this.targetState = 'walk'; // Par défaut
+                        
+                        this.angle = 0;
+                        this.lastTime = performance.now();
+                        this.animate();
+                    }
+
+                    setState(state) {
+                        this.targetState = state;
+                    }
+
+                    animate(time) {
+                        const dt = time - this.lastTime || 0;
+                        this.lastTime = time;
+                        
+                        // Cible fixe (vers le haut) pour l'orientation
+                        this.enemy.update(dt, { x: 150, y: -1000 }, {}, this.targetState);
+                        
+                        // Forcer la position pour ne pas qu'il sorte de l'écran
+                        this.enemy.x = 150;
+                        this.enemy.y = 150;
+                        
+                        const ctx = this.ctx;
+                        ctx.clearRect(0, 0, 300, 300);
+                        
+                        ctx.save();
+                        // Zoomer de 3x par rapport au centre (comme demandé pour le joueur)
+                        ctx.translate(150, 150);
+                        ctx.scale(3, 3);
+                        ctx.translate(-150, -150);
+
+                        // Appliquer l'effet de -90 degrés (cohérence avec le player showcase)
+                        const originalAngle = this.enemy.angle || 0;
+                        this.enemy.angle = originalAngle - Math.PI / 2;
+
+                        this.enemy.draw(ctx);
+                        
+                        // Restaurer
+                        this.enemy.angle = originalAngle;
+                        ctx.restore();
+                        
+                        requestAnimationFrame((t) => this.animate(t));
+                    }
+                }
+
+                const grid = document.getElementById('test-grid');
+                Object.entries(data.enemies).forEach(([id, stats]) => {
+                    const card = document.createElement('div');
+                    card.className = 'test-card';
+                    card.innerHTML = `
+                        <h2>[SÉRIE-${id.toUpperCase()}]</h2>
+                        <div class="canvas-container" id="c-${id}">
+                            <div class="scanline"></div>
+                        </div>
+                        <div class="stats">
+                            <div class="stat-item"><span>PV:</span> <span class="stat-val">${stats.hp}</span></div>
+                            <div class="stat-item"><span>Dégâts:</span> <span class="stat-val">${stats.damage}</span></div>
+                            <div class="stat-item"><span>Vitesse:</span> <span class="stat-val">${stats.speed}</span></div>
+                            <div class="stat-item"><span>XP:</span> <span class="stat-val">${stats.xpValue}</span></div>
+                        </div>
+                        <div class="controls">
+                            <button class="btn btn-idle" id="idle-${id}">Idle</button>
+                            <button class="btn btn-walk" id="walk-${id}">Marche</button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                    const showcase = new EnemyShowcase(id, stats, document.getElementById(`c-${id}`));
+                    document.getElementById(`idle-${id}`).onclick = () => showcase.setState('idle');
+                    document.getElementById(`walk-${id}`).onclick = () => showcase.setState('walk');
+                });
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loader').innerHTML = `<p style="color:red">Erreur critique d'analyse : ${err.message}</p>`;
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

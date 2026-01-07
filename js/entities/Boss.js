@@ -25,7 +25,7 @@ export class Boss extends Enemy {
         this.behaviorPhase = 0;
     }
 
-    update(deltaTime, player, onShoot) {
+    update(deltaTime, player, onShoot, forceState = null) {
         // Logique de mouvement spécifique
         this.handleMovement(deltaTime, player);
 
@@ -64,7 +64,8 @@ export class Boss extends Enemy {
         if (this.animator) {
             this.animator.update(deltaTime, {
                 velocity: this.velocity,
-                isHurt: this.isHurt
+                isHurt: this.isHurt,
+                forceState: forceState
             });
             this.isHurt = false;
         }

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centre de Tests - EVG Anthony</title>
+    <style>
+        :root {
+            --primary: #0af;
+            --secondary: #f0f;
+            --accent: #3f3;
+            --bg: #0a0a1a;
+            --panel: #161625;
+            --text: #fff;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 50px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .hub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .hub-card {
+            background: var(--panel);
+            border-radius: 20px;
+            padding: 30px;
+            text-decoration: none;
+            color: var(--text);
+            border: 1px solid #334;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .hub-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 40px rgba(0, 170, 255, 0.3);
+        }
+
+        .hub-card.boss:hover { border-color: var(--secondary); box-shadow: 0 15px 40px rgba(255, 0, 255, 0.3); }
+        .hub-card.enemy:hover { border-color: var(--accent); box-shadow: 0 15px 40px rgba(51, 255, 51, 0.3); }
+
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+        }
+
+        .hub-card h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+        }
+
+        .hub-card p {
+            color: #aaa;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .tag {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .footer {
+            margin-top: 80px;
+            color: #556;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Lab Hub</h1>
+    
+    <div class="hub-grid">
+        <a href="players_showcase.html" class="hub-card">
+            <div class="icon">👤</div>
+            <h2>Personnages</h2>
+            <p>Visualisez Anthony et tous les autres futurs héros du jeu.</p>
+            <div class="tag" style="color: var(--primary)">Vérification des Sprites</div>
+        </a>
+
+        <a href="weapons_showcase.html" class="hub-card">
+            <div class="icon">⚔️</div>
+            <h2>Armements</h2>
+            <p>Testez les tirs, les auras et les projectiles spéciaux.</p>
+            <div class="tag" style="color: var(--primary)">Dégâts & Effets</div>
+        </a>
+
+        <a href="enemies_showcase.html" class="hub-card enemy">
+            <div class="icon">🦠</div>
+            <h2>Bestiaire</h2>
+            <p>Observez les mutations et les comportements des ennemis.</p>
+            <div class="tag" style="color: var(--accent)">Animations Scan</div>
+        </a>
+
+        <a href="bosses_showcase.html" class="hub-card boss">
+            <div class="icon">👾</div>
+            <h2>Boss Finaux</h2>
+            <p>Afrocontez l'Ovule Géant et les autres monstres épiques.</p>
+            <div class="tag" style="color: var(--secondary)">Attack Patterns</div>
+        </a>
+    </div>
+
+    <div class="footer">EVG Anthony - Survivale Roguelike Engine © 2026</div>
+</body>
+</html>

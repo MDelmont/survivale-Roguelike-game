@@ -658,6 +658,7 @@ class PlayersModule {
         p.visuals.animations = newAnimations;
 
         this.updateJsonPreview();
+        this.loadPreview();
     }
 
     /**

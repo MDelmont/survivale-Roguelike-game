@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panthéon des Boss - EVG Anthony</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #f0f;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+            gap: 25px;
+        }
+
+        .test-card {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #444;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .test-card:hover {
+            transform: translateY(-5px);
+            border-color: #f0f;
+            box-shadow: 0 15px 30px rgba(255, 0, 255, 0.2);
+        }
+
+        .test-card h2 {
+            margin-top: 0;
+            color: #fff;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px rgba(255,0,255,0.5);
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, #101030 0%, #050510 100%);
+            border: 2px solid #333;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .controls {
+            margin-top: 15px;
+            font-size: 1rem;
+            color: #ccc;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .btn-reset {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: #f0f;
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-reset:hover {
+            background: #bf00bf;
+            transform: scale(1.05);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loader {
+            border: 5px solid #333;
+            border-top: 5px solid #f0f;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loader" class="loading-overlay">
+        <div class="loader"></div>
+        <p>Éveil des Boss...</p>
+    </div>
+
+    <h1>👾 Panthéon des Boss de Fin de Phase</h1>
+    <div class="grid" id="test-grid"></div>
+
+    <script type="module">
+        import { Boss } from '../js/entities/Boss.js';
+        import { Player } from '../js/entities/Player.js';
+        import { Projectile } from '../js/entities/Projectile.js';
+        import { AssetManager } from '../js/core/AssetManager.js';
+
+        const assetManager = new AssetManager();
+
+        async function init() {
+            try {
+                const [bossRes, playerRes] = await Promise.all([
+                    fetch('../data/bosses.json'),
+                    fetch('../data/player.json')
+                ]);
+
+                const bossesData = await bossRes.json();
+                const playerData = await playerRes.json();
+                const anthonyBase = playerData.players.anthony;
+
+                // Collect Assets
+                function collectAssets(obj) {
+                    const paths = [];
+                    const find = (o) => {
+                        if (!o || typeof o !== 'object') return;
+                        if (o.frames && Array.isArray(o.frames)) {
+                            o.frames.forEach(p => paths.push(p));
+                        }
+                        Object.values(o).forEach(find);
+                    };
+                    find(obj);
+                    return paths;
+                }
+
+                const assetsToLoad = [
+                    ...collectAssets(bossesData),
+                    ...collectAssets(anthonyBase)
+                ];
+
+                // Patch AssetManager
+                const originalLoadImage = assetManager.loadImage.bind(assetManager);
+                assetManager.loadImage = (originalPath) => {
+                    if (assetManager.images.has(originalPath)) return Promise.resolve(assetManager.images.get(originalPath));
+                    const modifiedPath = originalPath.startsWith('assets/') ? '../' + originalPath : originalPath;
+                    const promise = new Promise((resolve) => {
+                        const img = new Image();
+                        img.src = modifiedPath;
+                        img.onload = () => { assetManager.images.set(originalPath, img); resolve(img); };
+                        img.onerror = () => { console.warn(`Missing: ${modifiedPath}`); resolve(null); };
+                    });
+                    assetManager.loadingPromises.push(promise);
+                    return promise;
+                };
+
+                assetsToLoad.forEach(p => assetManager.loadImage(p));
+                await assetManager.waitForAll();
+                document.getElementById('loader').style.display = 'none';
+
+                const scenarios = Object.entries(bossesData.bosses).map(([id, data]) => ({
+                    id,
+                    name: data.name,
+                    data: data,
+                    playerBase: anthonyBase
+                }));
+
+                class BossShowcase {
+                    constructor(config, container) {
+                        this.config = config;
+                        this.canvas = document.createElement('canvas');
+                        this.canvas.width = 600;
+                        this.canvas.height = 600;
+                        container.appendChild(this.canvas);
+                        this.ctx = this.canvas.getContext('2d');
+
+                        this.reset();
+                        this.lastTime = performance.now();
+                        this.animate();
+                    }
+
+                    reset() {
+                        // Le joueur est caché mais sert de cible invisible en bas
+                        this.player = new Player(300, 550, this.config.playerBase, assetManager);
+                        // On centre le boss au milieu du canevas
+                        this.boss = new Boss(300, 300, this.config.data, assetManager);
+                        this.projectiles = [];
+                    }
+
+                    animate(time) {
+                        const dt = time - this.lastTime || 0;
+                        this.lastTime = time;
+                        this.update(dt);
+                        this.draw();
+                        requestAnimationFrame((t) => this.animate(t));
+                    }
+
+                    update(dt) {
+                        // Boss update avec pattern de tir
+                        // On force 'walk' si possible, sinon 'idle'
+                        let bossState = 'walk';
+                        if (this.boss.animator && (!this.boss.animator.visuals.animations.walk || this.boss.animator.visuals.animations.walk.frames.length === 0)) {
+                            bossState = 'idle';
+                        }
+                        
+                        this.boss.update(dt, this.player, (x, y, dx, dy, stats) => {
+                            this.projectiles.push(new Projectile(x, y, dx, dy, stats, assetManager));
+                        }, bossState);
+
+                        // Projectiles update
+                        for (let i = this.projectiles.length - 1; i >= 0; i--) {
+                            const p = this.projectiles[i];
+                            p.update(dt);
+                            if (p.x < -100 || p.x > 700 || p.y < -100 || p.y > 700) this.projectiles.splice(i, 1);
+                        }
+
+                        this.player.update(dt, { dx: 0, dy: 0 }, { targetDir: { dx: 0, dy: -1 }, enemies: [], explosions: [] });
+                    }
+
+                    draw() {
+                        const ctx = this.ctx;
+                        ctx.fillStyle = '#050515';
+                        ctx.fillRect(0, 0, 600, 600);
+
+                        // Grid background
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                        ctx.lineWidth = 1;
+                        for(let x=0; x<=600; x+=50) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,600); ctx.stroke(); }
+                        for(let y=0; y<=600; y+=50) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(600,y); ctx.stroke(); }
+
+                        this.projectiles.forEach(p => p.draw(ctx));
+                        this.boss.draw(ctx);
+                        // On ne dessine PLUS le joueur comme demandé
+                        // this.player.draw(ctx);
+                    }
+                }
+
+                const grid = document.getElementById('test-grid');
+                scenarios.forEach(sc => {
+                    const card = document.createElement('div');
+                    card.className = 'test-card';
+                    card.innerHTML = `
+                        <h2>${sc.name}</h2>
+                        <div class="canvas-container" id="c-${sc.id}"></div>
+                        <div class="controls">
+                            PV: ${sc.data.hp} | Pattern: ${sc.data.attackPattern}<br>
+                            Mouvement: ${sc.data.movePattern}
+                        </div>
+                        <button class="btn-reset" id="r-${sc.id}">Relancer Boss</button>
+                    `;
+                    grid.appendChild(card);
+                    const showcase = new BossShowcase(sc, document.getElementById(`c-${sc.id}`));
+                    document.getElementById(`r-${sc.id}`).onclick = () => showcase.reset();
+                });
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loader').innerHTML = `<p style="color:red">Erreur: ${err.message}</p>`;
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

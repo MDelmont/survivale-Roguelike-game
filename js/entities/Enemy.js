@@ -37,7 +37,7 @@ export class Enemy {
         }
     }
 
-    update(deltaTime, playerPos, context = {}) {
+    update(deltaTime, playerPos, context = {}, forceState = null) {
         const dt = deltaTime / 1000;
 
         // Gestion des effets (Poison, Ralentissement, etc.)
@@ -92,7 +92,8 @@ export class Enemy {
         if (this.animator) {
             this.animator.update(deltaTime, {
                 velocity: this.velocity,
-                isHurt: this.isHurt
+                isHurt: this.isHurt,
+                forceState: forceState
             });
             this.isHurt = false;
         }

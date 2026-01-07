@@ -86,7 +86,7 @@ export class Player {
         this.pendingUpgrade = true;
     }
 
-    update(deltaTime, movement, combatContext) {
+    update(deltaTime, movement, combatContext, forceState = null) {
         // Gestion des effets de statut
         let speedMultiplier = 1.0;
         for (let i = this.activeEffects.length - 1; i >= 0; i--) {
@@ -133,7 +133,8 @@ export class Player {
         if (this.animator) {
             this.animator.update(deltaTime, {
                 velocity: this.velocity,
-                isHurt: this.isHurt
+                isHurt: this.isHurt,
+                forceState: forceState
             });
             this.isHurt = false; // Reset après lecture par l'animator
         }

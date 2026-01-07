@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sélection des Héros - EVG Anthony</title>
+    <style>
+        body {
+            background: #0a0a1a;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #0af;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 0 0 15px rgba(0, 170, 255, 0.5);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .test-card {
+            background: linear-gradient(145deg, #1e1e2e, #161625);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #334;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .test-card:hover {
+            transform: scale(1.02);
+            border-color: #0af;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .test-card h2 {
+            margin-top: 0;
+            color: #fff;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .canvas-container {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #202040 0%, #0a0a1a 100%);
+            border-radius: 50%;
+            border: 4px solid #334;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .stats {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #aaa;
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-val {
+            color: #0af;
+            font-weight: bold;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loader {
+            border: 5px solid #112;
+            border-top: 5px solid #0af;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-idle { background: #334; color: #fff; }
+        .btn-walk { background: #0af; color: #fff; }
+        .btn-walk:hover { background: #0088cc; }
+    </style>
+</head>
+
+<body>
+    <div id="loader" class="loading-overlay">
+        <div class="loader"></div>
+        <p>Recrutement des Héros...</p>
+    </div>
+
+    <h1>👤 Galerie des Personnages Jouables</h1>
+    <div class="grid" id="test-grid"></div>
+
+    <script type="module">
+        import { Player } from '../js/entities/Player.js';
+        import { AssetManager } from '../js/core/AssetManager.js';
+
+        const assetManager = new AssetManager();
+
+        async function init() {
+            try {
+                const res = await fetch('../data/player.json');
+                const data = await res.json();
+
+                // Collect Assets
+                function collectAssets(obj) {
+                    const paths = [];
+                    const find = (o) => {
+                        if (!o || typeof o !== 'object') return;
+                        if (o.frames && Array.isArray(o.frames)) {
+                            o.frames.forEach(p => paths.push(p));
+                        }
+                        Object.values(o).forEach(find);
+                    };
+                    find(obj);
+                    return paths;
+                }
+
+                const assetsToLoad = collectAssets(data);
+
+                // Patch AssetManager
+                assetManager.loadImage = (originalPath) => {
+                    const modifiedPath = originalPath.startsWith('assets/') ? '../' + originalPath : originalPath;
+                    const promise = new Promise((resolve) => {
+                        const img = new Image();
+                        img.src = modifiedPath;
+                        img.onload = () => { assetManager.images.set(originalPath, img); resolve(img); };
+                        img.onerror = () => resolve(null);
+                    });
+                    assetManager.loadingPromises.push(promise);
+                    return promise;
+                };
+
+                assetsToLoad.forEach(p => assetManager.loadImage(p));
+                await assetManager.waitForAll();
+                document.getElementById('loader').style.display = 'none';
+
+                class PlayerShowcase {
+                    constructor(id, stats, container) {
+                        this.id = id;
+                        this.stats = stats;
+                        this.canvas = document.createElement('canvas');
+                        this.canvas.width = 300;
+                        this.canvas.height = 300;
+                        container.appendChild(this.canvas);
+                        this.ctx = this.canvas.getContext('2d');
+                        
+                        this.player = new Player(150, 150, stats, assetManager);
+                        this.targetState = 'walk'; // Par défaut
+                        
+                        this.angle = 0;
+                        this.lastTime = performance.now();
+                        this.animate();
+                    }
+
+                    setState(state) {
+                        this.targetState = state;
+                    }
+
+                    animate(time) {
+                        const dt = time - this.lastTime || 0;
+                        this.lastTime = time;
+                        
+                        // Rotation lente pour voir le "rotate mode"
+                        if (this.stats.visuals.directionMode === 'rotate') {
+                            this.angle += 0.02;
+                        }
+
+                        this.player.update(dt, { dx: 0, dy: 0 }, { targetDir: { dx: 0, dy: 0 }, enemies: [], explosions: [] }, this.targetState);
+                        
+                        const ctx = this.ctx;
+                        ctx.clearRect(0, 0, 300, 300);
+                        
+                        ctx.save();
+                        // Zoomer de 1.5x par rapport au centre
+                        ctx.translate(150, 150);
+                        ctx.scale(3, 3);
+                        ctx.translate(-150, -150);
+                        
+                        // Appliquer l'effet de -90 degrés demandé
+                        const originalAngle = this.player.angle || 0;
+                        this.player.angle = originalAngle - Math.PI / 2;
+                        
+                        this.player.draw(ctx);
+                        
+                        // Restaurer l'angle original
+                        this.player.angle = originalAngle;
+                        ctx.restore();
+                        
+                        requestAnimationFrame((t) => this.animate(t));
+                    }
+                }
+
+                const grid = document.getElementById('test-grid');
+                Object.entries(data.players).forEach(([id, stats]) => {
+                    const card = document.createElement('div');
+                    card.className = 'test-card';
+                    card.innerHTML = `
+                        <h2>${stats.name}</h2>
+                        <div class="canvas-container" id="c-${id}"></div>
+                        <div class="stats">
+                            <div class="stat-item"><span>Vie:</span> <span class="stat-val">${stats.hp}</span></div>
+                            <div class="stat-item"><span>Vitesse:</span> <span class="stat-val">${stats.speed}</span></div>
+                            <div class="stat-item"><span>Dégâts:</span> <span class="stat-val">${stats.damage}</span></div>
+                            <div class="stat-item"><span>Portée:</span> <span class="stat-val">${stats.pickupRadius}</span></div>
+                        </div>
+                        <div class="controls">
+                            <button class="btn btn-idle" id="idle-${id}">Idle</button>
+                            <button class="btn btn-walk" id="walk-${id}">Marche</button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                    const showcase = new PlayerShowcase(id, stats, document.getElementById(`c-${id}`));
+                    document.getElementById(`idle-${id}`).onclick = () => showcase.setState('idle');
+                    document.getElementById(`walk-${id}`).onclick = () => showcase.setState('walk');
+                });
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loader').innerHTML = `<p style="color:red">Erreur: ${err.message}</p>`;
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

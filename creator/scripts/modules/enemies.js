@@ -698,8 +698,8 @@ class EnemiesModule {
             }
         });
         e.visuals.animations = newAnimations;
-
         this.updateJsonPreview();
+        this.loadPreview();
     }
 
     /**

@@ -23,7 +23,8 @@
                         "frames": [
                             "assets/players/Spermateozoide-Anthony-1.png"
                         ],
-                        "frameRate": 1
+                        "frameRate": 1,
+                        "loop": true
                     },
                     "walk": {
                         "frames": [
