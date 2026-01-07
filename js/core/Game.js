@@ -231,7 +231,7 @@ class Game {
 
         // Cible pour tir auto
         let targetDir = null;
-        let potentialTargets = this.boss ? [this.boss] : this.enemies;
+        let potentialTargets = this.boss ? [this.boss, ...this.enemies] : this.enemies;
         if (potentialTargets.length > 0) {
             let closest = potentialTargets[0];
             let minDist = Infinity;
