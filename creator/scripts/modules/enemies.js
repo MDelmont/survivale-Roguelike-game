@@ -248,7 +248,16 @@ class EnemiesModule {
                 </div>
 
                 <div class="form-section">
-                    <h3 class="form-section-title">Statistiques de Combat</h3>
+                    <h3 class="form-section-title">Combat & Équipement</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Arme équipée</label>
+                            <select class="form-select" id="enemyWeapon">
+                                <option value="">-- Aucune (Contact uniquement) --</option>
+                                ${this.app.gameData.weapons.map(w => `<option value="${w.id}" ${e.weapon_id === w.id ? 'selected' : ''}>${w.name || w.id}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Points de vie (HP)</label>
@@ -624,6 +633,7 @@ class EnemiesModule {
         e.xpValue = parseInt(document.getElementById('enemyXpValue')?.value) || 10;
         e.radius = parseInt(document.getElementById('enemyRadius')?.value) || 12;
         e.color = document.getElementById('enemyColor')?.value || '#fff';
+        e.weapon_id = document.getElementById('enemyWeapon')?.value || '';
 
         // Visuels
         if (!e.visuals) e.visuals = {};

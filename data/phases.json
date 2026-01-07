@@ -22,7 +22,7 @@
             "boss_id": "ovule_geant",
             "story_intro": [],
             "story_outro": [],
-            "background_image": "assets/fond/fond-ovule.png",
+            "background_image": "assets/fond/fond-ovule-dark.png",
             "transition_intro_id": "transition_1767784600979",
             "transition_outro_id": ""
         }

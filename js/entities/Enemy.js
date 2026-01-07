@@ -1,4 +1,5 @@
 import { Animator } from './Animator.js';
+import { WeaponFactory } from '../systems/WeaponFactory.js';
 
 /**
  * Enemy Class
@@ -26,9 +27,17 @@ export class Enemy {
         this.velocity = { x: 0, y: 0 };
         this.angle = 0;
         this.isHurt = false;
+
+        // Arme de l'ennemi
+        this.weapon = null;
+        if (this.stats.weapon_id) {
+            // WeaponFactory aura besoin des données de l'arme. 
+            // On s'attend à ce que l'appelant les fournisse ou qu'on y ait accès.
+            // Pour l'instant, on laisse l'initialisation à Game ou une méthode dédiée.
+        }
     }
 
-    update(deltaTime, playerPos) {
+    update(deltaTime, playerPos, context = {}) {
         const dt = deltaTime / 1000;
 
         // Gestion des effets (Poison, Ralentissement, etc.)
@@ -68,6 +77,17 @@ export class Enemy {
             this.y += this.velocity.y * dt;
         }
 
+        // Mise à jour de l'arme
+        if (this.weapon) {
+            const targetDir = dist > 0 ? { dx: dx / dist, dy: dy / dist } : { dx: 1, dy: 0 };
+            this.weapon.update(deltaTime, this, {
+                targetDir: targetDir,
+                onShoot: (x, y, dx, dy, stats) => context.onEnemyShoot(x, y, dx, dy, stats),
+                enemies: [playerPos], // L'ennemi voit le joueur comme sa cible
+                player: playerPos
+            });
+        }
+
         // Mise à jour de l'animateur
         if (this.animator) {
             this.animator.update(deltaTime, {
@@ -102,6 +122,10 @@ export class Enemy {
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = 1;
             ctx.stroke();
+        }
+
+        if (this.weapon) {
+            this.weapon.draw(ctx, this);
         }
 
         // Barre de vie au-dessus de la tête

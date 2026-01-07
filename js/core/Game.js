@@ -300,8 +300,12 @@ class Game {
             const ep = this.enemyProjectiles[i];
             ep.update(deltaTime);
             if (this.player && CombatSystem.checkCollision(ep, this.player)) {
-                this.player.takeDamage(ep.damage);
-                ep.toRemove = true;
+                // Utilise hit() au lieu de takeDamage() pour appliquer tous les effets (poison, slow, etc.)
+                ep.hit(this.player, {
+                    player: this.player,
+                    enemies: [this.player], // Pour l'AOE ennemie, la cible est le joueur
+                    explosions: this.explosions
+                });
             }
             if (ep.isOutOfBounds(this.logicalWidth, this.logicalHeight) || ep.toRemove) this.enemyProjectiles.splice(i, 1);
         }
@@ -321,7 +325,9 @@ class Game {
         // Ennemis
         for (let i = this.enemies.length - 1; i >= 0; i--) {
             const e = this.enemies[i];
-            e.update(deltaTime, this.player);
+            e.update(deltaTime, this.player, {
+                onEnemyShoot: (x, y, dx, dy, stats) => this.spawnEnemyProjectile(x, y, dx, dy, stats)
+            });
             if (this.player && CombatSystem.checkCollision(this.player, e)) { this.player.takeDamage(e.damage); e.toRemove = true; }
             if (e.toRemove) {
                 if (e.hp <= 0) {
@@ -403,7 +409,15 @@ class Game {
         const bossId = this.currentPhase.boss_id;
         const bossStats = this.dataManager.getBossData(bossId);
         if (bossStats) {
-            this.boss = new Boss(this.canvas.width / 2, -100, bossStats, this.dataManager.assetManager);
+            this.boss = new Boss(this.logicalWidth / 2, -100, bossStats, this.dataManager.assetManager);
+            
+            // Équiper l'arme si présente sur le boss
+            if (bossStats.weapon_id) {
+                const weaponData = this.dataManager.data.weapons.weapons.find(w => w.id === bossStats.weapon_id);
+                if (weaponData) {
+                    this.boss.weapon = WeaponFactory.create(weaponData, this.dataManager.assetManager);
+                }
+            }
         } else {
             console.error(`Boss ID inconnu : ${bossId}`);
         }
@@ -421,7 +435,22 @@ class Game {
             console.error(`Type d'ennemi inconnu : ${type}`);
             return;
         }
-        this.enemies.push(new Enemy(x, y, enemyData, this.dataManager.assetManager));
+        
+        const enemy = new Enemy(x, y, enemyData, this.dataManager.assetManager);
+        
+        // Équiper l'arme si présente
+        if (enemyData.weapon_id) {
+            const weaponData = this.dataManager.data.weapons.weapons.find(w => w.id === enemyData.weapon_id);
+            if (weaponData) {
+                enemy.weapon = WeaponFactory.create(weaponData, this.dataManager.assetManager);
+                // On peut ajuster les stats de l'arme pour les ennemis si nécessaire
+                if (enemy.weapon) {
+                    enemy.weapon.stats.damage = enemy.weapon.stats.damage || 5;
+                }
+            }
+        }
+        
+        this.enemies.push(enemy);
     }
 
     spawnLoot(x, y, v, t) { this.loots.push(new Loot(x, y, v, t, this.dataManager.assetManager)); }

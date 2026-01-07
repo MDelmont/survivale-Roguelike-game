@@ -117,8 +117,9 @@ export class OrbitalWeapon extends Weapon {
 
         this.masterAngle += orbitSpeed * dt;
 
-        const enemies = context.enemies || [];
-        const boss = context.boss;
+        const targets = [...(context.enemies || [])];
+        if (context.boss) targets.push(context.boss);
+        if (context.player && !targets.includes(context.player)) targets.push(context.player);
 
         this.satellites.forEach((s, index) => {
             const currentAngle = this.masterAngle + (index / this.satellites.length) * Math.PI * 2;
@@ -127,22 +128,38 @@ export class OrbitalWeapon extends Weapon {
 
             // Mise à jour de l'animateur du satellite
             if (s.animator) {
-                // Pour les satellites, on peut simuler une vitesse ou donner l'angle de rotation
                 s.animator.update(deltaTime, { velocity: { x: 1, y: 1 } }); 
             }
 
             const checkCollision = (e) => {
                 const dx = e.x - sx;
                 const dy = e.y - sy;
-                return Math.sqrt(dx * dx + dy * dy) < (10 + e.radius);
+                return Math.sqrt(dx * dx + dy * dy) < (10 + (e.radius || 10));
             };
 
-            enemies.forEach(e => {
-                if (checkCollision(e)) {
+            targets.forEach(t => {
+                if (!t || t === owner) return;
+                if (checkCollision(t)) {
                     const baseDamage = (this.stats.damage || 0) * (owner.stats.damageMultiplier || 1.0);
                     const hitDamage = baseDamage * dt * 5;
-                    if (hitDamage > 0) e.takeDamage(hitDamage);
-                    // ... (effets poison/slowing inchangés)
+                    if (hitDamage > 0) t.takeDamage(hitDamage);
+                    
+                    // Application des effets
+                    if (this.stats.isPoisonous && t.applyEffect) {
+                        t.applyEffect({
+                            type: 'poison',
+                            duration: this.stats.poisonDuration || 2000,
+                            damagePerTick: this.stats.poisonDamage || 5,
+                            tickRate: this.stats.poisonTickRate || 500
+                        });
+                    }
+                    if (this.stats.isSlowing && t.applyEffect) {
+                        t.applyEffect({
+                            type: 'slowing',
+                            duration: 2000,
+                            multiplier: this.stats.slowMultiplier || 0.5
+                        });
+                    }
                 }
             });
         });
@@ -184,9 +201,46 @@ export class AreaWeapon extends Weapon {
     }
 
     update(deltaTime, owner, context) {
-        // Logique de dégâts (inchangée)
         const range = (this.stats.range || 100) * (owner.stats.rangeMultiplier || 1.0);
-        // ... (boucle collision ennemis inchangée)
+        const dt = deltaTime / 1000;
+        
+        const targets = [...(context.enemies || [])];
+        if (context.boss) targets.push(context.boss);
+        // Si context.player est présent et n'est pas déjà dans targets (cas spécifique ennemi)
+        if (context.player && !targets.includes(context.player)) targets.push(context.player);
+
+        targets.forEach(t => {
+            if (!t || t === owner) return;
+            const dx = t.x - owner.x;
+            const dy = t.y - owner.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < range + (t.radius || 10)) {
+                // Dégâts continus
+                if (this.stats.damage > 0) {
+                    const d = (this.stats.damage || 0) * (owner.stats.damageMultiplier || 1.0) * dt;
+                    t.takeDamage(d);
+                }
+
+                // Application des effets (plus fréquents ou persistants en AOE)
+                // On met une durée courte car on est dans la zone
+                if (this.stats.isPoisonous && t.applyEffect) {
+                    t.applyEffect({
+                        type: 'poison',
+                        duration: 1000,
+                        damagePerTick: this.stats.poisonDamage || 5,
+                        tickRate: this.stats.poisonTickRate || 500
+                    });
+                }
+                if (this.stats.isSlowing && t.applyEffect) {
+                    t.applyEffect({
+                        type: 'slowing',
+                        duration: 1000,
+                        multiplier: this.stats.slowMultiplier || 0.5
+                    });
+                }
+            }
+        });
 
         if (this.animator) {
             this.animator.update(deltaTime, { velocity: { x: 0, y: 0 } });
@@ -195,17 +249,38 @@ export class AreaWeapon extends Weapon {
 
     draw(ctx, owner) {
         const range = (this.stats.range || 100) * (owner.stats.rangeMultiplier || 1.0);
+        
+        // On dessine l'animateur si il existe ET qu'il a des images
+        let hasSprite = false;
         if (this.animator) {
-            // L'aura utilise sa propre width/height définie dans le JSON
+            const currentAnim = this.animator.getAnimation(this.animator.currentState);
+            if (currentAnim && currentAnim.frames && currentAnim.frames.length > 0) {
+                hasSprite = true;
+            }
+        }
+
+        if (hasSprite) {
             this.animator.draw(ctx, owner.x, owner.y);
         } else {
+            // Dessin du cercle de secours si pas de sprite
             ctx.save();
             ctx.beginPath();
             ctx.arc(owner.x, owner.y, range, 0, Math.PI * 2);
             const alpha = 0.1 + Math.sin(Date.now() / 200) * 0.05;
-            ctx.fillStyle = this.stats.isPoisonous ? `rgba(0, 255, 0, ${alpha})` : `rgba(0, 200, 255, ${alpha})`;
+            
+            if (this.stats.isPoisonous) {
+                ctx.fillStyle = `rgba(0, 255, 0, ${alpha})`;
+                ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)';
+            } else if (this.stats.isSlowing) {
+                ctx.fillStyle = `rgba(0, 200, 255, ${alpha})`;
+                ctx.strokeStyle = 'rgba(0, 200, 255, 0.3)';
+            } else {
+                ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            }
+            
             ctx.fill();
-            ctx.strokeStyle = this.stats.isPoisonous ? 'rgba(0, 255, 0, 0.3)' : 'rgba(0, 200, 255, 0.3)';
+            ctx.lineWidth = 2;
             ctx.stroke();
             ctx.restore();
         }

@@ -23,16 +23,15 @@
                         "loop": true
                     },
                     "idle": {
-                        "frames": [
-                            "assets/projectiles/capotes.png"
-                        ],
+                        "frames": [],
                         "frameRate": 10,
                         "loop": true
                     }
                 },
                 "angleOffset": 90,
                 "pixelPerfect": false
-            }
+            },
+            "weapon_id": ""
         },
         "fast_cell": {
             "name": "diforme-spermatozoïde",
@@ -57,16 +56,15 @@
                         "loop": true
                     },
                     "idle": {
-                        "frames": [
-                            "assets/projectiles/capotes.png"
-                        ],
+                        "frames": [],
                         "frameRate": 10,
                         "loop": true
                     }
                 },
                 "angleOffset": 90,
                 "pixelPerfect": false
-            }
+            },
+            "weapon_id": ""
         },
         "tank_cell": {
             "name": "diablo-spermateozoide",
@@ -91,16 +89,15 @@
                         "loop": true
                     },
                     "idle": {
-                        "frames": [
-                            "assets/projectiles/capotes.png"
-                        ],
+                        "frames": [],
                         "frameRate": 10,
                         "loop": true
                     }
                 },
                 "angleOffset": 90,
                 "pixelPerfect": false
-            }
+            },
+            "weapon_id": ""
         }
     }
 }

@@ -45,6 +45,21 @@ export class Boss extends Enemy {
             }
         }
 
+        // Mise à jour de l'arme équipée (si existante)
+        if (this.weapon && player) {
+            const dx = player.x - this.x;
+            const dy = player.y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const targetDir = dist > 0 ? { dx: dx / dist, dy: dy / dist } : { dx: 1, dy: 0 };
+            
+            this.weapon.update(deltaTime, this, {
+                targetDir: targetDir,
+                onShoot: (x, y, dx, dy, stats) => onShoot(x, y, dx, dy, stats),
+                enemies: [player],
+                player: player
+            });
+        }
+
         // Mise à jour de l'animateur (héritée d'Enemy)
         if (this.animator) {
             this.animator.update(deltaTime, {
@@ -273,6 +288,10 @@ export class Boss extends Enemy {
             ctx.lineWidth = 4;
             ctx.stroke();
             ctx.restore();
+        }
+
+        if (this.weapon) {
+            this.weapon.draw(ctx, this);
         }
 
         // Barre de vie spécifique au Boss

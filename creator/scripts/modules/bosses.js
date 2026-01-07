@@ -265,7 +265,16 @@ class BossesModule {
                 </div>
 
                 <div class="form-section">
-                    <h3 class="form-section-title">Statistiques de Combat</h3>
+                    <h3 class="form-section-title">Combat & Équipement</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Arme équipée</label>
+                            <select class="form-select" id="bossWeapon">
+                                <option value="">-- Aucune (Pattern uniquement) --</option>
+                                ${this.app.gameData.weapons.map(w => `<option value="${w.id}" ${b.weapon_id === w.id ? 'selected' : ''}>${w.name || w.id}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Points de vie (HP)</label>
@@ -730,6 +739,7 @@ class BossesModule {
         b.damage = parseInt(document.getElementById('bossDamage')?.value) || 20;
         b.radius = parseInt(document.getElementById('bossRadius')?.value) || 80;
         b.color = document.getElementById('bossColor')?.value || '#fff';
+        b.weapon_id = document.getElementById('bossWeapon')?.value || '';
 
         // Combat
         b.attackPattern = document.getElementById('bossAttackPattern')?.value || 'spiral';
