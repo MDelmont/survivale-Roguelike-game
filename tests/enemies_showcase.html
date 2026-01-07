@@ -279,7 +279,7 @@
                     const card = document.createElement('div');
                     card.className = 'test-card';
                     card.innerHTML = `
-                        <h2>[SÉRIE-${id.toUpperCase()}]</h2>
+                        <h2>${stats.name || id.toUpperCase()}</h2>
                         <div class="canvas-container" id="c-${id}">
                             <div class="scanline"></div>
                         </div>
