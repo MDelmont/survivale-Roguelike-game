@@ -20,106 +20,11 @@
                 "smartphone_poison"
             ],
             "boss_id": "ovule_geant",
-            "story_intro": [
-                {
-                    "title": "L'Étincelle de Vie",
-                    "text": "Dans l'obscurité primordiale, une course contre la montre commence. Anthony, un spermatozoïde pas comme les autres, doit se frayer un chemin parmi ses semblables pour atteindre l'objectif ultime.",
-                    "image": ""
-                }
-            ],
-            "story_outro": [
-                {
-                    "title": "La Premier Passage",
-                    "text": "L'ovule est en vue ! Malgré les obstacles, Anthony a réussi à percer les premières défenses. Mais ce n'est que le début d'une longue aventure vers la maturité.",
-                    "image": ""
-                }
-            ],
-            "background_image": "assets/fond/fond-ovule.png"
-        },
-        {
-            "id": 2,
-            "name": "Le Bébé",
-            "duration_before_boss": 60,
-            "enemy_types": [
-                "basic_baby",
-                "tank_baby"
-            ],
-            "spawn_rate": 1200,
-            "default_weapon": "basic_shot",
-            "available_weapons": [
-                "basic_shot",
-                "poison_shot"
-            ],
-            "boss_id": "puree_brocolis"
-        },
-        {
-            "id": 3,
-            "name": "L'École",
-            "duration_before_boss": 60,
-            "enemy_types": [
-                "basic_school",
-                "fast_school",
-                "tank_school"
-            ],
-            "spawn_rate": 1000,
-            "default_weapon": "pen_launcher",
-            "available_weapons": [
-                "pen_launcher",
-                "shield_orbit"
-            ],
-            "boss_id": "prof_maths"
-        },
-        {
-            "id": 4,
-            "name": "L'Adolescence",
-            "duration_before_boss": 75,
-            "enemy_types": [
-                "basic_teen",
-                "fast_teen",
-                "tank_teen"
-            ],
-            "spawn_rate": 800,
-            "default_weapon": "pen_launcher",
-            "available_weapons": [
-                "pen_launcher",
-                "smartphone_wave"
-            ],
-            "boss_id": "crise_revolte"
-        },
-        {
-            "id": 5,
-            "name": "La Vie Adulte",
-            "duration_before_boss": 90,
-            "enemy_types": [
-                "basic_adult",
-                "fast_adult",
-                "tank_adult"
-            ],
-            "spawn_rate": 700,
-            "default_weapon": "smartphone_wave",
-            "available_weapons": [
-                "smartphone_wave",
-                "pen_launcher"
-            ],
-            "boss_id": "burn_out"
-        },
-        {
-            "id": 6,
-            "name": "Le Mariage",
-            "duration_before_boss": 120,
-            "enemy_types": [
-                "basic_wedding",
-                "fast_wedding",
-                "tank_wedding"
-            ],
-            "spawn_rate": 600,
-            "default_weapon": "smartphone_wave",
-            "available_weapons": [
-                "smartphone_wave",
-                "pen_launcher",
-                "shield_orbit"
-            ],
-            "boss_id": "pretre_interminable"
+            "story_intro": [],
+            "story_outro": [],
+            "background_image": "assets/fond/fond-ovule.png",
+            "transition_intro_id": "transition_1767784600979",
+            "transition_outro_id": ""
         }
     ]
 }

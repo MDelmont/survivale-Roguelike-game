@@ -306,7 +306,12 @@ class App {
                 }
                 this.modules.phases.init();
                 break;
-            // Les autres modules seront ajoutés plus tard
+            case 'transitions':
+                if (!this.modules.transitions) {
+                    this.modules.transitions = new TransitionsModule(this);
+                }
+                this.modules.transitions.init();
+                break;
         }
     }
 

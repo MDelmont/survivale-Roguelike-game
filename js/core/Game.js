@@ -92,6 +92,17 @@ class Game {
         this.explosions = [];
         this.boss = null;
 
+        if (this.currentPhase.transition_intro_id) {
+            const transition = this.dataManager.getTransitionData(this.currentPhase.transition_intro_id);
+            if (transition) {
+                this.openStory(transition.pages, () => {
+                    this.setupInitialPlayer();
+                    this.state = GameState.PLAYING;
+                });
+                return;
+            }
+        }
+
         if (this.currentPhase.story_intro && this.currentPhase.story_intro.length > 0) {
             this.openStory(this.currentPhase.story_intro, () => {
                 this.setupInitialPlayer();
@@ -334,6 +345,16 @@ class Game {
     }
 
     handlePhaseWin() {
+        if (this.currentPhase.transition_outro_id) {
+            const transition = this.dataManager.getTransitionData(this.currentPhase.transition_outro_id);
+            if (transition) {
+                this.openStory(transition.pages, () => {
+                    this.state = GameState.VICTORY;
+                });
+                return;
+            }
+        }
+
         if (this.currentPhase.story_outro && this.currentPhase.story_outro.length > 0) {
             this.openStory(this.currentPhase.story_outro, () => {
                 this.state = GameState.VICTORY;
@@ -463,9 +484,16 @@ class Game {
         const h = this.logicalHeight;
         const page = this.storyQueue[this.storyPageIndex];
 
-        // Background dark overlay
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-        ctx.fillRect(0, 0, w, h);
+        // Background (page specific background)
+        if (page.background && this.dataManager.assetManager.isLoaded(page.background)) {
+            const bgImg = this.dataManager.assetManager.getImage(page.background);
+            ctx.drawImage(bgImg, 0, 0, w, h);
+            // Plus d'overlay sombre pour laisser l'image de fond totalement claire
+        } else {
+            // Fond noir total si aucune image n'est définie
+            ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+            ctx.fillRect(0, 0, w, h);
+        }
 
         // Illustration image (if present)
         if (page.image && this.dataManager.assetManager.isLoaded(page.image)) {
@@ -476,34 +504,47 @@ class Game {
             ctx.drawImage(img, w / 2 - imgW / 2, 100, imgW, imgH);
         }
 
-        // Glass box for text
-        const boxW = Math.min(w * 0.8, 800);
-        const boxH = 300;
-        const boxX = w / 2 - boxW / 2;
-        const boxY = h / 2 + 50 - boxH / 2;
-
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-        ctx.fillRect(boxX, boxY, boxW, boxH);
-        ctx.strokeStyle = '#3b82f6';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(boxX, boxY, boxW, boxH);
-
-        // Title
-        ctx.fillStyle = '#3b82f6';
-        ctx.font = 'bold 32px Inter, Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(page.title || 'HISTOIRE', w / 2, boxY + 60);
-
-        // Text with wrapping
+        // Final prompt
         ctx.fillStyle = 'white';
-        ctx.font = '20px Inter, Arial';
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 3;
+        ctx.font = 'bold 18px Inter, Arial';
         ctx.textAlign = 'center';
-        this.wrapText(ctx, page.text || '', w / 2, boxY + 120, boxW - 80, 30);
+        ctx.strokeText('CLIQUE POUR CONTINUER...', w / 2, h - 50);
+        ctx.fillText('CLIQUE POUR CONTINUER...', w / 2, h - 50);
 
-        // Prompt
-        ctx.fillStyle = '#666';
-        ctx.font = '16px Inter, Arial';
-        ctx.fillText('CLIQUE POUR CONTINUER...', w / 2, boxY + boxH - 40);
+        // Story content box
+        if (!page.hideTitle || !page.hideText) {
+            const boxW = Math.min(w * 0.8, 800);
+            const boxH = 300;
+            const boxX = w / 2 - boxW / 2;
+            const boxY = h / 2 + 100 - boxH / 2;
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(boxX, boxY, boxW, boxH);
+            ctx.strokeStyle = page.titleColor || '#3b82f6';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+            // Title
+            if (!page.hideTitle) {
+                ctx.fillStyle = page.titleColor || '#3b82f6';
+                const titleSize = page.titleSize || 32;
+                ctx.font = `bold ${titleSize}px Inter, Arial`;
+                ctx.textAlign = 'center';
+                ctx.fillText(page.title || 'HISTOIRE', w / 2, boxY + 60);
+            }
+
+            // Text
+            if (!page.hideText) {
+                ctx.fillStyle = page.textColor || 'white';
+                const textSize = page.textSize || 20;
+                ctx.font = `${textSize}px Inter, Arial`;
+                ctx.textAlign = 'center';
+                const textY = page.hideTitle ? boxY + 60 : boxY + 120;
+                this.wrapText(ctx, page.text || '', w / 2, textY, boxW - 80, textSize + 10);
+            }
+        }
     }
 
     wrapText(ctx, text, x, y, maxWidth, lineHeight) {

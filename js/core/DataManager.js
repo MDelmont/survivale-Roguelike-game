@@ -12,7 +12,8 @@ export class DataManager {
             enemies: null,
             phases: null,
             weapons: null,
-            bosses: null
+            bosses: null,
+            transitions: null
         };
     }
 
@@ -21,12 +22,13 @@ export class DataManager {
      */
     async loadAll() {
         try {
-            const [playerRes, enemiesRes, phasesRes, weaponsRes, bossesRes] = await Promise.all([
+            const [playerRes, enemiesRes, phasesRes, weaponsRes, bossesRes, transitionsRes] = await Promise.all([
                 fetch('./data/player.json'),
                 fetch('./data/enemies.json'),
                 fetch('./data/phases.json'),
                 fetch('./data/weapons.json'),
-                fetch('./data/bosses.json')
+                fetch('./data/bosses.json'),
+                fetch('./data/transitions.json')
             ]);
 
             this.data.player = await playerRes.json();
@@ -34,6 +36,7 @@ export class DataManager {
             this.data.phases = await phasesRes.json();
             this.data.weapons = await weaponsRes.json();
             this.data.bosses = await bossesRes.json();
+            this.data.transitions = await transitionsRes.json();
 
             // Parcourir les données pour trouver et charger tous les assets visuels
             this.preloadVisuals();
@@ -63,6 +66,16 @@ export class DataManager {
                 if (phase.story_outro) {
                     phase.story_outro.forEach(p => p.image && this.assetManager.loadImage(p.image));
                 }
+            });
+        }
+
+        // Charger les images des transitions
+        if (this.data.transitions && this.data.transitions.transitions) {
+            this.data.transitions.transitions.forEach(transition => {
+                transition.pages.forEach(page => {
+                    if (page.image) this.assetManager.loadImage(page.image);
+                    if (page.background) this.assetManager.loadImage(page.background);
+                });
             });
         }
 
@@ -110,6 +123,11 @@ export class DataManager {
 
     getBossData(id) {
         return this.data.bosses.bosses[id];
+    }
+
+    getTransitionData(id) {
+        if (!this.data.transitions || !this.data.transitions.transitions) return null;
+        return this.data.transitions.transitions.find(t => t.id === id);
     }
 }
 

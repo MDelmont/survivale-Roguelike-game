@@ -272,25 +272,25 @@ creator/
 **Durée estimée : 1 session**
 
 #### À développer
-1. Créer le fichier `data/transitions.json` s'il n'existe pas
-2. Éditeur de séquences narratives :
-   - Liste des transitions
-   - Éditeur de pages (title, text, image, background, duration, animation, music)
-3. Drag & Drop pour réorganiser les pages
-4. Prévisualisation de la page narrative
-5. Ajout des transition au systeme de phase, (modifier l'existant)
+1. [x] Créer le fichier `data/transitions.json` s'il n'existe pas
+2. [x] Éditeur de séquences narratives :
+   - [x] Liste des transitions
+   - [x] Éditeur de pages (title, text, image, background, duration, animation, music)
+3. [x] Drag & Drop pour réorganiser les pages (implémenté via boutons Haut/Bas)
+4. [x] Prévisualisation de la page narrative
+5. [x] Ajout des transition au systeme de phase, (modifier l'existant)
 
 #### Fichiers à créer/modifier
 - `scripts/modules/transitions.js`
 - `data/transitions.json` (création initiale)
 
-#### ✅ Critères de validation (À TESTER)
-- [ ] Le fichier `transitions.json` est créé automatiquement s'il n'existe pas
-- [ ] On peut créer une nouvelle séquence de transition
-- [ ] On peut ajouter plusieurs pages à une séquence
-- [ ] Le drag & drop permet de réorganiser les pages
-- [ ] La prévisualisation affiche le rendu de la page
-- [ ] Sauvegarder écrit correctement dans `transitions.json`
+#### ✅ Critères de validation (TERMINÉ)
+- [x] Le fichier `transitions.json` est créé automatiquement s'il n'existe pas
+- [x] On peut créer une nouvelle séquence de transition
+- [x] On peut ajouter plusieurs pages à une séquence
+- [x] Le drag & drop permet de réorganiser les pages
+- [x] La prévisualisation affiche le rendu de la page
+- [x] Sauvegarder écrit correctement dans `transitions.json`
 
 ---
 

@@ -1,0 +1,25 @@
+{
+    "transitions": [
+        {
+            "id": "transition_1767784600979",
+            "name": "Fécondé et survivre",
+            "pages": [
+                {
+                    "title": "Le commencement",
+                    "titleSize": 24,
+                    "titleColor": "#6366f1",
+                    "hideTitle": true,
+                    "text": "Il avance seul dans le chaos salin, né pour une seule tâche. Tout son être est vectorisé vers l’ovule, point fixe dans la tempête. Autour de lui, la masse des autres n’est que bruit, interférence, matière à éliminer. Il ne négocie pas. Il percute, supplante, épuise. Chaque rival tombé réduit l’entropie, affine la trajectoire. Sa tête est clé, sa queue est moteur, sa mission est loi. Quand il atteint la membrane, il ne reste plus de concurrence, seulement l’impact final et la fermeture du monde derrière lui. Féconder. Exclure. Clore.",
+                    "textSize": 16,
+                    "textColor": "#ffffff",
+                    "hideText": true,
+                    "image": "",
+                    "background": "assets/fond/fond-ovule.png",
+                    "duration": 5000,
+                    "music": "",
+                    "animation": "none"
+                }
+            ]
+        }
+    ]
+}

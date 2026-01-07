@@ -148,6 +148,7 @@ class PhasesModule {
         // Conversion en tableaux pour les chips
         const enemiesArr = Object.entries(enemiesObj).map(([id, data]) => ({ id, ...data }));
         const bossesArr = Object.entries(bossesObj).map(([id, data]) => ({ id, ...data }));
+        const transitions = this.app.gameData.transitions || [];
 
         editor.innerHTML = `
             <div class="editor-form">
@@ -231,22 +232,38 @@ class PhasesModule {
                 </div>
 
                 <div class="form-section">
-                    <div class="section-header-inline">
-                        <h3 class="form-section-title">Narration : Intro</h3>
-                        <button class="btn btn-sm btn-secondary" id="addStoryIntroBtn">+ Ajouter Page</button>
-                    </div>
-                    <div id="storyIntroContainer" class="story-pages-list">
-                        ${this.renderStoryPages(p.story_intro, 'intro')}
+                    <h3 class="form-section-title">Narration : Intro (Avant la phase)</h3>
+                    <div class="form-group">
+                        <label class="form-label">Séquence Narrative</label>
+                        <div class="form-row" style="align-items: flex-end;">
+                            <div class="form-group" style="flex: 1;">
+                                <select class="form-select" id="phaseTransitionIntro">
+                                    <option value="">-- Aucune --</option>
+                                    ${transitions.map(t => `<option value="${t.id}" ${p.transition_intro_id === t.id ? 'selected' : ''}>${t.name || t.id} (${t.pages?.length || 0} pages)</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex: 0 0 auto; margin-bottom: 0;">
+                                <button class="btn btn-secondary edit-transition-btn" data-type="intro" ${!p.transition_intro_id ? 'disabled' : ''}>✏️ Éditer</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="form-section">
-                    <div class="section-header-inline">
-                        <h3 class="form-section-title">Narration : Outro</h3>
-                        <button class="btn btn-sm btn-secondary" id="addStoryOutroBtn">+ Ajouter Page</button>
-                    </div>
-                    <div id="storyOutroContainer" class="story-pages-list">
-                        ${this.renderStoryPages(p.story_outro, 'outro')}
+                    <h3 class="form-section-title">Narration : Outro (Après le boss)</h3>
+                    <div class="form-group">
+                        <label class="form-label">Séquence Narrative</label>
+                        <div class="form-row" style="align-items: flex-end;">
+                            <div class="form-group" style="flex: 1;">
+                                <select class="form-select" id="phaseTransitionOutro">
+                                    <option value="">-- Aucune --</option>
+                                    ${transitions.map(t => `<option value="${t.id}" ${p.transition_outro_id === t.id ? 'selected' : ''}>${t.name || t.id} (${t.pages?.length || 0} pages)</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex: 0 0 auto; margin-bottom: 0;">
+                                <button class="btn btn-secondary edit-transition-btn" data-type="outro" ${!p.transition_outro_id ? 'disabled' : ''}>✏️ Éditer</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -358,6 +375,23 @@ class PhasesModule {
         document.getElementById('savePhaseBtn')?.addEventListener('click', () => this.savePhase());
         document.getElementById('deletePhaseBtn')?.addEventListener('click', () => this.deletePhase());
 
+        // Edit transition links
+        editor.querySelectorAll('.edit-transition-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const type = btn.dataset.type;
+                const transitionId = (type === 'intro') ? this.currentPhase.transition_intro_id : this.currentPhase.transition_outro_id;
+                if (transitionId) {
+                    // Switch to transitions module
+                    this.app.navigateTo('transitions');
+                    // Select the specific transition
+                    const index = this.app.gameData.transitions.findIndex(t => t.id === transitionId);
+                    if (index !== -1) {
+                        this.app.modules.transitions.selectTransition(index);
+                    }
+                }
+            });
+        });
+
         // JSON toggle
         document.getElementById('togglePhaseJsonBtn')?.addEventListener('click', (e) => {
             const content = document.getElementById('phaseJsonPreview');
@@ -386,6 +420,8 @@ class PhasesModule {
         p.boss_id = document.getElementById('phaseBoss').value;
         p.default_weapon = document.getElementById('phaseDefaultWeapon').value;
         p.background_image = document.getElementById('phaseBackground').value;
+        p.transition_intro_id = document.getElementById('phaseTransitionIntro').value;
+        p.transition_outro_id = document.getElementById('phaseTransitionOutro').value;
 
         // Chips -> Arrays
         p.enemy_types = Array.from(document.querySelectorAll('.chip[data-type="enemy"].active'))
@@ -394,21 +430,18 @@ class PhasesModule {
         p.available_weapons = Array.from(document.querySelectorAll('.chip[data-type="weapon"].active'))
             .map(c => c.dataset.id);
 
-        // Story Intro
-        p.story_intro = Array.from(document.querySelectorAll('.story-page-item[data-prefix="intro"]'))
-            .map(item => ({
-                title: item.querySelector('.story-title').value,
-                text: item.querySelector('.story-text').value,
-                image: item.querySelector('.story-image').value
-            }));
+        p.transition_intro_id = document.getElementById('phaseTransitionIntro').value;
+        p.transition_outro_id = document.getElementById('phaseTransitionOutro').value;
+        
+        // Update edit buttons state
+        const introBtn = document.querySelector('.edit-transition-btn[data-type="intro"]');
+        const outroBtn = document.querySelector('.edit-transition-btn[data-type="outro"]');
+        if (introBtn) introBtn.disabled = !p.transition_intro_id;
+        if (outroBtn) outroBtn.disabled = !p.transition_outro_id;
 
-        // Story Outro
-        p.story_outro = Array.from(document.querySelectorAll('.story-page-item[data-prefix="outro"]'))
-            .map(item => ({
-                title: item.querySelector('.story-title').value,
-                text: item.querySelector('.story-text').value,
-                image: item.querySelector('.story-image').value
-            }));
+        // Legacy compatibility: story sequences are now handled by transitions
+        p.story_intro = [];
+        p.story_outro = [];
 
         this.updateJsonPreview();
     }
