@@ -274,7 +274,17 @@ export class Boss extends Enemy {
         onShoot(this.x, this.y, Math.cos(this.angle), Math.sin(this.angle), { ...stats, projectileSpeed: speed });
     }
 
+    drawAuras(ctx) {
+        if (this.weapon && this.weapon.type === 'area') {
+            this.weapon.draw(ctx, this);
+        }
+    }
+
     draw(ctx) {
+        if (this.weapon && this.weapon.type !== 'area') {
+            this.weapon.draw(ctx, this);
+        }
+
         if (this.animator) {
             this.animator.draw(ctx, this.x, this.y, this.angle);
         } else {
@@ -288,10 +298,6 @@ export class Boss extends Enemy {
             ctx.lineWidth = 4;
             ctx.stroke();
             ctx.restore();
-        }
-
-        if (this.weapon) {
-            this.weapon.draw(ctx, this);
         }
 
         // Barre de vie spécifique au Boss

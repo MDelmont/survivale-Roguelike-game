@@ -58,16 +58,18 @@ export class Loot {
                 ctx.stroke();
             } else {
                 // Dessin d'une étoile pour le butin rare
+                ctx.save();
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#ffd700';
+                
                 this.drawStar(ctx, this.x, this.y, 5, this.radius, this.radius / 2);
                 ctx.fillStyle = this.color;
                 ctx.fill();
 
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = '#ffd700';
                 ctx.strokeStyle = '#fff';
                 ctx.lineWidth = 2;
                 ctx.stroke();
-                ctx.shadowBlur = 0;
+                ctx.restore();
             }
         }
     }

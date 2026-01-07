@@ -46,6 +46,7 @@ export class Weapon {
 export class ProjectileWeapon extends Weapon {
     constructor(id, name, stats, upgrades, visuals) {
         super(id, name, stats, upgrades, visuals);
+        this.type = 'projectile';
     }
 
     update(deltaTime, owner, context) {
@@ -91,6 +92,7 @@ import { Animator } from './Animator.js';
 export class OrbitalWeapon extends Weapon {
     constructor(id, name, stats, upgrades, visuals, assetManager) {
         super(id, name, stats, upgrades, visuals);
+        this.type = 'orbital';
         this.assetManager = assetManager;
         this.satellites = [];
         this.spawnTimer = 0;
@@ -197,6 +199,7 @@ export class OrbitalWeapon extends Weapon {
 export class AreaWeapon extends Weapon {
     constructor(id, name, stats, upgrades, visuals, assetManager) {
         super(id, name, stats, upgrades, visuals);
+        this.type = 'area';
         this.animator = visuals ? new Animator(visuals, assetManager) : null;
     }
 
@@ -260,7 +263,8 @@ export class AreaWeapon extends Weapon {
         }
 
         if (hasSprite) {
-            this.animator.draw(ctx, owner.x, owner.y);
+            // On force la taille de l'animateur pour qu'elle corresponde exactement au diamètre de la zone (range * 2)
+            this.animator.draw(ctx, owner.x, owner.y, 0, { width: range * 2, height: range * 2 });
         } else {
             // Dessin du cercle de secours si pas de sprite
             ctx.save();

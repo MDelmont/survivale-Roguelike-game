@@ -15,8 +15,7 @@
             "available_weapons": [
                 "basic_shot",
                 "poison_shot",
-                "double_shot",
-                "shield_orbit",
+                "smartphone_wave",
                 "smartphone_poison"
             ],
             "boss_id": "ovule_geant",

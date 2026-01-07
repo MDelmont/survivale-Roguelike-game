@@ -102,7 +102,17 @@ export class Enemy {
         }
     }
 
+    drawAuras(ctx) {
+        if (this.weapon && this.weapon.type === 'area') {
+            this.weapon.draw(ctx, this);
+        }
+    }
+
     draw(ctx) {
+        if (this.weapon && this.weapon.type !== 'area') {
+            this.weapon.draw(ctx, this);
+        }
+
         if (this.animator) {
             this.animator.draw(ctx, this.x, this.y, this.angle);
         } else {
@@ -122,10 +132,6 @@ export class Enemy {
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = 1;
             ctx.stroke();
-        }
-
-        if (this.weapon) {
-            this.weapon.draw(ctx, this);
         }
 
         // Barre de vie au-dessus de la tête

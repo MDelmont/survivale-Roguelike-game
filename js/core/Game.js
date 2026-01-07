@@ -347,7 +347,7 @@ class Game {
                     }
 
                     // Chance de dropper un bonus d'arme (indépendant de l'XP)
-                    if (Math.random() < 0.1) {
+                    if (Math.random() < 0.25) {
                         this.spawnLoot(e.x, e.y, 1, 'weapon');
                     }
                 }
@@ -515,11 +515,20 @@ class Game {
 
         if (this.state === GameState.MENU) { this.drawMenu(); this.ctx.restore(); return; }
 
+        // COUCHE 1 : Les zones d'auras (Tout en dessous)
+        if (this.player) this.player.drawAuras(this.ctx);
+        this.enemies.forEach(e => e.drawAuras(this.ctx));
+        if (this.boss) this.boss.drawAuras(this.ctx);
+
+        // COUCHE 2 : Les butins (XP, bonus)
         this.loots.forEach(l => l.draw(this.ctx));
+
+        // COUCHE 3 : Les projectiles
         this.projectiles.forEach(p => p.draw(this.ctx));
         this.enemyProjectiles.forEach(ep => ep.draw(this.ctx));
-        this.enemies.forEach(e => e.draw(this.ctx));
 
+        // COUCHE 4 : Les personnages (Sprites et corps)
+        this.enemies.forEach(e => e.draw(this.ctx));
         if (this.boss) this.boss.draw(this.ctx);
         if (this.player) {
             this.player.draw(this.ctx);

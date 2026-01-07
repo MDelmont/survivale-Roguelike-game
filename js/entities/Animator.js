@@ -119,7 +119,7 @@ export class Animator {
     /**
      * Dessine la frame actuelle
      */
-    draw(ctx, posX, posY, angle = 0) {
+    draw(ctx, posX, posY, angle = 0, overrideSize = null) {
         const anim = this.getAnimation(this.currentState);
         if (!anim || !anim.frames) return;
 
@@ -129,8 +129,8 @@ export class Animator {
         if (!img) return;
 
         // Calcul dynamique des dimensions pour garder l'aspect ratio (Bounding Box)
-        let drawW = this.width;
-        let drawH = this.height;
+        let drawW = overrideSize ? overrideSize.width : this.width;
+        let drawH = overrideSize ? overrideSize.height : this.height;
 
         if (drawW && drawH) {
             const imgRatio = img.width / img.height;

@@ -147,7 +147,19 @@ export class Player {
         });
     }
 
+    drawAuras(ctx) {
+        // Dessine UNIQUEMENT les auras (couche la plus basse)
+        this.weapons.filter(w => w.type === 'area').forEach(w => {
+            w.draw(ctx, this);
+        });
+    }
+
     draw(ctx) {
+        // Rendu visuel des armes orbitales/satellites (en dessous du joueur mais au dessus des auras)
+        this.weapons.filter(w => w.type !== 'area').forEach(w => {
+            w.draw(ctx, this);
+        });
+
         if (this.animator) {
             // Rendu Data-Driven - Passage de l'angle calculé
             this.animator.draw(ctx, this.x, this.y, this.angle || 0);
@@ -174,11 +186,6 @@ export class Player {
 
             ctx.restore();
         }
-
-        // Rendu visuel de TOUTES les armes
-        this.weapons.forEach(w => {
-            w.draw(ctx, this);
-        });
     }
 
     takeDamage(amount) {
