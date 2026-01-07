@@ -332,7 +332,24 @@ class Game {
             if (e.toRemove) {
                 if (e.hp <= 0) {
                     this.killCount++;
-                    this.spawnLoot(e.x, e.y, e.xpValue, Math.random() < 0.15 ? 'weapon' : 'xp');
+                    // Drop d'XP éclaté en plusieurs orbes pour plus de satisfaction
+                    const totalXp = e.xpValue || 10;
+                    const orbValue = 1; // 1 orbe pour 1 exp pour un maximum d'effet visuel
+                    const numOrbs = totalXp;
+                    const remainingXp = totalXp % orbValue;
+
+                    for (let j = 0; j < numOrbs; j++) {
+                        // On ajoute un petit décalage aléatoire pour que les boules ne soient pas parfaitement superposées
+                        const offsetX = (Math.random() - 0.5) * 30;
+                        const offsetY = (Math.random() - 0.5) * 30;
+                        const value = orbValue + (j === numOrbs - 1 ? remainingXp : 0);
+                        this.spawnLoot(e.x + offsetX, e.y + offsetY, value, 'xp');
+                    }
+
+                    // Chance de dropper un bonus d'arme (indépendant de l'XP)
+                    if (Math.random() < 0.1) {
+                        this.spawnLoot(e.x, e.y, 1, 'weapon');
+                    }
                 }
                 this.enemies.splice(i, 1);
             }
