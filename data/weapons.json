@@ -167,7 +167,13 @@
                         "frameRate": 10,
                         "loop": true
                     }
-                }
+                },
+                "auraRotationSpeed": 0.1,
+                "auraPulseAlpha": false,
+                "auraPulseSize": true,
+                "auraAlphaSpeed": 200,
+                "auraAlphaMin": 0.8,
+                "auraAlphaMax": 1
             }
         },
         {
@@ -205,7 +211,13 @@
                         "frameRate": 10,
                         "loop": true
                     }
-                }
+                },
+                "auraRotationSpeed": -0.1,
+                "auraPulseAlpha": false,
+                "auraPulseSize": true,
+                "auraAlphaSpeed": 200,
+                "auraAlphaMin": 0.2,
+                "auraAlphaMax": 1
             }
         }
     ]

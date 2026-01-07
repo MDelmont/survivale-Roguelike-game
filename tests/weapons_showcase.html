@@ -22,7 +22,7 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
             gap: 20px;
         }
 
@@ -50,10 +50,12 @@
 
         .canvas-container {
             position: relative;
-            width: 360px;
-            height: 240px;
-            background: #111;
+            width: 400px;
+            height: 300px;
+            background: #0a0a1a;
             border: 2px solid #000;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .controls {
@@ -66,22 +68,57 @@
 
         .btn-reset {
             margin-top: 10px;
-            padding: 5px 15px;
-            background: #444;
+            padding: 8px 20px;
+            background: #0af;
             border: none;
             color: #fff;
-            border-radius: 4px;
+            font-weight: bold;
+            border-radius: 6px;
             cursor: pointer;
+            transition: background 0.2s;
         }
 
         .btn-reset:hover {
-            background: #666;
+            background: #0088cc;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loader {
+            border: 5px solid #333;
+            border-top: 5px solid #0af;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 
 <body>
-    <h1>🔬 Laboratoire Scalable - EVG Anthony</h1>
+    <div id="loader" class="loading-overlay">
+        <div class="loader"></div>
+        <p>Chargement des armements...</p>
+    </div>
+
+    <h1>🔬 Laboratoire d'Armements de Combat</h1>
     <div class="grid" id="test-grid"></div>
 
     <script type="module">
@@ -90,142 +127,258 @@
         import { Enemy } from '../js/entities/Enemy.js';
         import { WeaponFactory } from '../js/systems/WeaponFactory.js';
         import { CombatSystem } from '../js/systems/CombatSystem.js';
+        import { AssetManager } from '../js/core/AssetManager.js';
 
-        // Chargement dynamique des armes depuis weapons.json
-        const response = await fetch('../data/weapons.json');
-        const data = await response.json();
+        // Initialisation du gestionnaire d'assets
+        const assetManager = new AssetManager();
 
-        const scenarios = data.weapons.map(weapon => {
-            // Configuration par défaut de l'ennemi selon le type
-            let enemies = [{ x: 280, y: 120, hp: 1000 }];
-            let desc = `Logic class: ${weapon.type}. `;
+        async function init() {
+            try {
+                // Chargement des données
+                const [weaponsRes, playerRes, enemiesRes] = await Promise.all([
+                    fetch('../data/weapons.json'),
+                    fetch('../data/player.json'),
+                    fetch('../data/enemies.json')
+                ]);
 
-            if (weapon.type === 'defense') {
-                enemies = [{ x: 130, y: 120, hp: 1000 }];
-                desc += "Protège Anthony en tournant.";
-            } else if (weapon.type === 'aoe') {
-                enemies = [{ x: 120, y: 80, hp: 1000 }, { x: 160, y: 160, hp: 1000 }];
-                desc += "Affecte toute la zone autour.";
-            } else {
-                desc += "Tire des projectiles.";
-            }
+                const weaponsData = await weaponsRes.json();
+                const playerData = await playerRes.json();
+                const enemiesData = await enemiesRes.json();
 
-            return {
-                id: weapon.id,
-                name: weapon.name,
-                desc: desc,
-                weapon: weapon, // On passe l'objet complet
-                enemies: enemies
-            };
-        });
+                const playerBase = playerData.players.anthony;
+                const enemyBase = enemiesData.enemies.basic_cell;
 
-        class Showcase {
-            constructor(config, container) {
-                this.config = config;
-                this.canvas = document.createElement('canvas');
-                this.canvas.width = 360;
-                this.canvas.height = 240;
-                container.appendChild(this.canvas);
-                this.ctx = this.canvas.getContext('2d');
-
-                this.reset();
-                this.animate();
-            }
-
-            reset() {
-                this.player = new Player(60, 120, { hp: 100, speed: 0 });
-                this.player.weapons = []; // Reset arsenal for showcase
-                this.player.addWeapon(WeaponFactory.create({ ...this.config.weapon, name: this.config.name }));
-                this.enemies = this.config.enemies.map(e => new Enemy(e.x, e.y, { hp: e.hp, speed: 0, radius: 15 }));
-                this.projectiles = [];
-                this.explosions = [];
-                this.lastTime = performance.now();
-            }
-
-            animate(time) {
-                const dt = time - this.lastTime || 0;
-                this.lastTime = time;
-                this.update(dt);
-                this.draw();
-                requestAnimationFrame((t) => this.animate(t));
-            }
-
-            update(dt) {
-                // Le joueur délègue tout à son arme via un contexte unifié
-                this.player.update(dt, { dx: 0, dy: 0 }, {
-                    targetDir: { dx: 1, dy: 0 },
-                    onShoot: (x, y, dx, dy, stats) => this.projectiles.push(new Projectile(x, y, dx, dy, stats)),
-                    enemies: this.enemies,
-                    boss: null,
-                    explosions: this.explosions,
-                    handleAOE: (x, y, r, d) => CombatSystem.handleAOE({ x, y, radius: r, damage: d, enemies: this.enemies, explosions: this.explosions })
-                });
-
-                // Projectiles gèrent leurs propres impacts
-                for (let i = this.projectiles.length - 1; i >= 0; i--) {
-                    const p = this.projectiles[i];
-                    p.update(dt);
-
-                    for (const e of this.enemies) {
-                        if (CombatSystem.checkCollision(p, e)) {
-                            p.hit(e, { enemies: this.enemies, explosions: this.explosions });
-                            break;
+                // Préchargement des visuels
+                function collectAssets(obj) {
+                    const paths = [];
+                    const find = (o) => {
+                        if (!o || typeof o !== 'object') return;
+                        if (o.frames && Array.isArray(o.frames)) {
+                            o.frames.forEach(p => paths.push(p));
                         }
+                        Object.values(o).forEach(find);
+                    };
+                    find(obj);
+                    return paths;
+                }
+
+                const assetsToLoad = [
+                    ...collectAssets(playerBase),
+                    ...collectAssets(enemyBase),
+                    ...collectAssets(weaponsData)
+                ];
+
+                // On s'assure que les chemins sont corrects (relatifs au dossier racine)
+                // Dans le jeu ils sont 'assets/...', ici aussi ils devraient l'être
+                // l'AssetManager chargera via fetch('../' + path) si besoin ? non
+                // AssetManager charge via fetch(path).
+                
+                // On va modifier temporairement l'AssetManager pour chercher au bon endroit si besoin
+                // Mais normalement si on lance depuis le serveur à la racine
+                // tests/weapons_showcase.html -> assets/... c'est pas bon.
+                // Il faut '../assets/...'
+                
+                // Patch de l'AssetManager pour chercher au bon endroit par rapport au dossier tests/
+                assetManager.loadImage = (originalPath) => {
+                    if (assetManager.images.has(originalPath)) {
+                        return Promise.resolve(assetManager.images.get(originalPath));
                     }
 
-                    if (p.x > 360 || p.toRemove) this.projectiles.splice(i, 1);
-                }
+                    const modifiedPath = originalPath.startsWith('assets/') ? '../' + originalPath : originalPath;
+                    const promise = new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.src = modifiedPath;
+                        img.onload = () => {
+                            assetManager.images.set(originalPath, img); // On garde la clé originale pour Animator
+                            resolve(img);
+                        };
+                        img.onerror = () => {
+                            console.warn(`Impossible de charger l'image : ${modifiedPath}`);
+                            resolve(null); // On ne bloque pas tout le chargement
+                        };
+                    });
+                    assetManager.loadingPromises.push(promise);
+                    return promise;
+                };
 
-                // Explosions éphémères
-                for (let i = this.explosions.length - 1; i >= 0; i--) {
-                    this.explosions[i].timer -= dt;
-                    if (this.explosions[i].timer <= 0) this.explosions.splice(i, 1);
-                }
+                assetsToLoad.forEach(path => assetManager.loadImage(path));
+                await assetManager.waitForAll();
 
-                this.enemies.forEach(e => e.update(dt, this.player));
-            }
+                // Cacher le loader
+                document.getElementById('loader').style.display = 'none';
 
-            draw() {
-                this.ctx.fillStyle = '#111';
-                this.ctx.fillRect(0, 0, 360, 240);
+                const scenarios = weaponsData.weapons.map(weapon => {
+                    let enemies = [{ x: 300, y: 150, hp: 1000 }];
+                    let desc = `Classe : ${weapon.type}. `;
 
-                this.player.draw(this.ctx);
+                    if (weapon.logic === 'orbital' || weapon.id.includes('orbital')) {
+                        enemies = [{ x: 150, y: 100, hp: 1000 }, { x: 150, y: 200, hp: 1000 }];
+                        desc += "Protège Anthony en tournant.";
+                    } else if (weapon.logic === 'area' || weapon.id.includes('poison') || weapon.id.includes('wave')) {
+                        enemies = [{ x: 100, y: 100, hp: 1000 }, { x: 150, y: 200, hp: 1000 }];
+                        desc += "Zone d'effet constante.";
+                    } else {
+                        desc += "Tire des projectiles.";
+                    }
 
-                this.enemies.forEach(e => {
-                    e.draw(this.ctx);
-                    this.ctx.fillStyle = '#f00';
-                    this.ctx.fillRect(e.x - 15, e.y - 25, 30 * (Math.max(0, e.hp) / 1000), 4);
+                    return {
+                        id: weapon.id,
+                        name: weapon.name,
+                        desc: desc,
+                        weaponData: weapon,
+                        playerStats: playerBase,
+                        enemyStats: enemyBase,
+                        enemyPositions: enemies
+                    };
                 });
 
-                this.projectiles.forEach(p => p.draw(this.ctx));
+                class Showcase {
+                    constructor(config, container) {
+                        this.config = config;
+                        this.canvas = document.createElement('canvas');
+                        this.canvas.width = 400;
+                        this.canvas.height = 300;
+                        container.appendChild(this.canvas);
+                        this.ctx = this.canvas.getContext('2d');
 
-                this.explosions.forEach(exp => {
-                    const a = exp.timer / exp.maxTimer;
-                    this.ctx.beginPath();
-                    this.ctx.arc(exp.x, exp.y, exp.radius, 0, Math.PI * 2);
-                    this.ctx.fillStyle = `rgba(255, 100, 0, ${a * 0.4})`;
-                    this.ctx.fill();
-                    this.ctx.strokeStyle = `rgba(255, 200, 0, ${a})`;
-                    this.ctx.lineWidth = 2;
-                    this.ctx.stroke();
+                        this.reset();
+                        this.lastTime = performance.now();
+                        this.requestId = requestAnimationFrame((t) => this.animate(t));
+                    }
+
+                    reset() {
+                        this.player = new Player(80, 150, this.config.playerStats, assetManager);
+                        this.player.weapons = [];
+                        this.player.addWeapon(WeaponFactory.create(this.config.weaponData, assetManager));
+                        
+                        this.enemies = this.config.enemyPositions.map(pos => 
+                            new Enemy(pos.x, pos.y, { ...this.config.enemyStats, speed: 0 }, assetManager)
+                        );
+                        
+                        this.projectiles = [];
+                        this.explosions = [];
+                    }
+
+                    animate(time) {
+                        const dt = time - this.lastTime || 0;
+                        this.lastTime = time;
+                        this.update(dt);
+                        this.draw();
+                        this.requestId = requestAnimationFrame((t) => this.animate(t));
+                    }
+
+                    update(dt) {
+                        const targetDir = { dx: 1, dy: 0 };
+                        
+                        this.player.update(dt, { dx: 0, dy: 0 }, {
+                            targetDir: targetDir,
+                            onShoot: (x, y, dx, dy, stats) => this.projectiles.push(new Projectile(x, y, dx, dy, stats, assetManager)),
+                            enemies: this.enemies,
+                            boss: null,
+                            explosions: this.explosions,
+                            handleAOE: (x, y, r, d) => CombatSystem.handleAOE({ 
+                                x, y, radius: r, damage: d, 
+                                enemies: this.enemies, 
+                                explosions: this.explosions 
+                            })
+                        });
+
+                        // Projectiles
+                        for (let i = this.projectiles.length - 1; i >= 0; i--) {
+                            const p = this.projectiles[i];
+                            p.update(dt);
+
+                            for (const e of this.enemies) {
+                                if (CombatSystem.checkCollision(p, e)) {
+                                    p.hit(e, { enemies: this.enemies, explosions: this.explosions });
+                                    break;
+                                }
+                            }
+
+                            if (p.x > 450 || p.x < -50 || p.y > 350 || p.y < -50 || p.toRemove) {
+                                this.projectiles.splice(i, 1);
+                            }
+                        }
+
+                        // Explosions
+                        for (let i = this.explosions.length - 1; i >= 0; i--) {
+                            this.explosions[i].timer -= dt;
+                            if (this.explosions[i].timer <= 0) this.explosions.splice(i, 1);
+                        }
+
+                        this.enemies.forEach(e => {
+                            e.update(dt, this.player);
+                            // On force l'animation walk car idle est souvent vide dans le JSON
+                            if (e.animator) {
+                                const idleAnim = e.animator.getAnimation('idle');
+                                if (!idleAnim || !idleAnim.frames || idleAnim.frames.length === 0) {
+                                    e.animator.currentState = 'walk';
+                                }
+                            }
+                        });
+                    }
+
+                    draw() {
+                        const ctx = this.ctx;
+                        ctx.fillStyle = '#0a0a1a';
+                        ctx.fillRect(0, 0, 400, 300);
+
+                        // COUCHE 1 : Auras
+                        if (this.player.drawAuras) this.player.drawAuras(ctx);
+                        this.enemies.forEach(e => { if(e.drawAuras) e.drawAuras(ctx); });
+
+                        // COUCHE 2 : Projectiles
+                        this.projectiles.forEach(p => p.draw(ctx));
+
+                        // COUCHE 3 : Personnages
+                        this.enemies.forEach(e => {
+                            e.draw(ctx);
+                            // Barre de vie simplifiée
+                            ctx.fillStyle = '#444';
+                            ctx.fillRect(e.x - 20, e.y - 35, 40, 5);
+                            ctx.fillStyle = '#f00';
+                            ctx.fillRect(e.x - 20, e.y - 35, 40 * (Math.max(0, e.hp) / 1000), 5);
+                        });
+
+                        this.player.draw(ctx);
+
+                        // COUCHE 4 : Explosions
+                        this.explosions.forEach(exp => {
+                            const a = exp.timer / exp.maxTimer;
+                            const grad = ctx.createRadialGradient(exp.x, exp.y, 0, exp.x, exp.y, exp.radius);
+                            grad.addColorStop(0, `rgba(255, 200, 50, ${a})`);
+                            grad.addColorStop(0.5, `rgba(255, 50, 0, ${a * 0.5})`);
+                            grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                            ctx.beginPath();
+                            ctx.arc(exp.x, exp.y, exp.radius, 0, Math.PI * 2);
+                            ctx.fillStyle = grad;
+                            ctx.fill();
+                        });
+                    }
+                }
+
+                const grid = document.getElementById('test-grid');
+                scenarios.forEach(sc => {
+                    const card = document.createElement('div');
+                    card.className = 'test-card';
+                    card.innerHTML = `
+                        <h2>${sc.name}</h2>
+                        <div class="canvas-container" id="c-${sc.id}"></div>
+                        <div class="controls">${sc.desc}</div>
+                        <button class="btn-reset" id="r-${sc.id}">Réinitialiser</button>
+                    `;
+                    grid.appendChild(card);
+                    const inst = new Showcase(sc, document.getElementById(`c-${sc.id}`));
+                    document.getElementById(`r-${sc.id}`).onclick = () => inst.reset();
                 });
+
+            } catch (err) {
+                console.error("Erreur d'initialisation du showcase:", err);
+                document.getElementById('loader').innerHTML = `<p style="color:red">Erreur : ${err.message}</p>`;
             }
         }
 
-        const grid = document.getElementById('test-grid');
-        scenarios.forEach(sc => {
-            const card = document.createElement('div');
-            card.className = 'test-card';
-            card.innerHTML = `
-                <h2>${sc.name}</h2>
-                <div class="canvas-container" id="c-${sc.id}"></div>
-                <div class="controls">${sc.desc}</div>
-                <button class="btn-reset" id="r-${sc.id}">Réinitialiser</button>
-            `;
-            grid.appendChild(card);
-            const inst = new Showcase(sc, document.getElementById(`c-${sc.id}`));
-            document.getElementById(`r-${sc.id}`).onclick = () => inst.reset();
-        });
+        init();
     </script>
 </body>
 

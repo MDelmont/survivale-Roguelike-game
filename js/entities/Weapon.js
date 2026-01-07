@@ -201,6 +201,7 @@ export class AreaWeapon extends Weapon {
         super(id, name, stats, upgrades, visuals);
         this.type = 'area';
         this.animator = visuals ? new Animator(visuals, assetManager) : null;
+        this.angle = 0;
     }
 
     update(deltaTime, owner, context) {
@@ -248,10 +249,20 @@ export class AreaWeapon extends Weapon {
         if (this.animator) {
             this.animator.update(deltaTime, { velocity: { x: 0, y: 0 } });
         }
+
+        // Mise à jour de la rotation interne si configurée
+        if (this.visuals && this.visuals.auraRotationSpeed) {
+            this.angle += (this.visuals.auraRotationSpeed * Math.PI * 2) * dt;
+        }
     }
 
     draw(ctx, owner) {
-        const range = (this.stats.range || 100) * (owner.stats.rangeMultiplier || 1.0);
+        let range = (this.stats.range || 100) * (owner.stats.rangeMultiplier || 1.0);
+        
+        // Effet de pulsation de taille (visuel uniquement)
+        if (this.visuals && this.visuals.auraPulseSize) {
+            range *= (0.95 + Math.sin(Date.now() / 300) * 0.05);
+        }
         
         // On dessine l'animateur si il existe ET qu'il a des images
         let hasSprite = false;
@@ -263,8 +274,25 @@ export class AreaWeapon extends Weapon {
         }
 
         if (hasSprite) {
+            ctx.save();
+            
+            // Effet de clignotement / pulsation d'opacité
+            if (this.visuals && this.visuals.auraPulseAlpha) {
+                const speed = this.visuals.auraAlphaSpeed || 200;
+                const min = this.visuals.auraAlphaMin !== undefined ? this.visuals.auraAlphaMin : 0.2;
+                const max = this.visuals.auraAlphaMax !== undefined ? this.visuals.auraAlphaMax : 1.0;
+                const range = max - min;
+                const mid = min + range / 2;
+                const amplitude = range / 2;
+                
+                ctx.globalAlpha = mid + Math.sin(Date.now() / speed) * amplitude;
+            }
+
             // On force la taille de l'animateur pour qu'elle corresponde exactement au diamètre de la zone (range * 2)
-            this.animator.draw(ctx, owner.x, owner.y, 0, { width: range * 2, height: range * 2 });
+            // On passe l'angle de rotation interne
+            this.animator.draw(ctx, owner.x, owner.y, this.angle, { width: range * 2, height: range * 2 });
+            
+            ctx.restore();
         } else {
             // Dessin du cercle de secours si pas de sprite
             ctx.save();

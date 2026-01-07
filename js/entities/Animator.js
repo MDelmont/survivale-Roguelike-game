@@ -154,8 +154,8 @@ export class Animator {
         ctx.save();
         ctx.translate(posX + this.displayOffset.x, posY + this.displayOffset.y);
 
-        // Rotation pour le mode rotate (ex: spermatozoïde)
-        if (this.directionMode === 'rotate') {
+        // Rotation pour le mode rotate OU si un angle est explicitement fourni (ex: aura)
+        if (this.directionMode === 'rotate' || angle !== 0) {
             ctx.rotate(angle + this.angleOffset);
         }
 

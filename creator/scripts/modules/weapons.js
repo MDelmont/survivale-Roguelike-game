@@ -225,9 +225,50 @@ class WeaponsModule {
                                 <option value="4_way" ${w.visuals?.directionMode === '4_way' ? 'selected' : ''}>4-Way</option>
                             </select>
                         </div>
+                    <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Angle Offset (°)</label>
                             <input type="number" class="form-input" id="weaponVisualAngleOffset" value="${w.visuals?.angleOffset || 0}">
+                        </div>
+                        <div class="form-group"></div>
+                        <div class="form-group"></div>
+                    </div>
+
+                    <!-- Effets spécifiques AOE -->
+                    <div id="aoeVisualEffects" style="${w.type === 'aoe' ? '' : 'display: none;'}">
+                        <h4 style="margin: var(--space-md) 0 var(--space-xs); font-size: 0.9rem; color: var(--text-muted);">Effets d'Aura (AOE)</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Rotation (tours/sec)</label>
+                                <input type="number" step="0.1" class="form-input" id="auraRotationSpeed" value="${w.visuals?.auraRotationSpeed || 0}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label form-check" style="margin-top: 2rem;">
+                                    <input type="checkbox" id="auraPulseAlpha" ${w.visuals?.auraPulseAlpha ? 'checked' : ''}>
+                                    Clignotement (Alpha)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label form-check" style="margin-top: 2rem;">
+                                    <input type="checkbox" id="auraPulseSize" ${w.visuals?.auraPulseSize ? 'checked' : ''}>
+                                    Pulsation (Taille)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Vitesse Alpha</label>
+                                <input type="number" class="form-input" id="auraAlphaSpeed" value="${w.visuals?.auraAlphaSpeed || 200}" placeholder="200=rapide">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Alpha Min (0-1)</label>
+                                <input type="number" step="0.1" min="0" max="1" class="form-input" id="auraAlphaMin" value="${w.visuals?.auraAlphaMin ?? 0.2}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Alpha Max (0-1)</label>
+                                <input type="number" step="0.1" min="0" max="1" class="form-input" id="auraAlphaMax" value="${w.visuals?.auraAlphaMax ?? 1.0}">
+                            </div>
+                            <div class="form-group"></div>
                         </div>
                     </div>
                 </div>
@@ -410,7 +451,9 @@ class WeaponsModule {
         const stats = [
             'damage', 'fireRate', 'projectileSpeed', 'projectileCount', 'piercingCount',
             'radius', 'orbitSpeed', 'range', 'slowMultiplier', 'isPoisonous', 
-            'poisonDamage', 'poisonDuration', 'poisonTickRate', 'isSlowing'
+            'poisonDamage', 'poisonDuration', 'poisonTickRate', 'isSlowing',
+            'auraRotationSpeed', 'auraPulseAlpha', 'auraPulseSize', 'auraAlphaSpeed',
+            'auraAlphaMin', 'auraAlphaMax'
         ];
         return stats.map(s => `<option value="${s}">${s}</option>`).join('');
     }
@@ -527,6 +570,24 @@ class WeaponsModule {
         const dirMode = document.getElementById('weaponDirMode').value;
         w.visuals.directionMode = dirMode;
         w.visuals.rotateWithVelocity = (dirMode === 'rotate'); // Backward compatibility
+        
+        // AOE Specific
+        if (w.type === 'aoe') {
+            w.visuals.auraRotationSpeed = parseFloat(document.getElementById('auraRotationSpeed').value) || 0;
+            w.visuals.auraPulseAlpha = document.getElementById('auraPulseAlpha').checked;
+            w.visuals.auraPulseSize = document.getElementById('auraPulseSize').checked;
+            w.visuals.auraAlphaSpeed = parseInt(document.getElementById('auraAlphaSpeed').value) || 200;
+            w.visuals.auraAlphaMin = parseFloat(document.getElementById('auraAlphaMin').value);
+            w.visuals.auraAlphaMax = parseFloat(document.getElementById('auraAlphaMax').value);
+        } else {
+            delete w.visuals.auraRotationSpeed;
+            delete w.visuals.auraPulseAlpha;
+            delete w.visuals.auraPulseSize;
+            delete w.visuals.auraAlphaSpeed;
+            delete w.visuals.auraAlphaMin;
+            delete w.visuals.auraAlphaMax;
+        }
+
         w.visuals.animations = {
             idle: {
                 frames: path ? [path] : [],
