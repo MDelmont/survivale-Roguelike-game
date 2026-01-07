@@ -5,8 +5,8 @@
             "name": "Lance capote",
             "type": "attack",
             "stats": {
-                "damage": 10,
-                "fireRate": 500,
+                "damage": 20,
+                "fireRate": 400,
                 "projectileSpeed": 400,
                 "projectileCount": 1,
                 "piercingCount": 0,
@@ -55,14 +55,14 @@
             "name": "Lance capote moisie",
             "type": "attack",
             "stats": {
-                "damage": 10,
+                "damage": 0,
                 "fireRate": 500,
-                "projectileSpeed": 60,
+                "projectileSpeed": 250,
                 "projectileCount": 1,
                 "isPoisonous": true,
                 "poisonDuration": 2000,
-                "poisonDamage": 20,
-                "poisonTickRate": 200,
+                "poisonDamage": 30,
+                "poisonTickRate": 300,
                 "piercingCount": 0,
                 "color": null,
                 "isSlowing": false
@@ -201,7 +201,7 @@
             "type": "aoe",
             "stats": {
                 "poisonDuration": 2000,
-                "poisonDamage": 200,
+                "poisonDamage": 85,
                 "poisonTickRate": 500,
                 "damage": 0,
                 "range": 120,

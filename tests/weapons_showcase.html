@@ -208,17 +208,29 @@
                 document.getElementById('loader').style.display = 'none';
 
                 const scenarios = weaponsData.weapons.map(weapon => {
-                    let enemies = [{ x: 300, y: 150, hp: 1000 }];
+                    let enemies = [];
                     let desc = `Classe : ${weapon.type}. `;
 
-                    if (weapon.logic === 'orbital' || weapon.id.includes('orbital')) {
-                        enemies = [{ x: 150, y: 100, hp: 1000 }, { x: 150, y: 200, hp: 1000 }];
+                    if (weapon.type === 'attack') {
+                        // Seulement deux ennemis en ligne
+                        for(let i=0; i<2; i++) {
+                            enemies.push({ x: 220 + i*80, y: 150, hp: 1000 });
+                        }
+                        desc += "Tire des projectiles en ligne droite.";
+                    } else if (weapon.type === 'defense') {
+                        // Ennemis autour pour les orbitales
+                        enemies = [
+                            { x: 150, y: 100, hp: 1000 }, { x: 150, y: 200, hp: 1000 },
+                            { x: 100, y: 150, hp: 1000 }, { x: 50, y: 150, hp: 1000 }
+                        ];
                         desc += "Protège Anthony en tournant.";
-                    } else if (weapon.logic === 'area' || weapon.id.includes('poison') || weapon.id.includes('wave')) {
-                        enemies = [{ x: 100, y: 100, hp: 1000 }, { x: 150, y: 200, hp: 1000 }];
+                    } else if (weapon.type === 'aoe') {
+                        // Ennemis dans la zone pour les AOE
+                        enemies = [
+                            { x: 100, y: 120, hp: 1000 }, { x: 130, y: 180, hp: 1000 },
+                            { x: 110, y: 150, hp: 1000 }, { x: 70, y: 170, hp: 1000 }
+                        ];
                         desc += "Zone d'effet constante.";
-                    } else {
-                        desc += "Tire des projectiles.";
                     }
 
                     return {
@@ -308,6 +320,13 @@
 
                         this.enemies.forEach(e => {
                             e.update(dt, this.player);
+                            
+                            // RÉGÉNÉRATION : Si l'ennemi meurt, on le ressuscite instantanément
+                            // pour qu'il soit là "tout le temps" sur la trajectoire
+                            if (e.hp <= 0) {
+                                e.hp = 1000;
+                            }
+
                             // On force l'animation walk car idle est souvent vide dans le JSON
                             if (e.animator) {
                                 const idleAnim = e.animator.getAnimation('idle');
