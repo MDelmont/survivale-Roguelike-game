@@ -278,6 +278,7 @@ creator/
    - Éditeur de pages (title, text, image, background, duration, animation, music)
 3. Drag & Drop pour réorganiser les pages
 4. Prévisualisation de la page narrative
+5. Ajout des transition au systeme de phase, (modifier l'existant)
 
 #### Fichiers à créer/modifier
 - `scripts/modules/transitions.js`

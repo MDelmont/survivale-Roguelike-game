@@ -1,51 +1,50 @@
 {
     "enemies": {
         "basic_cell": {
-            "name": "Spermatozoïde",
-            "hp": 20,
-            "speed": 120,
+            "name": "Bat-spermatozoïde",
+            "hp": 15,
+            "speed": 200,
             "damage": 5,
             "xpValue": 10,
             "radius": 12,
             "color": "#fff",
             "visuals": {
                 "type": "sprite",
-                "width": 48,
-                "height": 48,
+                "width": 45,
                 "directionMode": "rotate",
                 "hitFlash": true,
                 "animations": {
                     "walk": {
                         "frames": [
                             "assets/monster/sperm_monster_1_v2.png",
-                            "assets/monster/sperm_monster_2_v2.png"
+                            "assets/monster/sperm_monster_1_v1.png"
                         ],
                         "frameRate": 8,
                         "loop": true
                     },
                     "idle": {
                         "frames": [
-                            "assets/monster/sperm_monster_2_v2.png"
+                            "assets/projectiles/capotes.png"
                         ],
                         "frameRate": 10,
-                        "loop": false
+                        "loop": true
                     }
                 },
-                "angleOffset": 0
+                "angleOffset": 90,
+                "pixelPerfect": false
             }
         },
         "fast_cell": {
-            "name": "Neurone",
-            "hp": 15,
-            "speed": 180,
+            "name": "diforme-spermatozoïde",
+            "hp": 60,
+            "speed": 55,
             "damage": 3,
-            "xpValue": 15,
+            "xpValue": 20,
             "radius": 10,
             "color": "#0ff",
             "visuals": {
                 "type": "sprite",
-                "width": 36,
-                "height": 36,
+                "width": 80,
                 "directionMode": "rotate",
                 "hitFlash": true,
                 "animations": {
@@ -56,23 +55,30 @@
                         ],
                         "frameRate": 12,
                         "loop": true
+                    },
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/capotes.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
                     }
                 },
-                "angleOffset": 0
+                "angleOffset": 90,
+                "pixelPerfect": false
             }
         },
         "tank_cell": {
-            "name": "Globule Blanc",
-            "hp": 60,
-            "speed": 70,
+            "name": "diablo-spermateozoide",
+            "hp": 30,
+            "speed": 120,
             "damage": 10,
-            "xpValue": 30,
+            "xpValue": 20,
             "radius": 20,
             "color": "#f00",
             "visuals": {
                 "type": "sprite",
-                "width": 64,
-                "height": 64,
+                "width": 60,
                 "directionMode": "rotate",
                 "hitFlash": true,
                 "animations": {
@@ -83,160 +89,17 @@
                         ],
                         "frameRate": 6,
                         "loop": true
+                    },
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/capotes.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
                     }
-                }
-            }
-        },
-        "basic_baby": {
-            "name": "Biberon",
-            "hp": 30,
-            "speed": 100,
-            "damage": 8,
-            "xpValue": 15,
-            "radius": 15,
-            "color": "#ffaf"
-        },
-        "fast_baby": {
-            "name": "Sucette",
-            "hp": 20,
-            "speed": 200,
-            "damage": 5,
-            "xpValue": 20,
-            "radius": 12,
-            "color": "#f0f"
-        },
-        "tank_baby": {
-            "name": "Couche",
-            "hp": 80,
-            "speed": 60,
-            "damage": 12,
-            "xpValue": 40,
-            "radius": 22,
-            "color": "#888"
-        },
-        "basic_school": {
-            "name": "Cahier",
-            "hp": 45,
-            "speed": 110,
-            "damage": 12,
-            "xpValue": 25,
-            "radius": 16,
-            "color": "#3f3"
-        },
-        "fast_school": {
-            "name": "Stylo",
-            "hp": 30,
-            "speed": 220,
-            "damage": 8,
-            "xpValue": 30,
-            "radius": 10,
-            "color": "#33f"
-        },
-        "tank_school": {
-            "name": "Sac à dos",
-            "hp": 120,
-            "speed": 70,
-            "damage": 18,
-            "xpValue": 60,
-            "radius": 25,
-            "color": "#a52"
-        },
-        "basic_teen": {
-            "name": "Smartphone",
-            "hp": 70,
-            "speed": 130,
-            "damage": 20,
-            "xpValue": 40,
-            "radius": 14,
-            "color": "#111"
-        },
-        "fast_teen": {
-            "name": "Casque Audio",
-            "hp": 50,
-            "speed": 250,
-            "damage": 15,
-            "xpValue": 50,
-            "radius": 12,
-            "color": "#666"
-        },
-        "tank_teen": {
-            "name": "Console de Jeu",
-            "hp": 200,
-            "speed": 80,
-            "damage": 30,
-            "xpValue": 100,
-            "radius": 28,
-            "color": "#000"
-        },
-        "basic_adult": {
-            "name": "Dossier Client",
-            "hp": 120,
-            "speed": 140,
-            "damage": 35,
-            "xpValue": 80,
-            "radius": 18,
-            "color": "#444"
-        },
-        "fast_adult": {
-            "name": "Réveil",
-            "hp": 80,
-            "speed": 280,
-            "damage": 25,
-            "xpValue": 100,
-            "radius": 14,
-            "color": "#f00"
-        },
-        "tank_adult": {
-            "name": "Impôts",
-            "hp": 400,
-            "speed": 90,
-            "damage": 50,
-            "xpValue": 250,
-            "radius": 35,
-            "color": "#ff0"
-        },
-        "basic_wedding": {
-            "name": "Alliance",
-            "hp": 250,
-            "speed": 150,
-            "damage": 60,
-            "xpValue": 200,
-            "radius": 15,
-            "color": "#ffd700"
-        },
-        "fast_wedding": {
-            "name": "Champagne",
-            "hp": 180,
-            "speed": 300,
-            "damage": 45,
-            "xpValue": 300,
-            "radius": 12,
-            "color": "#fff"
-        },
-        "tank_wedding": {
-            "name": "Beau-Père",
-            "hp": 1000,
-            "speed": 100,
-            "damage": 100,
-            "xpValue": 1000,
-            "radius": 45,
-            "color": "#4b0082"
-        },
-        "new_enemy_1767693993307": {
-            "name": "Nouvel Ennemi",
-            "hp": 20,
-            "speed": 100,
-            "damage": 5,
-            "xpValue": 10,
-            "radius": 12,
-            "color": "#ff5555",
-            "visuals": {
-                "type": "sprite",
-                "width": 48,
-                "height": 48,
-                "directionMode": "rotate",
-                "hitFlash": true,
-                "animations": {}
+                },
+                "angleOffset": 90,
+                "pixelPerfect": false
             }
         }
     }

@@ -6,9 +6,10 @@
             "duration_before_boss": 45,
             "enemy_types": [
                 "basic_cell",
-                "fast_cell"
+                "fast_cell",
+                "tank_cell"
             ],
-            "player_id": "",
+            "player_id": "anthony",
             "spawn_rate": 1500,
             "default_weapon": "basic_shot",
             "available_weapons": [

@@ -6,13 +6,13 @@
             "speed": 50,
             "damage": 20,
             "fireRate": 1500,
-            "attackPattern": "spiral",
-            "movePattern": "constant",
+            "attackPattern": "spray",
+            "movePattern": "fixed",
             "radius": 80,
             "color": "#fff",
             "visuals": {
                 "type": "sprite",
-                "width": 250,
+                "width": 450,
                 "directionMode": "none",
                 "angleOffset": 0,
                 "hitFlash": false,
@@ -41,124 +41,8 @@
                     }
                 },
                 "path": "assets/projectiles/capotes.png",
-                "angleOffset": 180
-            }
-        },
-        "biberon_alpha": {
-            "name": "Biberon Alpha",
-            "hp": 1500,
-            "speed": 100,
-            "damage": 25,
-            "fireRate": 1000,
-            "attackPattern": "spray",
-            "movePattern": "rush",
-            "radius": 60,
-            "color": "#0ff"
-        },
-        "puree_brocolis": {
-            "name": "La Purée de Brocolis",
-            "hp": 1000,
-            "speed": 40,
-            "damage": 30,
-            "radius": 90,
-            "fireRate": 2200,
-            "attackPattern": "circle",
-            "movePattern": "constant",
-            "color": "#4b5320"
-        },
-        "prof_maths": {
-            "name": "Le Prof de Maths",
-            "hp": 2000,
-            "speed": 50,
-            "damage": 50,
-            "radius": 100,
-            "fireRate": 2000,
-            "attackPattern": "wall",
-            "movePattern": "fixed",
-            "color": "#555"
-        },
-        "crise_revolte": {
-            "name": "La Crise de Révolte",
-            "hp": 4000,
-            "speed": 80,
-            "damage": 80,
-            "radius": 110,
-            "fireRate": 1800,
-            "attackPattern": "spiral",
-            "movePattern": "rush",
-            "color": "#f00"
-        },
-        "burn_out": {
-            "name": "Le Burn-out",
-            "hp": 8000,
-            "speed": 30,
-            "damage": 120,
-            "radius": 120,
-            "fireRate": 1500,
-            "attackPattern": "vortex",
-            "movePattern": "constant",
-            "color": "#000"
-        },
-        "pretre_interminable": {
-            "name": "Le Prêtre Interminable",
-            "hp": 20000,
-            "speed": 20,
-            "damage": 250,
-            "radius": 150,
-            "fireRate": 1200,
-            "attackPattern": "web",
-            "movePattern": "fixed",
-            "color": "#4b0082"
-        },
-        "cahier_supreme": {
-            "name": "Le Cahier Suprême",
-            "hp": 3000,
-            "speed": 40,
-            "damage": 30,
-            "fireRate": 2000,
-            "attackPattern": "wall",
-            "movePattern": "fixed",
-            "radius": 90,
-            "color": "#3f3"
-        },
-        "new_boss_1767700047441": {
-            "name": "Nouveau Boss",
-            "hp": 2000,
-            "speed": 50,
-            "damage": 20,
-            "fireRate": 1500,
-            "attackPattern": "spiral",
-            "movePattern": "constant",
-            "radius": 80,
-            "color": "#ff3333",
-            "visuals": {
-                "type": "sprite",
-                "width": 128,
-                "directionMode": "none",
-                "hitFlash": true,
-                "animations": {
-                    "idle": {
-                        "frames": [
-                            "assets/boss/sperm_monster_1_v1.png",
-                            "assets/boss/sperm_monster_1_v1.png"
-                        ],
-                        "frameRate": 10,
-                        "loop": true
-                    }
-                },
-                "angleOffset": 0
-            },
-            "projectileVisuals": {
-                "type": "sprite",
-                "width": 16,
-                "directionMode": "rotate",
-                "animations": {
-                    "idle": {
-                        "frames": [],
-                        "frameRate": 10,
-                        "loop": true
-                    }
-                }
+                "angleOffset": 180,
+                "height": 16
             }
         }
     }
