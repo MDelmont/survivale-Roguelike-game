@@ -242,11 +242,21 @@ class PhasesModule {
                             </select>
                         </div>
                         <div class="form-group">
+                            <label class="form-label">Taille XP</label>
+                            <input type="number" class="form-input" id="phaseXpSize" value="${p.xp_size || 20}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
                             <label class="form-label">Sprite Arme (Bonus)</label>
                             <select class="form-select" id="phaseWeaponVisual">
                                 <option value="">-- Étoile dorée (Défaut) --</option>
                                 ${this.app.assetScanner.getAssetPathsForSelect().map(path => `<option value="${path}" ${p.weapon_visual === path ? 'selected' : ''}>${path.split('/').pop()}</option>`).join('')}
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Taille Arme</label>
+                            <input type="number" class="form-input" id="phaseWeaponSize" value="${p.weapon_size || 30}">
                         </div>
                     </div>
                 </div>
@@ -441,7 +451,9 @@ class PhasesModule {
         p.default_weapon = document.getElementById('phaseDefaultWeapon').value;
         p.background_image = document.getElementById('phaseBackground').value;
         p.xp_visual = document.getElementById('phaseXpVisual').value;
+        p.xp_size = parseInt(document.getElementById('phaseXpSize').value) || 20;
         p.weapon_visual = document.getElementById('phaseWeaponVisual').value;
+        p.weapon_size = parseInt(document.getElementById('phaseWeaponSize').value) || 30;
         p.transition_intro_id = document.getElementById('phaseTransitionIntro').value;
         p.transition_outro_id = document.getElementById('phaseTransitionOutro').value;
 
@@ -508,7 +520,9 @@ class PhasesModule {
             boss_id: this.app.gameData.bosses[0]?.id || '',
             background_image: '',
             xp_visual: '',
+            xp_size: 20,
             weapon_visual: '',
+            weapon_size: 30,
             story_intro: [],
             story_outro: []
         };

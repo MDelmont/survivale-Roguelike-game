@@ -475,9 +475,10 @@ class Game {
         const path = (t === 'xp') ? this.currentPhase.xp_visual : this.currentPhase.weapon_visual;
         
         if (path) {
+            const size = (t === 'xp') ? (this.currentPhase.xp_size || 20) : (this.currentPhase.weapon_size || 30);
             visuals = {
-                width: t === 'xp' ? 20 : 30,
-                height: t === 'xp' ? 20 : 30,
+                width: size,
+                height: size,
                 animations: {
                     idle: {
                         frames: [path],
@@ -488,7 +489,12 @@ class Game {
             };
         }
         
-        this.loots.push(new Loot(x, y, v, t, this.dataManager.assetManager, visuals)); 
+        const loot = new Loot(x, y, v, t, this.dataManager.assetManager, visuals);
+        // On ajuste le rayon de la hitbox en fonction de la taille visuelle personnalisée
+        if (visuals) {
+            loot.radius = visuals.width / 2;
+        }
+        this.loots.push(loot); 
     }
     spawnProjectile(x, y, dx, dy, s) { this.projectiles.push(new Projectile(x, y, dx, dy, s, this.dataManager.assetManager)); }
     spawnEnemyProjectile(x, y, dx, dy, s = null) { 

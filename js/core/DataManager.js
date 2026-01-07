@@ -60,6 +60,12 @@ export class DataManager {
                 if (phase.background_image) {
                     this.assetManager.loadImage(phase.background_image);
                 }
+                if (phase.xp_visual) {
+                    this.assetManager.loadImage(phase.xp_visual);
+                }
+                if (phase.weapon_visual) {
+                    this.assetManager.loadImage(phase.weapon_visual);
+                }
                 if (phase.story_intro) {
                     phase.story_intro.forEach(p => p.image && this.assetManager.loadImage(p.image));
                 }
