@@ -2,7 +2,7 @@
     "weapons": [
         {
             "id": "basic_shot",
-            "name": "Tir de Base",
+            "name": "Lance capote",
             "type": "attack",
             "stats": {
                 "damage": 10,
@@ -81,58 +81,6 @@
             ]
         },
         {
-            "id": "double_shot",
-            "name": "Tir Double",
-            "type": "attack",
-            "stats": {
-                "damage": 10,
-                "fireRate": 500,
-                "projectileSpeed": 400,
-                "projectileCount": 2
-            },
-            "upgrades": [
-                {
-                    "name": "Vitesse Accrue",
-                    "stats": {
-                        "fireRate": -100
-                    }
-                },
-                {
-                    "name": "Tir Cryogénique",
-                    "stats": {
-                        "isSlowing": true,
-                        "slowMultiplier": 0.4
-                    }
-                }
-            ]
-        },
-        {
-            "id": "pen_launcher",
-            "name": "Lance-Stylos",
-            "type": "attack",
-            "stats": {
-                "damage": 20,
-                "fireRate": 400,
-                "projectileSpeed": 500,
-                "projectileCount": 1,
-                "piercingCount": 1
-            },
-            "upgrades": [
-                {
-                    "name": "Perçage Mastoc",
-                    "stats": {
-                        "piercingCount": 2
-                    }
-                },
-                {
-                    "name": "Multi-Stylos",
-                    "stats": {
-                        "projectileCount": 1
-                    }
-                }
-            ]
-        },
-        {
             "id": "shield_orbit",
             "name": "Bouclier de Protection",
             "type": "defense",
@@ -180,13 +128,17 @@
         },
         {
             "id": "smartphone_wave",
-            "name": "Aura frozen",
+            "name": "Zone Sperm gluant",
             "type": "aoe",
             "stats": {
                 "damage": 0,
                 "range": 85,
                 "isSlowing": true,
-                "slowMultiplier": 0.6
+                "slowMultiplier": 0.6,
+                "isPoisonous": false,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500
             },
             "upgrades": [
                 {
@@ -201,11 +153,26 @@
                         "isPoisonous": true
                     }
                 }
-            ]
+            ],
+            "visuals": {
+                "path": "assets/projectiles/sperm-splash.png",
+                "width": 20,
+                "directionMode": "none",
+                "rotateWithVelocity": false,
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/sperm-splash.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            }
         },
         {
             "id": "smartphone_poison",
-            "name": "Aura poisson",
+            "name": "Zone sperm empoisonné",
             "type": "aoe",
             "stats": {
                 "poisonDuration": 2000,
@@ -226,38 +193,20 @@
                 }
             ],
             "visuals": {
-                "path": "",
+                "path": "assets/projectiles/sperm-splash-empoisoné.png",
                 "width": 20,
                 "directionMode": "none",
                 "rotateWithVelocity": false,
                 "animations": {
                     "idle": {
-                        "frames": [],
+                        "frames": [
+                            "assets/projectiles/sperm-splash-empoisoné.png"
+                        ],
                         "frameRate": 10,
                         "loop": true
                     }
                 }
             }
-        },
-        {
-            "id": "smartphone",
-            "name": "Aura",
-            "type": "aoe",
-            "stats": {
-                "damage": 20,
-                "range": 100,
-                "isPoisonous": false,
-                "isSlowing": false,
-                "slowMultiplier": 0.6
-            },
-            "upgrades": [
-                {
-                    "name": "Portée +",
-                    "stats": {
-                        "range": 40
-                    }
-                }
-            ]
         }
     ]
 }
