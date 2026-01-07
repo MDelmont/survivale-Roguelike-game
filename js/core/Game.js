@@ -453,7 +453,26 @@ class Game {
         this.enemies.push(enemy);
     }
 
-    spawnLoot(x, y, v, t) { this.loots.push(new Loot(x, y, v, t, this.dataManager.assetManager)); }
+    spawnLoot(x, y, v, t) { 
+        let visuals = null;
+        const path = (t === 'xp') ? this.currentPhase.xp_visual : this.currentPhase.weapon_visual;
+        
+        if (path) {
+            visuals = {
+                width: t === 'xp' ? 20 : 30,
+                height: t === 'xp' ? 20 : 30,
+                animations: {
+                    idle: {
+                        frames: [path],
+                        frameRate: 1,
+                        loop: true
+                    }
+                }
+            };
+        }
+        
+        this.loots.push(new Loot(x, y, v, t, this.dataManager.assetManager, visuals)); 
+    }
     spawnProjectile(x, y, dx, dy, s) { this.projectiles.push(new Projectile(x, y, dx, dy, s, this.dataManager.assetManager)); }
     spawnEnemyProjectile(x, y, dx, dy, s = null) { 
         const stats = s || { projectileSpeed: 200, damage: 10, color: '#f0f' };

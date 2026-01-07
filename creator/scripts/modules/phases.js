@@ -232,6 +232,26 @@ class PhasesModule {
                 </div>
 
                 <div class="form-section">
+                    <h3 class="form-section-title">Visuels des Butins (Loots)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Sprite XP (Orbes)</label>
+                            <select class="form-select" id="phaseXpVisual">
+                                <option value="">-- Cercle vert (Défaut) --</option>
+                                ${this.app.assetScanner.getAssetPathsForSelect().map(path => `<option value="${path}" ${p.xp_visual === path ? 'selected' : ''}>${path.split('/').pop()}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sprite Arme (Bonus)</label>
+                            <select class="form-select" id="phaseWeaponVisual">
+                                <option value="">-- Étoile dorée (Défaut) --</option>
+                                ${this.app.assetScanner.getAssetPathsForSelect().map(path => `<option value="${path}" ${p.weapon_visual === path ? 'selected' : ''}>${path.split('/').pop()}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
                     <h3 class="form-section-title">Narration : Intro (Avant la phase)</h3>
                     <div class="form-group">
                         <label class="form-label">Séquence Narrative</label>
@@ -420,6 +440,8 @@ class PhasesModule {
         p.boss_id = document.getElementById('phaseBoss').value;
         p.default_weapon = document.getElementById('phaseDefaultWeapon').value;
         p.background_image = document.getElementById('phaseBackground').value;
+        p.xp_visual = document.getElementById('phaseXpVisual').value;
+        p.weapon_visual = document.getElementById('phaseWeaponVisual').value;
         p.transition_intro_id = document.getElementById('phaseTransitionIntro').value;
         p.transition_outro_id = document.getElementById('phaseTransitionOutro').value;
 
@@ -485,6 +507,8 @@ class PhasesModule {
             available_weapons: [],
             boss_id: this.app.gameData.bosses[0]?.id || '',
             background_image: '',
+            xp_visual: '',
+            weapon_visual: '',
             story_intro: [],
             story_outro: []
         };
