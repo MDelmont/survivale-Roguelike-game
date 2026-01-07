@@ -278,6 +278,10 @@ class EnemiesModule {
                             <input type="number" class="form-input" id="enemyXpValue" value="${e.xpValue || 10}">
                         </div>
                         <div class="form-group">
+                            <label class="form-label">Coût Menace (threatLevel)</label>
+                            <input type="number" class="form-input" id="enemyThreatLevel" value="${e.threatLevel || 10}">
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">Rayon hitbox (radius)</label>
                             <input type="number" class="form-input" id="enemyRadius" value="${e.radius || 12}">
                         </div>
@@ -631,6 +635,7 @@ class EnemiesModule {
         e.speed = parseInt(document.getElementById('enemySpeed')?.value) || 100;
         e.damage = parseInt(document.getElementById('enemyDamage')?.value) || 5;
         e.xpValue = parseInt(document.getElementById('enemyXpValue')?.value) || 10;
+        e.threatLevel = parseInt(document.getElementById('enemyThreatLevel')?.value) || 10;
         e.radius = parseInt(document.getElementById('enemyRadius')?.value) || 12;
         e.color = document.getElementById('enemyColor')?.value || '#fff';
         e.weapon_id = document.getElementById('enemyWeapon')?.value || '';

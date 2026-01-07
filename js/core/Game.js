@@ -91,6 +91,7 @@ class Game {
         this.loots = [];
         this.explosions = [];
         this.boss = null;
+        this.threatBudgets = {}; // Un budget par type d'ennemi pour des jauges parallèles
 
         if (this.currentPhase.transition_intro_id) {
             const transition = this.dataManager.getTransitionData(this.currentPhase.transition_intro_id);
@@ -260,13 +261,35 @@ class Game {
             if (this.explosions[i].timer <= 0) this.explosions.splice(i, 1);
         }
 
-        // Spawns
-        if (!this.boss) {
-            this.spawnTimer += deltaTime;
-            if (this.spawnTimer >= this.currentPhase.spawn_rate) {
-                this.spawnEnemy();
-                this.spawnTimer = 0;
-            }
+        // Spawns (Système de Jauges Parallèles)
+        if (!this.boss && this.currentPhase.enemy_types?.length > 0) {
+            const phase = this.currentPhase;
+            const types = phase.enemy_types;
+            const diffMult = phase.difficulty_multiplier || 1.0;
+            const baseGrowth = phase.threat_growth_rate || 5.0;
+            
+            const phaseProgress = Math.min(1.0, this.phaseTimer / (phase.duration_before_boss || 60));
+            const progressionBonus = baseGrowth * phaseProgress;
+            const levelBonus = (this.player.stats.level - 1) * 2;
+            const weaponBonus = (this.player.weapons.length - 1) * 5;
+            
+            const totalGrowthPerSec = (baseGrowth + progressionBonus + levelBonus + weaponBonus) * diffMult;
+            this.lastThreatGrowth = Math.round(totalGrowthPerSec * 10) / 10;
+
+            // On divise le gain total équitablement entre toutes les jauges actives
+            const growthPerType = (totalGrowthPerSec * (deltaTime / 1000)) / types.length;
+            
+            types.forEach(type => {
+                if (!this.threatBudgets[type]) this.threatBudgets[type] = 0;
+                this.threatBudgets[type] += growthPerType;
+                
+                // Cap de sécurité pour éviter l'accumulation infinie si on ne spawn pas
+                const enemyData = this.dataManager.getEnemyData(type);
+                const cost = enemyData?.threatLevel || 10;
+                if (this.threatBudgets[type] > cost * 3) this.threatBudgets[type] = cost * 3;
+            });
+
+            this.trySpawnEnemy();
         }
 
         this.updateGameEntities(deltaTime);
@@ -439,19 +462,32 @@ class Game {
             console.error(`Boss ID inconnu : ${bossId}`);
         }
     }
-    spawnEnemy() {
-        const type = this.currentPhase.enemy_types[Math.floor(Math.random() * this.currentPhase.enemy_types.length)];
+    trySpawnEnemy() {
+        // On parcourt chaque budget individuel
+        Object.keys(this.threatBudgets).forEach(type => {
+            const enemyData = this.dataManager.getEnemyData(type);
+            if (!enemyData) return;
+            
+            const cost = enemyData.threatLevel || 10;
+            
+            // On peut faire spawner plusieurs fois si on a accumulé beaucoup (ex: petits mobs)
+            // Limité à 5 pour la performance
+            let count = 0;
+            while (this.threatBudgets[type] >= cost && count < 5) {
+                this.spawnSpecificEnemy(type, enemyData);
+                this.threatBudgets[type] -= cost;
+                count++;
+            }
+        });
+    }
+
+    spawnSpecificEnemy(type, enemyData) {
         const side = Math.floor(Math.random() * 4);
         let x, y;
         if (side === 0) { x = Math.random() * this.logicalWidth; y = -50; }
         else if (side === 1) { x = Math.random() * this.logicalWidth; y = this.logicalHeight + 50; }
         else if (side === 2) { x = -50; y = Math.random() * this.logicalHeight; }
         else { x = this.logicalWidth + 50; y = Math.random() * this.logicalHeight; }
-        const enemyData = this.dataManager.getEnemyData(type);
-        if (!enemyData) {
-            console.error(`Type d'ennemi inconnu : ${type}`);
-            return;
-        }
         
         const enemy = new Enemy(x, y, enemyData, this.dataManager.assetManager);
         
@@ -460,7 +496,6 @@ class Game {
             const weaponData = this.dataManager.data.weapons.weapons.find(w => w.id === enemyData.weapon_id);
             if (weaponData) {
                 enemy.weapon = WeaponFactory.create(weaponData, this.dataManager.assetManager);
-                // On peut ajuster les stats de l'arme pour les ennemis si nécessaire
                 if (enemy.weapon) {
                     enemy.weapon.stats.damage = enemy.weapon.stats.damage || 5;
                 }
@@ -761,6 +796,14 @@ class Game {
         ctx.textAlign = 'left';
         ctx.fillText(`PHASE: ${this.currentPhaseIndex + 1} - ${this.currentPhase.name}`, 50, 50);
         ctx.fillText(`KILLS: ${this.killCount}`, 50, 70);
+
+        // Debug info pour le budget de menace (Visible si ?debug=1 dans l'URL)
+        if (window.location.search.includes('debug')) {
+            ctx.fillStyle = '#ff5555';
+            const totalAcc = Math.floor(Object.values(this.threatBudgets).reduce((a, b) => a + b, 0));
+            ctx.fillText(`MENACE: ${totalAcc} PM (+${this.lastThreatGrowth || 0}/s)`, 50, 90);
+            ctx.fillStyle = 'white';
+        }
 
         if (this.player.weapons.length > 0) {
             ctx.textAlign = 'right';

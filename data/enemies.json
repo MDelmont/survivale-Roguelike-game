@@ -6,6 +6,7 @@
             "speed": 200,
             "damage": 5,
             "xpValue": 10,
+            "threatLevel": 10,
             "radius": 12,
             "color": "#fff",
             "visuals": {
@@ -37,10 +38,11 @@
         },
         "fast_cell": {
             "name": "diforme-spermatozoïde",
-            "hp": 60,
-            "speed": 55,
+            "hp": 80,
+            "speed": 70,
             "damage": 3,
             "xpValue": 20,
+            "threatLevel": 20,
             "radius": 10,
             "color": "#0ff",
             "visuals": {
@@ -76,6 +78,7 @@
             "speed": 120,
             "damage": 10,
             "xpValue": 20,
+            "threatLevel": 40,
             "radius": 20,
             "color": "#f00",
             "visuals": {
@@ -107,10 +110,11 @@
         },
         "new_enemy_1767798373589": {
             "name": "multi-spermateozoide",
-            "hp": 20,
+            "hp": 25,
             "speed": 100,
             "damage": 5,
             "xpValue": 10,
+            "threatLevel": 15,
             "radius": 12,
             "color": "#ff5555",
             "visuals": {

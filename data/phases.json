@@ -28,7 +28,11 @@
             "xp_visual": "assets/experiences/exp-sperm.png",
             "weapon_visual": "",
             "xp_size": 15,
-            "weapon_size": 30
+            "weapon_size": 30,
+            "difficulty_multiplier": 1.0,
+            "initial_threat_budget": 20,
+            "max_threat_budget": 200,
+            "threat_growth_rate": 15.0
         }
     ]
 }

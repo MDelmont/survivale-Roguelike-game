@@ -182,6 +182,30 @@ class PhasesModule {
                         </div>
                     </div>
                 </div>
+                
+                <div class="form-section">
+                    <h3 class="form-section-title">Paramètres de Difficulté (Menace)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Multiplicateur d'Intensité (x0.5 - x3.0)</label>
+                            <input type="number" step="0.1" class="form-input" id="phaseDifficultyMultiplier" value="${p.difficulty_multiplier || 1.0}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Budget Initial (PM)</label>
+                            <input type="number" class="form-input" id="phaseInitialThreat" value="${p.initial_threat_budget || 20}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Budget Max (PM)</label>
+                            <input type="number" class="form-input" id="phaseMaxThreat" value="${p.max_threat_budget || 200}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Taux de croissance (PM/sec)</label>
+                            <input type="number" step="0.1" class="form-input" id="phaseThreatGrowth" value="${p.threat_growth_rate || 0.5}">
+                        </div>
+                    </div>
+                </div>
 
                 <div class="form-section">
                     <h3 class="form-section-title">Configuration des Entités</h3>
@@ -450,6 +474,12 @@ class PhasesModule {
         p.boss_id = document.getElementById('phaseBoss').value;
         p.default_weapon = document.getElementById('phaseDefaultWeapon').value;
         p.background_image = document.getElementById('phaseBackground').value;
+        
+        // Difficulté
+        p.difficulty_multiplier = parseFloat(document.getElementById('phaseDifficultyMultiplier').value) || 1.0;
+        p.initial_threat_budget = parseInt(document.getElementById('phaseInitialThreat').value) || 20;
+        p.max_threat_budget = parseInt(document.getElementById('phaseMaxThreat').value) || 200;
+        p.threat_growth_rate = parseFloat(document.getElementById('phaseThreatGrowth').value) || 0.5;
         p.xp_visual = document.getElementById('phaseXpVisual').value;
         p.xp_size = parseInt(document.getElementById('phaseXpSize').value) || 20;
         p.weapon_visual = document.getElementById('phaseWeaponVisual').value;
