@@ -225,12 +225,10 @@ class WeaponsModule {
                                 <option value="4_way" ${w.visuals?.directionMode === '4_way' ? 'selected' : ''}>4-Way</option>
                             </select>
                         </div>
-                    <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Angle Offset (°)</label>
                             <input type="number" class="form-input" id="weaponVisualAngleOffset" value="${w.visuals?.angleOffset || 0}">
                         </div>
-                        <div class="form-group"></div>
                         <div class="form-group"></div>
                     </div>
 
@@ -570,6 +568,7 @@ class WeaponsModule {
         const dirMode = document.getElementById('weaponDirMode').value;
         w.visuals.directionMode = dirMode;
         w.visuals.rotateWithVelocity = (dirMode === 'rotate'); // Backward compatibility
+        w.visuals.angleOffset = parseInt(document.getElementById('weaponVisualAngleOffset').value) || 0;
         
         // AOE Specific
         if (w.type === 'aoe') {

@@ -7,7 +7,8 @@
             "enemy_types": [
                 "basic_cell",
                 "fast_cell",
-                "tank_cell"
+                "tank_cell",
+                "new_enemy_1767798373589"
             ],
             "player_id": "anthony",
             "spawn_rate": 1500,

@@ -52,7 +52,7 @@
         },
         {
             "id": "poison_shot",
-            "name": "Tir de Poison",
+            "name": "Lance capote moisie",
             "type": "attack",
             "stats": {
                 "damage": 10,
@@ -62,23 +62,42 @@
                 "isPoisonous": true,
                 "poisonDuration": 2000,
                 "poisonDamage": 20,
-                "poisonTickRate": 500
+                "poisonTickRate": 200,
+                "piercingCount": 0,
+                "color": null,
+                "isSlowing": false
             },
             "upgrades": [
                 {
-                    "name": "Vitesse Accrue",
+                    "name": "Poison féroce",
                     "stats": {
                         "fireRate": -100
                     }
                 },
                 {
-                    "name": "Tir Cryogénique",
+                    "name": "Effet paralysant",
                     "stats": {
                         "isSlowing": true,
                         "slowMultiplier": 0.4
                     }
                 }
-            ]
+            ],
+            "visuals": {
+                "path": "assets/projectiles/capotes-empoisonné.png",
+                "width": 20,
+                "directionMode": "rotate",
+                "rotateWithVelocity": true,
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/capotes-empoisonné.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "angleOffset": 180
+            }
         },
         {
             "id": "shield_orbit",
