@@ -14,10 +14,31 @@
                     "textColor": "#ffffff",
                     "hideText": true,
                     "image": "",
-                    "background": "assets/fond/fond-ovule.png",
+                    "background": "assets/fond/La-conception-start.png",
                     "duration": 5000,
                     "music": "",
                     "animation": "none"
+                }
+            ]
+        },
+        {
+            "id": "transition_1767806453330",
+            "name": "fin fécond survie",
+            "pages": [
+                {
+                    "title": "Nouveau Titre",
+                    "titleSize": 24,
+                    "titleColor": "#6366f1",
+                    "hideTitle": true,
+                    "text": "Nouveau texte...",
+                    "textSize": 16,
+                    "textColor": "#ffffff",
+                    "hideText": true,
+                    "image": "",
+                    "background": "assets/fond/La-conception-end.png",
+                    "duration": 5000,
+                    "music": "",
+                    "animation": "fade"
                 }
             ]
         }

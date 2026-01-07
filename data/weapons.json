@@ -238,6 +238,25 @@
                 "auraAlphaMin": 0.2,
                 "auraAlphaMax": 1
             }
+        },
+        {
+            "id": "new_weapon_mk4ajk29",
+            "name": "Nouvelle Arme",
+            "type": "attack",
+            "stats": {
+                "damage": 10,
+                "fireRate": 500,
+                "projectileSpeed": 400,
+                "projectileCount": 1
+            },
+            "upgrades": [],
+            "visuals": {
+                "path": "",
+                "width": 20,
+                "height": 20,
+                "rotateWithVelocity": true,
+                "angleOffset": 0
+            }
         }
     ]
 }
