@@ -607,7 +607,7 @@ class Game {
             this.drawUI();
         }
 
-        this.input.draw(this.ctx);
+
 
         if (this.state === GameState.STORY) this.drawStory();
         if (this.state === GameState.UPGRADE) this.drawChoiceMenu('AMÉLIORATION DISPONIBLE', '#fbbf24', 80);
@@ -616,6 +616,7 @@ class Game {
         if (this.state === GameState.GAMEOVER) this.drawEndScreen('GAME OVER', '#f00');
 
         this.ctx.restore();
+        this.input.draw(this.ctx);
     }
 
     drawStory() {
