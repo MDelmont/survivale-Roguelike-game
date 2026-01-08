@@ -143,6 +143,22 @@ class Game {
         this.logicalHeight = window.innerHeight / this.scale;
     }
 
+    requestFullscreen() {
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.warn(`Erreur lors du passage en plein écran : ${err.message}`);
+            });
+        }
+    }
+
+    exitFullscreen() {
+        if (document.fullscreenElement && document.exitFullscreen) {
+            document.exitFullscreen().catch(err => {
+                console.warn(`Erreur lors de la sortie du plein écran : ${err.message}`);
+            });
+        }
+    }
+
     handleCanvasClick(e) {
         const rect = this.canvas.getBoundingClientRect();
         // Conversion des coordonnées écran -> coordonnées logiques
@@ -158,6 +174,7 @@ class Game {
             const npY = this.logicalHeight / 2 + 50;
             if (mouseX >= centerX - btnW/2 && mouseX <= centerX + btnW/2 &&
                 mouseY >= npY - btnH/2 && mouseY <= npY + btnH/2) {
+                this.requestFullscreen();
                 this.startNewGame();
                 return;
             }
@@ -167,6 +184,7 @@ class Game {
                 const cY = this.logicalHeight / 2 + 130;
                 if (mouseX >= centerX - btnW/2 && mouseX <= centerX + btnW/2 &&
                     mouseY >= cY - btnH/2 && mouseY <= cY + btnH/2) {
+                    this.requestFullscreen();
                     this.continueGame();
                     return;
                 }
@@ -225,7 +243,11 @@ class Game {
 
         if (this.player.pendingUpgrade) { this.openUpgradeMenu(); return; }
         if (this.player.pendingWeaponUpgrade) { this.openWeaponMenu(); return; }
-        if (this.player.stats.hp <= 0) { this.state = GameState.GAMEOVER; return; }
+        if (this.player.stats.hp <= 0) { 
+            this.exitFullscreen();
+            this.state = GameState.GAMEOVER; 
+            return; 
+        }
 
         this.phaseTimer += deltaTime / 1000;
         if (this.phaseTimer >= this.currentPhase.duration_before_boss && !this.boss) this.spawnBoss();
@@ -395,6 +417,7 @@ class Game {
             const transition = this.dataManager.getTransitionData(this.currentPhase.transition_outro_id);
             if (transition) {
                 this.openStory(transition.pages, () => {
+                    this.exitFullscreen();
                     this.state = GameState.VICTORY;
                 });
                 return;
@@ -403,9 +426,11 @@ class Game {
 
         if (this.currentPhase.story_outro && this.currentPhase.story_outro.length > 0) {
             this.openStory(this.currentPhase.story_outro, () => {
+                this.exitFullscreen();
                 this.state = GameState.VICTORY;
             });
         } else {
+            this.exitFullscreen();
             this.state = GameState.VICTORY;
         }
     }
