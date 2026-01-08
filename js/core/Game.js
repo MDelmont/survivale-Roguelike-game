@@ -628,7 +628,7 @@ class Game {
         // Background (page specific background)
         if (page.background && this.dataManager.assetManager.isLoaded(page.background)) {
             const bgImg = this.dataManager.assetManager.getImage(page.background);
-            ctx.drawImage(bgImg, 0, 0, w, h);
+            this.drawImageCover(ctx, bgImg, w, h);
             // Plus d'overlay sombre pour laisser l'image de fond totalement claire
         } else {
             // Fond noir total si aucune image n'est définie
@@ -708,6 +708,34 @@ class Game {
         ctx.fillText(line, x, testY);
     }
 
+    /**
+     * Dessine une image pour qu'elle remplisse un rectangle sans déformation (comme object-fit: cover)
+     */
+    drawImageCover(ctx, img, targetW, targetH) {
+        const imgW = img.width;
+        const imgH = img.height;
+        const targetRatio = targetW / targetH;
+        const imgRatio = imgW / imgH;
+
+        let sX, sY, sW, sH;
+
+        if (imgRatio > targetRatio) {
+            // L'image est plus large que la zone : on coupe les côtés
+            sH = imgH;
+            sW = imgH * targetRatio;
+            sX = (imgW - sW) / 2;
+            sY = 0;
+        } else {
+            // L'image est plus haute que la zone : on coupe le haut et le bas
+            sW = imgW;
+            sH = imgW / targetRatio;
+            sX = 0;
+            sY = (imgH - sH) / 2;
+        }
+
+        ctx.drawImage(img, sX, sY, sW, sH, 0, 0, targetW, targetH);
+    }
+
     openStory(queue, callback) {
         this.storyQueue = queue;
         this.storyPageIndex = 0;
@@ -727,10 +755,8 @@ class Game {
         if (this.currentPhase && this.currentPhase.background_image) {
             const img = this.dataManager.assetManager.getImage(this.currentPhase.background_image);
             if (img) {
-                // On dessine l'image en pattern ou scale ? 
-                // Pour un roguelike, souvent on veut qu'elle couvre tout ou se répète.
-                // Ici on va la dessiner pour couvrir tout le rectangle logique.
-                this.ctx.drawImage(img, 0, 0, this.logicalWidth, this.logicalHeight);
+                // Utilisation de drawImageCover pour éviter la déformation
+                this.drawImageCover(this.ctx, img, this.logicalWidth, this.logicalHeight);
                 return; // On ne dessine pas la grille si on a une image de fond
             }
         }
