@@ -276,6 +276,29 @@ export class LevelUpScreen {
     getStatDisplay(opt) {
         if (opt.preview) return opt.preview;
 
+        // Si c'est un retrait d'arme (nouvelle arme)
+        if (opt.type === 'weapon' && opt.weaponData) {
+            const data = opt.weaponData;
+            const categoryMap = {
+                'attack': 'PROJECTILE',
+                'defense': 'ORBITE',
+                'aoe': 'AURA'
+            };
+            const typeLabel = categoryMap[data.type] || 'ARME';
+
+            const stats = data.stats || {};
+            const statParts = [];
+            if (stats.damage) statParts.push(`DMG: ${stats.damage}`);
+            if (stats.fireRate) statParts.push(`CD: ${stats.fireRate}ms`);
+            if (stats.range) statParts.push(`RNG: ${stats.range}`);
+            if (stats.radius) statParts.push(`RAD: ${stats.radius}`);
+
+            if (statParts.length > 0) {
+                return `${typeLabel}  |  ${statParts.slice(0, 2).join('  ')}`;
+            }
+            return typeLabel;
+        }
+
         if (opt.multiplier) {
             const percent = Math.round((opt.multiplier - 1) * 100);
             const sign = percent > 0 ? '+' : '';

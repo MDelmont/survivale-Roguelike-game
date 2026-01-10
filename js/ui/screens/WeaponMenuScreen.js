@@ -259,20 +259,10 @@ export class WeaponMenuScreen {
             const upgradeInfo = this.getUpgradeInfo(data);
             ctx.fillStyle = Colors.ACCENT;
             ctx.fillText(upgradeInfo, x + padding, statsLineY);
-        } else if (data.preview) {
-            ctx.fillStyle = Colors.PRIMARY;
-            ctx.fillText(data.preview, x + padding, statsLineY);
-        } else if (data.stats) {
-            let statsText = [];
-            if (data.stats.damage) statsText.push(`DMG: ${data.stats.damage}`);
-            if (data.stats.fireRate) statsText.push(`CD: ${data.stats.fireRate}ms`);
-            if (data.stats.range) statsText.push(`RNG: ${data.stats.range}`);
-
-            ctx.fillStyle = Colors.PRIMARY;
-            ctx.fillText(statsText.join('   ') || 'Base', x + padding, statsLineY);
         } else {
-            ctx.fillStyle = Colors.TEXT_MUTED;
-            ctx.fillText('Stats de base', x + padding, statsLineY);
+            const previewText = this.getWeaponPreview(data);
+            ctx.fillStyle = Colors.PRIMARY;
+            ctx.fillText(previewText, x + padding, statsLineY);
         }
 
         // === SCHÉMA D'ÉVOLUTION (plus gros nœuds, descendu au fond) ===
@@ -322,6 +312,50 @@ export class WeaponMenuScreen {
             return parts.join(', ') || 'Amélioration';
         }
         return 'Niveau suivant';
+    }
+
+    getWeaponPreview(data) {
+        if (data.preview) return data.preview;
+
+        const stats = data.stats || {};
+        const parts = [];
+
+        // Catégorie
+        const categoryMap = {
+            'attack': 'PROJECTILE',
+            'defense': 'ORBITE',
+            'aoe': 'AURA'
+        };
+        const typeLabel = categoryMap[data.type] || 'ARME';
+
+        if (data.type === 'attack') {
+            if (stats.damage !== undefined) parts.push(`DMG: ${stats.damage}`);
+            if (stats.fireRate) parts.push(`CD: ${stats.fireRate}ms`);
+            if (stats.projectileSpeed) parts.push(`SPD: ${stats.projectileSpeed}`);
+            if (stats.projectileCount > 1) parts.push(`x${stats.projectileCount}`);
+            if (stats.piercingCount > 0) parts.push(`PIERCE: ${stats.piercingCount}`);
+        } else if (data.type === 'defense') {
+            if (stats.damage !== undefined) parts.push(`DMG: ${stats.damage}`);
+            if (stats.radius) parts.push(`RAD: ${stats.radius}`);
+            if (stats.orbitSpeed) parts.push(`ROT: ${stats.orbitSpeed}`);
+            if (stats.projectileCount) parts.push(`x${stats.projectileCount}`);
+            if (stats.fireRate) parts.push(`DUR: ${stats.fireRate}ms`);
+        } else if (data.type === 'aoe') {
+            if (stats.isPoisonous) parts.push(`POISON: ${stats.poisonDamage || 0}`);
+            else if (stats.damage) parts.push(`DMG: ${stats.damage}`);
+
+            if (stats.range) parts.push(`RNG: ${stats.range}`);
+            if (stats.slowMultiplier !== undefined && stats.slowMultiplier < 1) {
+                const slowPct = Math.round((1 - stats.slowMultiplier) * 100);
+                parts.push(`SLOW: -${slowPct}%`);
+            }
+        }
+
+        if (parts.length > 0) {
+            return `${typeLabel}  |  ${parts.join('  ')}`;
+        }
+
+        return typeLabel;
     }
 
     drawEvolutionNodes(ctx, x, y, width, data, borderColor) {

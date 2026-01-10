@@ -107,7 +107,7 @@
                 },
                 "angleOffset": 180
             },
-            "preview": "DDDDD"
+            "preview": ""
         },
         {
             "id": "shield_orbit",
@@ -159,7 +159,7 @@
                 },
                 "angleOffset": 0
             },
-            "preview": "DDDD"
+            "preview": ""
         },
         {
             "id": "smartphone_wave",
