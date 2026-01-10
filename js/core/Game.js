@@ -143,6 +143,22 @@ class Game {
         this.logicalHeight = window.innerHeight / this.scale;
     }
 
+    requestFullscreen() {
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.warn(`Erreur lors du passage en plein écran : ${err.message}`);
+            });
+        }
+    }
+
+    exitFullscreen() {
+        if (document.fullscreenElement && document.exitFullscreen) {
+            document.exitFullscreen().catch(err => {
+                console.warn(`Erreur lors de la sortie du plein écran : ${err.message}`);
+            });
+        }
+    }
+
     handleCanvasClick(e) {
         const rect = this.canvas.getBoundingClientRect();
         // Conversion des coordonnées écran -> coordonnées logiques
@@ -158,6 +174,7 @@ class Game {
             const npY = this.logicalHeight / 2 + 50;
             if (mouseX >= centerX - btnW / 2 && mouseX <= centerX + btnW / 2 &&
                 mouseY >= npY - btnH / 2 && mouseY <= npY + btnH / 2) {
+                this.requestFullscreen();
                 this.startNewGame();
                 return;
             }
@@ -167,6 +184,7 @@ class Game {
                 const cY = this.logicalHeight / 2 + 130;
                 if (mouseX >= centerX - btnW / 2 && mouseX <= centerX + btnW / 2 &&
                     mouseY >= cY - btnH / 2 && mouseY <= cY + btnH / 2) {
+                    this.requestFullscreen();
                     this.continueGame();
                     return;
                 }
@@ -225,7 +243,11 @@ class Game {
 
         if (this.player.pendingUpgrade) { this.openUpgradeMenu(); return; }
         if (this.player.pendingWeaponUpgrade) { this.openWeaponMenu(); return; }
-        if (this.player.stats.hp <= 0) { this.state = GameState.GAMEOVER; return; }
+        if (this.player.stats.hp <= 0) {
+            this.exitFullscreen();
+            this.state = GameState.GAMEOVER;
+            return;
+        }
 
         this.phaseTimer += deltaTime / 1000;
         if (this.phaseTimer >= this.currentPhase.duration_before_boss && !this.boss) this.spawnBoss();
@@ -395,6 +417,7 @@ class Game {
             const transition = this.dataManager.getTransitionData(this.currentPhase.transition_outro_id);
             if (transition) {
                 this.openStory(transition.pages, () => {
+                    this.exitFullscreen();
                     this.state = GameState.VICTORY;
                 });
                 return;
@@ -403,9 +426,11 @@ class Game {
 
         if (this.currentPhase.story_outro && this.currentPhase.story_outro.length > 0) {
             this.openStory(this.currentPhase.story_outro, () => {
+                this.exitFullscreen();
                 this.state = GameState.VICTORY;
             });
         } else {
+            this.exitFullscreen();
             this.state = GameState.VICTORY;
         }
     }
@@ -582,6 +607,11 @@ class Game {
             this.drawUI();
         }
 
+
+
+        if (this.state === GameState.STORY) this.drawStory();
+        if (this.state === GameState.UPGRADE) this.drawChoiceMenu('AMÉLIORATION DISPONIBLE', '#fbbf24', 80);
+        if (this.state === GameState.WEAPON_MENU) this.drawChoiceMenu('NOUVELLE ARME', '#3b82f6', 100);
         if (this.state === GameState.VICTORY) this.drawEndScreen('VICTOIRE !', '#0f0');
         if (this.state === GameState.GAMEOVER) this.drawEndScreen('GAME OVER', '#f00');
 
@@ -600,7 +630,7 @@ class Game {
         // Background (page specific background)
         if (page.background && this.dataManager.assetManager.isLoaded(page.background)) {
             const bgImg = this.dataManager.assetManager.getImage(page.background);
-            ctx.drawImage(bgImg, 0, 0, w, h);
+            this.drawImageCover(ctx, bgImg, w, h);
             // Plus d'overlay sombre pour laisser l'image de fond totalement claire
         } else {
             // Fond noir total si aucune image n'est définie
@@ -680,6 +710,34 @@ class Game {
         ctx.fillText(line, x, testY);
     }
 
+    /**
+     * Dessine une image pour qu'elle remplisse un rectangle sans déformation (comme object-fit: cover)
+     */
+    drawImageCover(ctx, img, targetW, targetH) {
+        const imgW = img.width;
+        const imgH = img.height;
+        const targetRatio = targetW / targetH;
+        const imgRatio = imgW / imgH;
+
+        let sX, sY, sW, sH;
+
+        if (imgRatio > targetRatio) {
+            // L'image est plus large que la zone : on coupe les côtés
+            sH = imgH;
+            sW = imgH * targetRatio;
+            sX = (imgW - sW) / 2;
+            sY = 0;
+        } else {
+            // L'image est plus haute que la zone : on coupe le haut et le bas
+            sW = imgW;
+            sH = imgW / targetRatio;
+            sX = 0;
+            sY = (imgH - sH) / 2;
+        }
+
+        ctx.drawImage(img, sX, sY, sW, sH, 0, 0, targetW, targetH);
+    }
+
     openStory(queue, callback) {
         this.storyQueue = queue;
         this.storyPageIndex = 0;
@@ -699,10 +757,8 @@ class Game {
         if (this.currentPhase && this.currentPhase.background_image) {
             const img = this.dataManager.assetManager.getImage(this.currentPhase.background_image);
             if (img) {
-                // On dessine l'image en pattern ou scale ? 
-                // Pour un roguelike, souvent on veut qu'elle couvre tout ou se répète.
-                // Ici on va la dessiner pour couvrir tout le rectangle logique.
-                this.ctx.drawImage(img, 0, 0, this.logicalWidth, this.logicalHeight);
+                // Utilisation de drawImageCover pour éviter la déformation
+                this.drawImageCover(this.ctx, img, this.logicalWidth, this.logicalHeight);
                 return; // On ne dessine pas la grille si on a une image de fond
             }
         }

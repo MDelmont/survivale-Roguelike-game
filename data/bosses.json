@@ -29,7 +29,7 @@
             },
             "projectileVisuals": {
                 "type": "sprite",
-                "width": 16,
+                "width": 50,
                 "directionMode": "rotate",
                 "animations": {
                     "idle": {
@@ -41,9 +41,9 @@
                     }
                 },
                 "path": "assets/projectiles/capotes.png",
-                "angleOffset": 180,
-                "height": 16
-            }
+                "angleOffset": 180
+            },
+            "weapon_id": ""
         }
     }
 }

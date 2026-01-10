@@ -17,13 +17,15 @@ export class Input {
             this.keys[e.code] = false;
         });
 
-        // Joystick Mobile
+        // Joystick Mobile & Souris
         this.touchStart = null;
         this.touchMove = null;
         this.joystickActive = false;
 
+        // Événements Tactiles
         window.addEventListener('touchstart', (e) => {
             this.touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            this.touchMove = { x: e.touches[0].clientX, y: e.touches[0].clientY };
             this.joystickActive = true;
         });
 
@@ -37,6 +39,30 @@ export class Input {
             this.joystickActive = false;
             this.touchStart = null;
             this.touchMove = null;
+        });
+
+        // Événements Souris (pour test sur desktop ou jouabilité souris)
+        window.addEventListener('mousedown', (e) => {
+            // On n'active le joystick souris que si on n'est pas déjà en tactile
+            if (!this.joystickActive && e.button === 0) {
+                this.touchStart = { x: e.clientX, y: e.clientY };
+                this.touchMove = { x: e.clientX, y: e.clientY };
+                this.joystickActive = true;
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (this.joystickActive && !('touches' in e)) { // Si c'est un vrai mousemove sans touch
+                this.touchMove = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (this.joystickActive) {
+                this.joystickActive = false;
+                this.touchStart = null;
+                this.touchMove = null;
+            }
         });
     }
 
