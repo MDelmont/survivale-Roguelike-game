@@ -52,7 +52,8 @@
                         "loop": true
                     }
                 }
-            }
+            },
+            "preview": "TEST"
         },
         {
             "id": "poison_shot",
@@ -105,7 +106,8 @@
                     }
                 },
                 "angleOffset": 180
-            }
+            },
+            "preview": "DDDDD"
         },
         {
             "id": "shield_orbit",
@@ -154,8 +156,10 @@
                         "frameRate": 10,
                         "loop": true
                     }
-                }
-            }
+                },
+                "angleOffset": 0
+            },
+            "preview": "DDDD"
         },
         {
             "id": "smartphone_wave",

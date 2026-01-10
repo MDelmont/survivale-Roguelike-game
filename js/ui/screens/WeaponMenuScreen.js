@@ -259,6 +259,9 @@ export class WeaponMenuScreen {
             const upgradeInfo = this.getUpgradeInfo(data);
             ctx.fillStyle = Colors.ACCENT;
             ctx.fillText(upgradeInfo, x + padding, statsLineY);
+        } else if (data.preview) {
+            ctx.fillStyle = Colors.PRIMARY;
+            ctx.fillText(data.preview, x + padding, statsLineY);
         } else if (data.stats) {
             let statsText = [];
             if (data.stats.damage) statsText.push(`DMG: ${data.stats.damage}`);

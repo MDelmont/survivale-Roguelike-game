@@ -100,6 +100,9 @@ Configurations des attaques et bonus.
 | `id` | String | Identifiant unique. |
 | `name` | String | Nom affiché. |
 | `type` | String | `"attack"` (projectile), `"defense"` (orbital), `"aoe"` (aura). |
+| `description` | String | Description courte affichée sur la carte. |
+| `category` | String | Catégorie visuelle (ex: `projectile`, `aura`, `poison`). |
+| `preview` | String | Résumé court des stats (ex: `PV: +10`). |
 | `stats.damage` | Number | Dégâts infligés. |
 | `stats.fireRate` | Number | Cadence de tir (en ms). Plus bas = plus rapide. |
 | `stats.projectileSpeed`| Number| Vitesse de la balle. |
@@ -111,6 +114,9 @@ Configurations des attaques et bonus.
 | `stats.radius` | Number | Rayon (pour orbital). |
 | `stats.range` | Number | Portée (pour aura). |
 | `visuals` | Object | Bloc visuel de l'arme/projectile. |
+| `upgrades[].name` | String | Nom de l'amélioration. |
+| `upgrades[].preview`| String | **Texte affiché sur le badge d'upgrade** (ex: `Dégâts +20%`). |
+| `upgrades[].stats` | Object | Stats modifiées par l'upgrade. |
 
 ---
 

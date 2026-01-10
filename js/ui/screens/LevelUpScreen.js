@@ -274,6 +274,8 @@ export class LevelUpScreen {
     }
 
     getStatDisplay(opt) {
+        if (opt.preview) return opt.preview;
+
         if (opt.multiplier) {
             const percent = Math.round((opt.multiplier - 1) * 100);
             const sign = percent > 0 ? '+' : '';

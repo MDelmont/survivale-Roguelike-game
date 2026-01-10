@@ -109,8 +109,8 @@ class WeaponsModule {
             .filter(w => {
                 if (!this.searchQuery) return true;
                 const query = this.searchQuery.toLowerCase();
-                return w.id.toLowerCase().includes(query) || 
-                       (w.name && w.name.toLowerCase().includes(query));
+                return w.id.toLowerCase().includes(query) ||
+                    (w.name && w.name.toLowerCase().includes(query));
             });
 
         for (const weapon of filteredEntries) {
@@ -119,7 +119,7 @@ class WeaponsModule {
             item.dataset.index = weapon.originalIndex;
 
             const icon = weapon.type === 'attack' ? '🔫' : (weapon.type === 'defense' ? '🛡️' : '🌀');
-            
+
             item.innerHTML = `
                 <div class="list-item-icon" style="font-size: 1.5rem;">
                     ${icon}
@@ -187,6 +187,20 @@ class WeaponsModule {
                                 <option value="defense" ${w.type === 'defense' ? 'selected' : ''}>Défense (Orbite)</option>
                                 <option value="aoe" ${w.type === 'aoe' ? 'selected' : ''}>AOE (Aura)</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 2;">
+                            <label class="form-label">Description (affichée sur la carte)</label>
+                            <input type="text" class="form-input" id="weaponDescription" value="${w.description || ''}" placeholder="Ex: Tire des projectiles rapides...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Catégorie</label>
+                            <input type="text" class="form-input" id="weaponCategory" value="${w.category || ''}" placeholder="Ex: projectile, aura...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preview Stat (Badge)</label>
+                            <input type="text" class="form-input" id="weaponPreview" value="${w.preview || ''}" placeholder="Ex: Dégâts: 20">
                         </div>
                     </div>
                 </div>
@@ -296,7 +310,7 @@ class WeaponsModule {
      */
     renderStatsForm(w) {
         const s = w.stats || {};
-        
+
         let fields = `
             <div class="form-row">
                 <div class="form-group">
@@ -412,9 +426,14 @@ class WeaponsModule {
             <div class="upgrade-item" data-index="${idx}">
                 <div class="upgrade-header">
                     <div class="form-group" style="flex: 1; margin: 0;">
-                        <input type="text" class="form-input upg-name-input" placeholder="Nom de l'upgrade" value="${upg.name || ''}">
+                        <label class="form-label-xs">Nom de l'amélioration</label>
+                        <input type="text" class="form-input upg-name-input" placeholder="Ex: Tir Rapide" value="${upg.name || ''}">
                     </div>
-                    <button class="btn btn-sm btn-danger remove-upgrade-btn" data-index="${idx}">×</button>
+                    <div class="form-group" style="flex: 1; margin: 0;">
+                        <label class="form-label-xs">Texte Preview (Badge)</label>
+                        <input type="text" class="form-input upg-preview-input" placeholder="Ex: Cadence +20%" value="${upg.preview || ''}">
+                    </div>
+                    <button class="btn btn-sm btn-danger remove-upgrade-btn" data-index="${idx}" style="align-self: flex-end;">×</button>
                 </div>
                 <div class="upgrade-stats-grid">
                     ${this.renderUpgradeStats(upg.stats)}
@@ -431,7 +450,7 @@ class WeaponsModule {
 
     renderUpgradeStats(stats) {
         if (!stats || Object.keys(stats).length === 0) return '';
-        
+
         return Object.entries(stats).map(([key, val]) => `
             <div class="upg-stat-row" data-stat="${key}">
                 <label>${key}</label>
@@ -448,7 +467,7 @@ class WeaponsModule {
     getAvailableStatsOptions() {
         const stats = [
             'damage', 'fireRate', 'projectileSpeed', 'projectileCount', 'piercingCount',
-            'radius', 'orbitSpeed', 'range', 'slowMultiplier', 'isPoisonous', 
+            'radius', 'orbitSpeed', 'range', 'slowMultiplier', 'isPoisonous',
             'poisonDamage', 'poisonDuration', 'poisonTickRate', 'isSlowing',
             'auraRotationSpeed', 'auraPulseAlpha', 'auraPulseSize', 'auraAlphaSpeed',
             'auraAlphaMin', 'auraAlphaMax'
@@ -496,7 +515,7 @@ class WeaponsModule {
 
         // Upgrades
         document.getElementById('addUpgradeBtn')?.addEventListener('click', () => this.addUpgrade());
-        
+
         editor.querySelectorAll('.remove-upgrade-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.removeUpgrade(parseInt(e.target.dataset.index)));
         });
@@ -520,7 +539,7 @@ class WeaponsModule {
         // Actions globales
         document.getElementById('saveWeaponBtn')?.addEventListener('click', () => this.saveWeapon());
         document.getElementById('deleteWeaponBtn')?.addEventListener('click', () => this.deleteWeapon());
-        
+
         // JSON toggle
         document.getElementById('toggleJsonBtn')?.addEventListener('click', (e) => {
             const content = document.getElementById('weaponJsonPreview');
@@ -544,6 +563,9 @@ class WeaponsModule {
         w.id = document.getElementById('weaponId').value;
         w.name = document.getElementById('weaponName').value;
         w.type = document.getElementById('weaponType').value;
+        w.description = document.getElementById('weaponDescription').value;
+        w.category = document.getElementById('weaponCategory').value;
+        w.preview = document.getElementById('weaponPreview').value;
 
         // Stats
         if (!w.stats) w.stats = {};
@@ -564,12 +586,12 @@ class WeaponsModule {
         const vHeight = document.getElementById('weaponVisualHeight').value;
         if (vHeight) w.visuals.height = parseInt(vHeight);
         else delete w.visuals.height;
-        
+
         const dirMode = document.getElementById('weaponDirMode').value;
         w.visuals.directionMode = dirMode;
         w.visuals.rotateWithVelocity = (dirMode === 'rotate'); // Backward compatibility
         w.visuals.angleOffset = parseInt(document.getElementById('weaponVisualAngleOffset').value) || 0;
-        
+
         // AOE Specific
         if (w.type === 'aoe') {
             w.visuals.auraRotationSpeed = parseFloat(document.getElementById('auraRotationSpeed').value) || 0;
@@ -599,6 +621,7 @@ class WeaponsModule {
         const upgradeItems = document.querySelectorAll('.upgrade-item');
         w.upgrades = Array.from(upgradeItems).map(item => {
             const name = item.querySelector('.upg-name-input').value;
+            const preview = item.querySelector('.upg-preview-input').value;
             const stats = {};
             item.querySelectorAll('.upg-stat-row').forEach(row => {
                 const key = row.dataset.stat;
@@ -609,7 +632,7 @@ class WeaponsModule {
                     stats[key] = input.value.includes('.') ? parseFloat(input.value) : parseInt(input.value);
                 }
             });
-            return { name, stats };
+            return { name, preview, stats };
         });
 
         this.updateJsonPreview();
@@ -716,7 +739,7 @@ class WeaponsModule {
         this.app.gameData.weapons.push(newWeapon);
         this.currentWeaponIndex = this.app.gameData.weapons.length - 1;
         this.currentWeapon = JSON.parse(JSON.stringify(newWeapon));
-        
+
         this.loadWeaponsList();
         this.selectWeapon(this.currentWeaponIndex);
         this.app.showNotification('Nouvelle arme créée', 'success');
@@ -744,7 +767,7 @@ class WeaponsModule {
                     <h3 class="empty-state-title">Arme supprimée</h3>
                 </div>
             `;
-            
+
             this.app.showNotification('Arme supprimée', 'info');
         } catch (error) {
             console.error('Erreur suppression:', error);
@@ -764,7 +787,7 @@ class WeaponsModule {
 
             this.app.showNotification('Arme sauvegardée avec succès', 'success');
             await this.loadWeaponsList();
-            
+
             // Mettre à jour les stats du hub
             this.app.updateStats();
 
