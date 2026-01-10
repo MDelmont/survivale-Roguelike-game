@@ -247,6 +247,12 @@ class PhasesModule {
                             ${this.renderChips(weapons, p.available_weapons || [], 'weapon')}
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Améliorations disponibles (Level Up)</label>
+                        <div class="chips-container" id="availableUpgradesChips">
+                            ${this.renderChips(this.app.gameData.upgrades || [], p.available_upgrades || [], 'upgrade')}
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-section">
@@ -498,6 +504,9 @@ class PhasesModule {
             .map(c => c.dataset.id);
 
         p.available_weapons = Array.from(document.querySelectorAll('.chip[data-type="weapon"].active'))
+            .map(c => c.dataset.id);
+
+        p.available_upgrades = Array.from(document.querySelectorAll('.chip[data-type="upgrade"].active'))
             .map(c => c.dataset.id);
 
         p.transition_intro_id = document.getElementById('phaseTransitionIntro').value;

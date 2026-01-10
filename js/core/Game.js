@@ -43,7 +43,7 @@ class Game {
         this.fpsTimer = 0;
 
         this.input = new Input();
-        this.upgradeSystem = new UpgradeSystem();
+        this.upgradeSystem = new UpgradeSystem(this);
         this.saveSystem = new SaveSystem();
         this.dataManager = new DataManager();
 
@@ -91,6 +91,9 @@ class Game {
         window.addEventListener('resize', () => this.handleResize());
         const success = await this.dataManager.loadAll();
         if (!success) return;
+
+        // Initialize Systems with dynamic data
+        this.upgradeSystem.init(this.dataManager.data.upgrades?.upgrades);
 
         // Initialize UI Screens
         this.mainMenu = new MainMenu(this);

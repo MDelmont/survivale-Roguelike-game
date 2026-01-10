@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Survivale Creator - Éditeur de Jeu</title>
     <meta name="description" content="Outil de création et de gestion des données JSON pour Survivale Roguelike">
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
     <!-- Styles -->
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/components.css">
     <link rel="stylesheet" href="styles/animations.css">
     <link rel="stylesheet" href="styles/editor.css">
 </head>
+
 <body>
     <!-- Header -->
     <header class="app-header">
@@ -115,6 +119,12 @@
                     <p class="card-desc">Construire les niveaux</p>
                     <span class="card-count" id="cardPhases">-</span>
                 </div>
+                <div class="module-card disabled" data-module="upgrades">
+                    <div class="card-icon">⚡</div>
+                    <h3 class="card-title">Améliorations</h3>
+                    <p class="card-desc">Gérer les bonus de stats</p>
+                    <span class="card-count" id="cardUpgrades">-</span>
+                </div>
                 <div class="module-card disabled" data-module="transitions">
                     <div class="card-icon">📖</div>
                     <h3 class="card-title">Transitions</h3>
@@ -197,6 +207,11 @@
             </div>
         </section>
 
+        <!-- Upgrades Section -->
+        <section class="section" id="upgradesSection">
+            <!-- Contenu généré par UpgradesModule.js -->
+        </section>
+
         <!-- Transitions Section -->
         <section class="section" id="transitionsSection">
             <!-- Contenu généré par TransitionsModule.js -->
@@ -214,7 +229,9 @@
     <script src="scripts/modules/bosses.js"></script>
     <script src="scripts/modules/weapons.js"></script>
     <script src="scripts/modules/phases.js"></script>
+    <script src="scripts/modules/upgrades.js"></script>
     <script src="scripts/modules/transitions.js"></script>
     <script src="scripts/app.js"></script>
 </body>
+
 </html>

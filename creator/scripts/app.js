@@ -7,7 +7,7 @@ class App {
         this.assetScanner = new AssetScanner(this.fileManager);
         this.currentSection = 'hub';
         this.gameData = null;
-        
+
         // Modules
         this.modules = {
             players: null,
@@ -15,6 +15,7 @@ class App {
             bosses: null,
             weapons: null,
             phases: null,
+            upgrades: null,
             transitions: null
         };
 
@@ -83,7 +84,7 @@ class App {
     async handleConnect() {
         const connectBtn = document.getElementById('connectBtn');
         const originalText = connectBtn.innerHTML;
-        
+
         try {
             connectBtn.innerHTML = '<span class="spinner spinner-sm"></span> Connexion...';
             connectBtn.disabled = true;
@@ -166,6 +167,7 @@ class App {
             bosses: Object.keys(this.gameData.bosses).length,
             weapons: this.gameData.weapons.length,
             phases: this.gameData.phases.length,
+            upgrades: this.gameData.upgrades.length,
             assets: this.assetScanner.getAssetCount()
         };
 
@@ -183,6 +185,8 @@ class App {
         document.getElementById('cardBosses').textContent = stats.bosses;
         document.getElementById('cardWeapons').textContent = stats.weapons;
         document.getElementById('cardPhases').textContent = stats.phases;
+        const upgradeCard = document.getElementById('cardUpgrades');
+        if (upgradeCard) upgradeCard.textContent = stats.upgrades;
         document.getElementById('cardTransitions').textContent = this.gameData.transitions.length || '0';
     }
 
@@ -205,7 +209,7 @@ class App {
         if (!assetsSection || !assetsGrid) return;
 
         const allAssets = this.assetScanner.getAllAssets();
-        
+
         if (allAssets.length === 0) {
             assetsSection.style.display = 'none';
             return;
@@ -264,18 +268,18 @@ class App {
                 btn.classList.add('active');
             }
         });
-        
+
         // Initialiser le module correspondant
         this.initModule(sectionId);
     }
-    
+
     /**
      * Initialise un module si nécessaire
      */
     initModule(moduleId) {
         if (!this.gameData) return;
-        
-        switch(moduleId) {
+
+        switch (moduleId) {
             case 'players':
                 if (!this.modules.players) {
                     this.modules.players = new PlayersModule(this);
@@ -306,6 +310,12 @@ class App {
                 }
                 this.modules.phases.init();
                 break;
+            case 'upgrades':
+                if (!this.modules.upgrades) {
+                    this.modules.upgrades = new UpgradesModule(this);
+                }
+                this.modules.upgrades.init();
+                break;
             case 'transitions':
                 if (!this.modules.transitions) {
                     this.modules.transitions = new TransitionsModule(this);
@@ -324,7 +334,7 @@ class App {
 
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
-        
+
         const icons = {
             success: '✓',
             error: '✕',

@@ -142,6 +142,9 @@ class FileManager {
         const phasesData = await this.readJSON('phases.json');
         data.phases = phasesData?.phases || [];
 
+        const upgradesData = await this.readJSON('upgrades.json');
+        data.upgrades = upgradesData?.upgrades || [];
+
         const transitionsData = await this.readJSON('transitions.json');
         data.transitions = transitionsData?.transitions || [];
 

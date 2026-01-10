@@ -13,6 +13,7 @@ export class DataManager {
             phases: null,
             weapons: null,
             bosses: null,
+            upgrades: null,
             transitions: null
         };
     }
@@ -22,12 +23,13 @@ export class DataManager {
      */
     async loadAll() {
         try {
-            const [playerRes, enemiesRes, phasesRes, weaponsRes, bossesRes, transitionsRes] = await Promise.all([
+            const [playerRes, enemiesRes, phasesRes, weaponsRes, bossesRes, upgradesRes, transitionsRes] = await Promise.all([
                 fetch('./data/player.json'),
                 fetch('./data/enemies.json'),
                 fetch('./data/phases.json'),
                 fetch('./data/weapons.json'),
                 fetch('./data/bosses.json'),
+                fetch('./data/upgrades.json'),
                 fetch('./data/transitions.json')
             ]);
 
@@ -36,6 +38,7 @@ export class DataManager {
             this.data.phases = await phasesRes.json();
             this.data.weapons = await weaponsRes.json();
             this.data.bosses = await bossesRes.json();
+            this.data.upgrades = await upgradesRes.json();
             this.data.transitions = await transitionsRes.json();
 
             // Parcourir les données pour trouver et charger tous les assets visuels

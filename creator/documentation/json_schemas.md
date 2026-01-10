@@ -132,9 +132,13 @@ Structure du déroulement d'un niveau.
 | `enemy_types` | Array | Liste des IDs d'ennemis présents. |
 | `player_id` | String | ID du joueur à utiliser (configuré dans `player.json`). |
 | `boss_id` | String | ID du boss final. |
+| `available_weapons` | Array | Liste des IDs d'armes disponibles en loot. |
+| `available_upgrades` | Array | Liste des IDs d'améliorations disponibles au level up. |
+| `transition_intro_id` | String | ID de la transition affichée avant la phase. |
+| `transition_outro_id` | String | ID de la transition affichée après la phase. |
 | `background_image`| String | Chemin de l'image de fond de la phase. |
-| `story_intro` | Array | Liste de pages de texte affichées **avant** le début de la phase. |
-| `story_outro` | Array | Liste de pages de texte affichées **après** la victoire (mort du boss). |
+| `story_intro` | Array | [DEPRECATED] Utiliser `transition_intro_id`. |
+| `story_outro` | Array | [DEPRECATED] Utiliser `transition_outro_id`. |
 
 ### Structure d'une page d'histoire :
 ```json

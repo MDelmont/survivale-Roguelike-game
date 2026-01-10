@@ -3,81 +3,37 @@
  * Gère la génération et l'application des améliorations de statistiques du joueur.
  */
 export class UpgradeSystem {
-    constructor() {
-        // Liste des upgrades de statistiques de base
-        this.availableUpgrades = [
-            {
-                id: 'speed_boost',
-                name: 'Chaussures de Sport',
-                description: 'Augmente la vitesse de déplacement de 15%.',
-                type: 'stat',
-                stat: 'speed',
-                multiplier: 1.15
-            },
-            {
-                id: 'damage_boost',
-                name: 'Force de la Nature',
-                description: 'Augmente les dégâts globaux de 20%.',
-                type: 'stat',
-                stat: 'damage',
-                multiplier: 1.2
-            },
-            {
-                id: 'fire_rate_boost',
-                name: 'Caféine',
-                description: 'Tire 15% plus vite (toutes armes).',
-                type: 'stat',
-                stat: 'fireRate',
-                multiplier: 0.85
-            },
-            {
-                id: 'max_hp_boost',
-                name: 'Gros Coeur',
-                description: 'Augmente les HP max de 20.',
-                type: 'stat',
-                stat: 'maxHp',
-                add: 20
-            },
-            {
-                id: 'pickup_range_boost',
-                name: 'Aimant',
-                description: 'Augmente la portée de collecte de 30%.',
-                type: 'stat',
-                stat: 'pickupRadius',
-                multiplier: 1.3
-            },
-            {
-                id: 'projectile_boost',
-                name: 'Munitions Doubles',
-                description: 'Ajoute +1 projectile à toutes vos armes de tir.',
-                type: 'stat',
-                stat: 'projectileBonus',
-                add: 1
-            },
-            {
-                id: 'aura_range_boost',
-                name: 'Amplificateur',
-                description: 'Augmente la portée de vos auras de 20%.',
-                type: 'stat',
-                stat: 'rangeMultiplier',
-                multiplier: 1.2
-            },
-            {
-                id: 'piercing_boost',
-                name: 'Munitions Perçantes',
-                description: 'Toutes vos balles traversent +1 ennemi supplémentaire.',
-                type: 'stat',
-                stat: 'piercingBonus',
-                add: 1
-            }
-        ];
+    constructor(game) {
+        this.game = game;
+        // Liste des upgrades de statistiques de base (chargée dynamiquement)
+        this.availableUpgrades = [];
+    }
+
+    /**
+     * Initialise les upgrades à partir des données JSON
+     */
+    init(data) {
+        this.availableUpgrades = data || [];
+        console.log(`Système d'améliorations prêt (${this.availableUpgrades.length} options)`);
     }
 
     /**
      * Retourne X options aléatoires pour les statistiques.
+     * Filtre les options en fonction de la phase actuelle si configuré.
      */
     getRandomOptions(count = 3) {
-        const shuffled = [...this.availableUpgrades].sort(() => 0.5 - Math.random());
+        let pool = this.availableUpgrades;
+
+        // Filtrer par phase si la liste est définie
+        const phaseUpgrades = this.game.currentPhase?.available_upgrades;
+        if (phaseUpgrades && phaseUpgrades.length > 0) {
+            pool = this.availableUpgrades.filter(u => phaseUpgrades.includes(u.id));
+        }
+
+        // Si le pool est vide après filtrage (erreur config), on revient au pool complet
+        if (pool.length === 0) pool = this.availableUpgrades;
+
+        const shuffled = [...pool].sort(() => 0.5 - Math.random());
         return shuffled.slice(0, count);
     }
 

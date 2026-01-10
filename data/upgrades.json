@@ -1,0 +1,68 @@
+{
+    "upgrades": [
+        {
+            "id": "speed_boost",
+            "name": "bbbbbbbb",
+            "description": "Augmente la vitesse de déplacement de 15%.",
+            "type": "stat",
+            "stat": "speed",
+            "multiplier": 1.14
+        },
+        {
+            "id": "damage_boost",
+            "name": "aaaaaa",
+            "description": "Augmente les dégâts globaux de 20%.",
+            "type": "stat",
+            "stat": "damage",
+            "multiplier": 1.2
+        },
+        {
+            "id": "fire_rate_boost",
+            "name": "Caféine",
+            "description": "Tire 15% plus vite (toutes armes).",
+            "type": "stat",
+            "stat": "fireRate",
+            "multiplier": 0.85
+        },
+        {
+            "id": "max_hp_boost",
+            "name": "Gros Coeur",
+            "description": "Augmente les HP max de 20.",
+            "type": "stat",
+            "stat": "maxHp",
+            "add": 20
+        },
+        {
+            "id": "pickup_range_boost",
+            "name": "Aimant",
+            "description": "Augmente la portée de collecte de 30%.",
+            "type": "stat",
+            "stat": "pickupRadius",
+            "multiplier": 1.3
+        },
+        {
+            "id": "projectile_boost",
+            "name": "Munitions Doubles",
+            "description": "Ajoute +1 projectile à toutes vos armes de tir.",
+            "type": "stat",
+            "stat": "projectileBonus",
+            "add": 1
+        },
+        {
+            "id": "aura_range_boost",
+            "name": "Amplificateur",
+            "description": "Augmente la portée de vos auras de 20%.",
+            "type": "stat",
+            "stat": "rangeMultiplier",
+            "multiplier": 1.2
+        },
+        {
+            "id": "piercing_boost",
+            "name": "Munitions Perçantes",
+            "description": "Toutes vos balles traversent +1 ennemi supplémentaire.",
+            "type": "stat",
+            "stat": "piercingBonus",
+            "add": 1
+        }
+    ]
+}
