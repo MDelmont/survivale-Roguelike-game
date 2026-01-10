@@ -58,24 +58,30 @@ export class DataManager {
      */
     preloadVisuals() {
         // Charger explicitement les images de fond et de story des phases
-        if (this.data.phases && this.data.phases.phases) {
-            this.data.phases.phases.forEach(phase => {
-                if (phase.background_image) {
-                    this.assetManager.loadImage(phase.background_image);
-                }
-                if (phase.xp_visual) {
-                    this.assetManager.loadImage(phase.xp_visual);
-                }
-                if (phase.weapon_visual) {
-                    this.assetManager.loadImage(phase.weapon_visual);
-                }
-                if (phase.story_intro) {
-                    phase.story_intro.forEach(p => p.image && this.assetManager.loadImage(p.image));
-                }
-                if (phase.story_outro) {
-                    phase.story_outro.forEach(p => p.image && this.assetManager.loadImage(p.image));
-                }
-            });
+        if (this.data.phases) {
+            if (this.data.phases.menu_background) {
+                this.assetManager.loadImage(this.data.phases.menu_background);
+            }
+
+            if (this.data.phases.phases) {
+                this.data.phases.phases.forEach(phase => {
+                    if (phase.background_image) {
+                        this.assetManager.loadImage(phase.background_image);
+                    }
+                    if (phase.xp_visual) {
+                        this.assetManager.loadImage(phase.xp_visual);
+                    }
+                    if (phase.weapon_visual) {
+                        this.assetManager.loadImage(phase.weapon_visual);
+                    }
+                    if (phase.story_intro) {
+                        phase.story_intro.forEach(p => p.image && this.assetManager.loadImage(p.image));
+                    }
+                    if (phase.story_outro) {
+                        phase.story_outro.forEach(p => p.image && this.assetManager.loadImage(p.image));
+                    }
+                });
+            }
         }
 
         // Charger les images des transitions

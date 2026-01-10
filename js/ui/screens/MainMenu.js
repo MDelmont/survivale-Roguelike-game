@@ -114,8 +114,8 @@ export class MainMenu {
     }
 
     drawBackground(ctx, w, h) {
-        // Check for menu background in phase config or use default
-        const bgImage = this.game.currentPhase?.menu_background;
+        // Check for menu background in phase config or use global default from phases.json
+        const bgImage = this.game.currentPhase?.menu_background || this.game.dataManager.data.phases?.menu_background;
 
         if (bgImage && this.game.dataManager.assetManager.isLoaded(bgImage)) {
             const img = this.game.dataManager.assetManager.getImage(bgImage);

@@ -16,7 +16,8 @@ class App {
             weapons: null,
             phases: null,
             upgrades: null,
-            transitions: null
+            transitions: null,
+            config: null
         };
 
         this.init();
@@ -180,14 +181,26 @@ class App {
         document.getElementById('statAssets').textContent = stats.assets;
 
         // Cards
-        document.getElementById('cardPlayers').textContent = stats.players;
-        document.getElementById('cardEnemies').textContent = stats.enemies;
-        document.getElementById('cardBosses').textContent = stats.bosses;
-        document.getElementById('cardWeapons').textContent = stats.weapons;
-        document.getElementById('cardPhases').textContent = stats.phases;
-        const upgradeCard = document.getElementById('cardUpgrades');
-        if (upgradeCard) upgradeCard.textContent = stats.upgrades;
-        document.getElementById('cardTransitions').textContent = this.gameData.transitions.length || '0';
+        const cardPlayers = document.getElementById('cardPlayers');
+        if (cardPlayers) cardPlayers.textContent = stats.players;
+
+        const cardEnemies = document.getElementById('cardEnemies');
+        if (cardEnemies) cardEnemies.textContent = stats.enemies;
+
+        const cardBosses = document.getElementById('cardBosses');
+        if (cardBosses) cardBosses.textContent = stats.bosses;
+
+        const cardWeapons = document.getElementById('cardWeapons');
+        if (cardWeapons) cardWeapons.textContent = stats.weapons;
+
+        const cardPhases = document.getElementById('cardPhases');
+        if (cardPhases) cardPhases.textContent = stats.phases;
+
+        const cardUpgrades = document.getElementById('cardUpgrades');
+        if (cardUpgrades) cardUpgrades.textContent = stats.upgrades;
+
+        const cardTransitions = document.getElementById('cardTransitions');
+        if (cardTransitions) cardTransitions.textContent = this.gameData.transitions?.length || '0';
     }
 
     /**
@@ -321,6 +334,12 @@ class App {
                     this.modules.transitions = new TransitionsModule(this);
                 }
                 this.modules.transitions.init();
+                break;
+            case 'config':
+                if (!this.modules.config) {
+                    this.modules.config = new ConfigModule(this);
+                }
+                this.modules.config.init();
                 break;
         }
     }

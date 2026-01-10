@@ -139,8 +139,9 @@ class FileManager {
         const weaponsData = await this.readJSON('weapons.json');
         data.weapons = weaponsData?.weapons || [];
 
-        const phasesData = await this.readJSON('phases.json');
-        data.phases = phasesData?.phases || [];
+        const phasesData = await this.readJSON('phases.json') || { phases: [] };
+        data.phases = phasesData.phases || [];
+        data.phasesFull = phasesData; // Keep all fields (like menu_background)
 
         const upgradesData = await this.readJSON('upgrades.json');
         data.upgrades = upgradesData?.upgrades || [];

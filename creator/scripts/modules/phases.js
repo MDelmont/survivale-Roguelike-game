@@ -608,7 +608,9 @@ class PhasesModule {
             this.currentPhase = null;
             this.currentPhaseIndex = null;
 
-            await this.app.fileManager.writeJSON('phases.json', { phases: this.app.gameData.phases });
+            // Update the phases list in the full object
+            this.app.gameData.phasesFull.phases = this.app.gameData.phases;
+            await this.app.fileManager.writeJSON('phases.json', this.app.gameData.phasesFull);
             await this.loadPhasesList();
             this.app.updateStats();
 
@@ -630,7 +632,9 @@ class PhasesModule {
 
         try {
             this.app.gameData.phases[this.currentPhaseIndex] = JSON.parse(JSON.stringify(this.currentPhase));
-            await this.app.fileManager.writeJSON('phases.json', { phases: this.app.gameData.phases });
+            // Update the phases list in the full object
+            this.app.gameData.phasesFull.phases = this.app.gameData.phases;
+            await this.app.fileManager.writeJSON('phases.json', this.app.gameData.phasesFull);
 
             this.app.showNotification('Phase sauvegardée avec succès', 'success');
             await this.loadPhasesList();
