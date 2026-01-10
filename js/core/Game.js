@@ -134,10 +134,10 @@ class Game {
     handleResize() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        
+
         // Calcul du scale basé sur la largeur de référence
         this.scale = window.innerWidth / this.baseWidth;
-        
+
         // Mise à jour des dimensions logiques (l'espace de jeu interne)
         this.logicalWidth = this.baseWidth;
         this.logicalHeight = window.innerHeight / this.scale;
@@ -153,11 +153,11 @@ class Game {
             const btnW = 250;
             const btnH = 60;
             const centerX = this.logicalWidth / 2;
-            
+
             // Check Nouvelle Partie
             const npY = this.logicalHeight / 2 + 50;
-            if (mouseX >= centerX - btnW/2 && mouseX <= centerX + btnW/2 &&
-                mouseY >= npY - btnH/2 && mouseY <= npY + btnH/2) {
+            if (mouseX >= centerX - btnW / 2 && mouseX <= centerX + btnW / 2 &&
+                mouseY >= npY - btnH / 2 && mouseY <= npY + btnH / 2) {
                 this.startNewGame();
                 return;
             }
@@ -165,8 +165,8 @@ class Game {
             // Check Continuer
             if (this.saveSystem.getProgress() > 0) {
                 const cY = this.logicalHeight / 2 + 130;
-                if (mouseX >= centerX - btnW/2 && mouseX <= centerX + btnW/2 &&
-                    mouseY >= cY - btnH/2 && mouseY <= cY + btnH/2) {
+                if (mouseX >= centerX - btnW / 2 && mouseX <= centerX + btnW / 2 &&
+                    mouseY >= cY - btnH / 2 && mouseY <= cY + btnH / 2) {
                     this.continueGame();
                     return;
                 }
@@ -267,22 +267,22 @@ class Game {
             const types = phase.enemy_types;
             const diffMult = phase.difficulty_multiplier || 1.0;
             const baseGrowth = phase.threat_growth_rate || 5.0;
-            
+
             const phaseProgress = Math.min(1.0, this.phaseTimer / (phase.duration_before_boss || 60));
             const progressionBonus = baseGrowth * phaseProgress;
             const levelBonus = (this.player.stats.level - 1) * 2;
             const weaponBonus = (this.player.weapons.length - 1) * 5;
-            
+
             const totalGrowthPerSec = (baseGrowth + progressionBonus + levelBonus + weaponBonus) * diffMult;
             this.lastThreatGrowth = Math.round(totalGrowthPerSec * 10) / 10;
 
             // On divise le gain total équitablement entre toutes les jauges actives
             const growthPerType = (totalGrowthPerSec * (deltaTime / 1000)) / types.length;
-            
+
             types.forEach(type => {
                 if (!this.threatBudgets[type]) this.threatBudgets[type] = 0;
                 this.threatBudgets[type] += growthPerType;
-                
+
                 // Cap de sécurité pour éviter l'accumulation infinie si on ne spawn pas
                 const enemyData = this.dataManager.getEnemyData(type);
                 const cost = enemyData?.threatLevel || 10;
@@ -382,8 +382,8 @@ class Game {
         if (this.boss) {
             this.boss.update(deltaTime, this.player, (x, y, dx, dy, stats) => this.spawnEnemyProjectile(x, y, dx, dy, stats));
             if (this.player && CombatSystem.checkCollision(this.player, this.boss)) this.player.takeDamage(this.boss.damage * (deltaTime / 1000));
-            if (this.boss.hp <= 0) { 
-                this.killCount++; 
+            if (this.boss.hp <= 0) {
+                this.killCount++;
                 this.boss = null;
                 this.handlePhaseWin();
             }
@@ -450,7 +450,7 @@ class Game {
         const bossStats = this.dataManager.getBossData(bossId);
         if (bossStats) {
             this.boss = new Boss(this.logicalWidth / 2, -100, bossStats, this.dataManager.assetManager);
-            
+
             // Équiper l'arme si présente sur le boss
             if (bossStats.weapon_id) {
                 const weaponData = this.dataManager.data.weapons.weapons.find(w => w.id === bossStats.weapon_id);
@@ -467,9 +467,9 @@ class Game {
         Object.keys(this.threatBudgets).forEach(type => {
             const enemyData = this.dataManager.getEnemyData(type);
             if (!enemyData) return;
-            
+
             const cost = enemyData.threatLevel || 10;
-            
+
             // On peut faire spawner plusieurs fois si on a accumulé beaucoup (ex: petits mobs)
             // Limité à 5 pour la performance
             let count = 0;
@@ -488,9 +488,9 @@ class Game {
         else if (side === 1) { x = Math.random() * this.logicalWidth; y = this.logicalHeight + 50; }
         else if (side === 2) { x = -50; y = Math.random() * this.logicalHeight; }
         else { x = this.logicalWidth + 50; y = Math.random() * this.logicalHeight; }
-        
+
         const enemy = new Enemy(x, y, enemyData, this.dataManager.assetManager);
-        
+
         // Équiper l'arme si présente
         if (enemyData.weapon_id) {
             const weaponData = this.dataManager.data.weapons.weapons.find(w => w.id === enemyData.weapon_id);
@@ -501,14 +501,14 @@ class Game {
                 }
             }
         }
-        
+
         this.enemies.push(enemy);
     }
 
-    spawnLoot(x, y, v, t) { 
+    spawnLoot(x, y, v, t) {
         let visuals = null;
         const path = (t === 'xp') ? this.currentPhase.xp_visual : this.currentPhase.weapon_visual;
-        
+
         if (path) {
             const size = (t === 'xp') ? (this.currentPhase.xp_size || 20) : (this.currentPhase.weapon_size || 30);
             visuals = {
@@ -523,18 +523,18 @@ class Game {
                 }
             };
         }
-        
+
         const loot = new Loot(x, y, v, t, this.dataManager.assetManager, visuals);
         // On ajuste le rayon de la hitbox en fonction de la taille visuelle personnalisée
         if (visuals) {
             loot.radius = visuals.width / 2;
         }
-        this.loots.push(loot); 
+        this.loots.push(loot);
     }
     spawnProjectile(x, y, dx, dy, s) { this.projectiles.push(new Projectile(x, y, dx, dy, s, this.dataManager.assetManager)); }
-    spawnEnemyProjectile(x, y, dx, dy, s = null) { 
+    spawnEnemyProjectile(x, y, dx, dy, s = null) {
         const stats = s || { projectileSpeed: 200, damage: 10, color: '#f0f' };
-        this.enemyProjectiles.push(new Projectile(x, y, dx, dy, stats, this.dataManager.assetManager)); 
+        this.enemyProjectiles.push(new Projectile(x, y, dx, dy, stats, this.dataManager.assetManager));
     }
 
     draw() {
@@ -582,15 +582,13 @@ class Game {
             this.drawUI();
         }
 
-        this.input.draw(this.ctx);
-
-        if (this.state === GameState.STORY) this.drawStory();
-        if (this.state === GameState.UPGRADE) this.drawChoiceMenu('AMÉLIORATION DISPONIBLE', '#fbbf24', 80);
-        if (this.state === GameState.WEAPON_MENU) this.drawChoiceMenu('NOUVELLE ARME', '#3b82f6', 100);
         if (this.state === GameState.VICTORY) this.drawEndScreen('VICTOIRE !', '#0f0');
         if (this.state === GameState.GAMEOVER) this.drawEndScreen('GAME OVER', '#f00');
 
         this.ctx.restore();
+
+        // Le joystick utilise les coordonnées écran brutes, donc on le dessine hors du scale
+        this.input.draw(this.ctx);
     }
 
     drawStory() {
