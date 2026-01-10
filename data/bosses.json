@@ -2,7 +2,7 @@
     "bosses": {
         "ovule_geant": {
             "name": "L'Ovule Géant",
-            "hp": 2000,
+            "hp": 5000,
             "speed": 50,
             "damage": 20,
             "fireRate": 1500,
@@ -41,7 +41,8 @@
                     }
                 },
                 "path": "assets/projectiles/capotes.png",
-                "angleOffset": 180
+                "angleOffset": 180,
+                "height": 16
             },
             "weapon_id": ""
         }

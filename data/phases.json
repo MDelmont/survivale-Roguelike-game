@@ -3,7 +3,7 @@
         {
             "id": 1,
             "name": "La Conception",
-            "duration_before_boss": 45,
+            "duration_before_boss": 60,
             "enemy_types": [
                 "basic_cell",
                 "fast_cell",
@@ -32,7 +32,8 @@
             "difficulty_multiplier": 1,
             "initial_threat_budget": 20,
             "max_threat_budget": 200,
-            "threat_growth_rate": 15
+            "threat_growth_rate": 15,
+            "weapon_drop_rate": 0.04
         }
     ]
 }

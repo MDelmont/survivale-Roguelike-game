@@ -138,7 +138,7 @@ class PhasesModule {
         if (!editor || !this.currentPhase) return;
 
         const p = this.currentPhase;
-        
+
         // Données pour les dropdowns
         const players = this.app.gameData.players || {};
         const enemiesObj = this.app.gameData.enemies || {};
@@ -235,6 +235,10 @@ class PhasesModule {
                                 <option value="">-- Aucune --</option>
                                 ${weapons.map(w => `<option value="${w.id}" ${p.default_weapon === w.id ? 'selected' : ''}>${w.name || w.id}</option>`).join('')}
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Taux de Drop Arme (0-1)</label>
+                            <input type="number" step="0.01" min="0" max="1" class="form-input" id="phaseWeaponDropRate" value="${p.weapon_drop_rate !== undefined ? p.weapon_drop_rate : 0.25}">
                         </div>
                     </div>
                     <div class="form-group">
@@ -473,8 +477,10 @@ class PhasesModule {
         p.player_id = document.getElementById('phasePlayer').value;
         p.boss_id = document.getElementById('phaseBoss').value;
         p.default_weapon = document.getElementById('phaseDefaultWeapon').value;
+        p.weapon_drop_rate = parseFloat(document.getElementById('phaseWeaponDropRate').value);
+        if (isNaN(p.weapon_drop_rate)) p.weapon_drop_rate = 0.25;
         p.background_image = document.getElementById('phaseBackground').value;
-        
+
         // Difficulté
         p.difficulty_multiplier = parseFloat(document.getElementById('phaseDifficultyMultiplier').value) || 1.0;
         p.initial_threat_budget = parseInt(document.getElementById('phaseInitialThreat').value) || 20;
@@ -490,13 +496,13 @@ class PhasesModule {
         // Chips -> Arrays
         p.enemy_types = Array.from(document.querySelectorAll('.chip[data-type="enemy"].active'))
             .map(c => c.dataset.id);
-        
+
         p.available_weapons = Array.from(document.querySelectorAll('.chip[data-type="weapon"].active'))
             .map(c => c.dataset.id);
 
         p.transition_intro_id = document.getElementById('phaseTransitionIntro').value;
         p.transition_outro_id = document.getElementById('phaseTransitionOutro').value;
-        
+
         // Update edit buttons state
         const introBtn = document.querySelector('.edit-transition-btn[data-type="intro"]');
         const outroBtn = document.querySelector('.edit-transition-btn[data-type="outro"]');
@@ -546,6 +552,7 @@ class PhasesModule {
             player_id: Object.keys(this.app.gameData.players || {})[0] || '',
             spawn_rate: 1000,
             default_weapon: this.app.gameData.weapons[0]?.id || '',
+            weapon_drop_rate: 0.25,
             available_weapons: [],
             boss_id: this.app.gameData.bosses[0]?.id || '',
             background_image: '',
@@ -560,7 +567,7 @@ class PhasesModule {
         this.app.gameData.phases.push(newPhase);
         this.currentPhaseIndex = this.app.gameData.phases.length - 1;
         this.currentPhase = JSON.parse(JSON.stringify(newPhase));
-        
+
         this.loadPhasesList();
         this.selectPhase(this.currentPhaseIndex);
         this.app.showNotification('Nouvelle phase créée', 'success');
@@ -598,7 +605,7 @@ class PhasesModule {
         try {
             this.app.gameData.phases[this.currentPhaseIndex] = JSON.parse(JSON.stringify(this.currentPhase));
             await this.app.fileManager.writeJSON('phases.json', { phases: this.app.gameData.phases });
-            
+
             this.app.showNotification('Phase sauvegardée avec succès', 'success');
             await this.loadPhasesList();
             this.app.updateStats();

@@ -392,7 +392,8 @@ class Game {
                     }
 
                     // Chance de dropper un bonus d'arme (indépendant de l'XP)
-                    if (Math.random() < 0.25) {
+                    const dropRate = this.currentPhase.weapon_drop_rate !== undefined ? this.currentPhase.weapon_drop_rate : 0.15;
+                    if (Math.random() < dropRate) {
                         this.spawnLoot(e.x, e.y, 1, 'weapon');
                     }
                 }
