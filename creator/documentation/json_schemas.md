@@ -136,6 +136,7 @@ Structure du déroulement d'un niveau.
 | `available_upgrades` | Array | Liste des IDs d'améliorations disponibles au level up. |
 | `transition_intro_id` | String | ID de la transition affichée avant la phase. |
 | `transition_outro_id` | String | ID de la transition affichée après la phase. |
+| `transition_defeat_id`| String | ID de la transition affichée lors de la défaite du joueur. |
 | `background_image`| String | Chemin de l'image de fond de la phase. |
 | `story_intro` | Array | [DEPRECATED] Utiliser `transition_intro_id`. |
 | `story_outro` | Array | [DEPRECATED] Utiliser `transition_outro_id`. |

@@ -41,6 +41,27 @@
                     "animation": "fade"
                 }
             ]
+        },
+        {
+            "id": "transition_1768064926813",
+            "name": "Fin féconde loose",
+            "pages": [
+                {
+                    "title": "loose",
+                    "titleSize": 24,
+                    "titleColor": "#6366f1",
+                    "hideTitle": true,
+                    "text": "Nouveau texte...",
+                    "textSize": 16,
+                    "textColor": "#ffffff",
+                    "hideText": true,
+                    "image": "",
+                    "background": "assets/fond/La-conception-end-loose.png",
+                    "duration": 5000,
+                    "music": "",
+                    "animation": "fade"
+                }
+            ]
         }
     ]
 }

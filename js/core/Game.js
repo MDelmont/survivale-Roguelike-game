@@ -275,8 +275,7 @@ class Game {
         if (this.player.pendingUpgrade) { this.openUpgradeMenu(); return; }
         if (this.player.pendingWeaponUpgrade) { this.openWeaponMenu(); return; }
         if (this.player.stats.hp <= 0) {
-            this.exitFullscreen();
-            this.state = GameState.GAMEOVER;
+            this.handlePlayerDeath();
             return;
         }
 
@@ -424,7 +423,7 @@ class Game {
 
                     // Chance de dropper un bonus d'arme (indépendant de l'XP)
                     const dropRate = this.currentPhase.weapon_drop_rate !== undefined ? this.currentPhase.weapon_drop_rate : 0.15;
-                    if (Math.random() < dropRate) {
+                    if (Math.random() < dropRate && this.canGetWeaponReward()) {
                         this.spawnLoot(e.x, e.y, 1, 'weapon');
                     }
                 }
@@ -468,6 +467,43 @@ class Game {
     }
 
     handleAOE(x, y, r, d) { CombatSystem.handleAOE({ x, y, radius: r, damage: d, enemies: this.enemies, boss: this.boss, explosions: this.explosions }); }
+
+    handlePlayerDeath() {
+        if (this.currentPhase && this.currentPhase.transition_defeat_id) {
+            const transition = this.dataManager.getTransitionData(this.currentPhase.transition_defeat_id);
+            if (transition) {
+                this.openStory(transition.pages, () => {
+                    this.exitFullscreen();
+                    this.state = GameState.MENU;
+                });
+                return;
+            }
+        }
+
+        // Fallback standard
+        this.exitFullscreen();
+        this.state = GameState.GAMEOVER;
+    }
+
+    /**
+     * Vérifie si le joueur peut encore recevoir une récompense d'arme
+     * (nouvelle arme ou amélioration d'une arme existante).
+     */
+    canGetWeaponReward() {
+        if (!this.player || !this.currentPhase) return false;
+
+        // 1. Reste-t-il des armes à découvrir ?
+        const availablePool = (this.currentPhase.available_weapons || [])
+            .filter(id => !this.player.weapons.find(w => w.id === id));
+
+        if (availablePool.length > 0) return true;
+
+        // 2. Reste-t-il des améliorations d'armes possibles ?
+        const canUpgrade = this.player.weapons.some(w => w.level <= (w.upgrades?.length || 0));
+
+        return canUpgrade;
+    }
+
     openUpgradeMenu() {
         this.state = GameState.UPGRADE;
         this.upgradeOptions = this.upgradeSystem.getRandomOptions(3);
@@ -652,7 +688,11 @@ class Game {
         if (this.state === GameState.UPGRADE && this.levelUpScreen) this.levelUpScreen.draw(this.ctx);
         if (this.state === GameState.WEAPON_MENU && this.weaponMenuScreen) this.weaponMenuScreen.draw(this.ctx);
         if (this.state === GameState.VICTORY) this.drawEndScreen('VICTOIRE !', '#0f0');
-        if (this.state === GameState.GAMEOVER) this.drawEndScreen('GAME OVER', '#f00');
+        if (this.state === GameState.GAMEOVER) {
+            // On ne dessine pas le "GAME OVER" si on utilise déjà une image de défaite (normalement déjà passé au MENU)
+            // Mais au cas où, on garde l'affichage standard
+            this.drawEndScreen('GAME OVER', '#f00');
+        }
 
         this.ctx.restore();
 

@@ -33,10 +33,11 @@
             "initial_threat_budget": 20,
             "max_threat_budget": 200,
             "threat_growth_rate": 15,
-            "weapon_drop_rate": 0.04,
+            "weapon_drop_rate": 1,
             "available_upgrades": [
                 "speed_boost"
-            ]
+            ],
+            "transition_defeat_id": "transition_1768064926813"
         }
     ]
 }

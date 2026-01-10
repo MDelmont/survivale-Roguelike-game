@@ -296,9 +296,9 @@ class PhasesModule {
                 </div>
 
                 <div class="form-section">
-                    <h3 class="form-section-title">Narration : Intro (Avant la phase)</h3>
+                    <h3 class="form-section-title">Séquences Narratives (Histoire)</h3>
                     <div class="form-group">
-                        <label class="form-label">Séquence Narrative</label>
+                        <label class="form-label">Intro (Avant la phase)</label>
                         <div class="form-row" style="align-items: flex-end;">
                             <div class="form-group" style="flex: 1;">
                                 <select class="form-select" id="phaseTransitionIntro">
@@ -311,12 +311,8 @@ class PhasesModule {
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="form-section">
-                    <h3 class="form-section-title">Narration : Outro (Après le boss)</h3>
                     <div class="form-group">
-                        <label class="form-label">Séquence Narrative</label>
+                        <label class="form-label">Outro (Après le boss)</label>
                         <div class="form-row" style="align-items: flex-end;">
                             <div class="form-group" style="flex: 1;">
                                 <select class="form-select" id="phaseTransitionOutro">
@@ -326,6 +322,20 @@ class PhasesModule {
                             </div>
                             <div class="form-group" style="flex: 0 0 auto; margin-bottom: 0;">
                                 <button class="btn btn-secondary edit-transition-btn" data-type="outro" ${!p.transition_outro_id ? 'disabled' : ''}>✏️ Éditer</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Défaite (Mort du joueur)</label>
+                        <div class="form-row" style="align-items: flex-end;">
+                            <div class="form-group" style="flex: 1;">
+                                <select class="form-select" id="phaseTransitionDefeat">
+                                    <option value="">-- Aucune (Game Over standard) --</option>
+                                    ${transitions.map(t => `<option value="${t.id}" ${p.transition_defeat_id === t.id ? 'selected' : ''}>${t.name || t.id} (${t.pages?.length || 0} pages)</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex: 0 0 auto; margin-bottom: 0;">
+                                <button class="btn btn-secondary edit-transition-btn" data-type="defeat" ${!p.transition_defeat_id ? 'disabled' : ''}>✏️ Éditer</button>
                             </div>
                         </div>
                     </div>
@@ -443,7 +453,11 @@ class PhasesModule {
         editor.querySelectorAll('.edit-transition-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const type = btn.dataset.type;
-                const transitionId = (type === 'intro') ? this.currentPhase.transition_intro_id : this.currentPhase.transition_outro_id;
+                let transitionId;
+                if (type === 'intro') transitionId = this.currentPhase.transition_intro_id;
+                else if (type === 'outro') transitionId = this.currentPhase.transition_outro_id;
+                else if (type === 'defeat') transitionId = this.currentPhase.transition_defeat_id;
+
                 if (transitionId) {
                     // Switch to transitions module
                     this.app.navigateTo('transitions');
@@ -511,12 +525,15 @@ class PhasesModule {
 
         p.transition_intro_id = document.getElementById('phaseTransitionIntro').value;
         p.transition_outro_id = document.getElementById('phaseTransitionOutro').value;
+        p.transition_defeat_id = document.getElementById('phaseTransitionDefeat').value;
 
         // Update edit buttons state
         const introBtn = document.querySelector('.edit-transition-btn[data-type="intro"]');
         const outroBtn = document.querySelector('.edit-transition-btn[data-type="outro"]');
+        const defeatBtn = document.querySelector('.edit-transition-btn[data-type="defeat"]');
         if (introBtn) introBtn.disabled = !p.transition_intro_id;
         if (outroBtn) outroBtn.disabled = !p.transition_outro_id;
+        if (defeatBtn) defeatBtn.disabled = !p.transition_defeat_id;
 
         // Legacy compatibility: story sequences are now handled by transitions
         p.story_intro = [];
