@@ -330,9 +330,22 @@ export class LevelUpScreen {
             if (data.type === 'attack') {
                 if (stats.damage !== undefined) statEntries.push({ label: 'DMG', value: stats.damage });
                 if (stats.fireRate) statEntries.push({ label: 'CD', value: stats.fireRate + 'ms' });
-                if (stats.projectileSpeed) statEntries.push({ label: 'SPD', value: stats.projectileSpeed });
+
+                // Status effects
+                if (stats.isPoisonous) {
+                    statEntries.push({ label: 'POISON', value: stats.poisonDamage || 0 });
+                }
+                if (stats.slowMultiplier !== undefined && stats.slowMultiplier < 1) {
+                    const slowPct = Math.round((1 - stats.slowMultiplier) * 100);
+                    statEntries.push({ label: 'SLOW', value: '-' + slowPct + '%' });
+                }
+
                 if (stats.projectileCount > 1) statEntries.push({ label: 'QTY', value: 'x' + stats.projectileCount });
                 if (stats.piercingCount > 0) statEntries.push({ label: 'PIERCE', value: stats.piercingCount });
+
+                if (stats.projectileSpeed && statEntries.length < 6) {
+                    statEntries.push({ label: 'SPD', value: stats.projectileSpeed });
+                }
             } else if (data.type === 'defense') {
                 if (stats.damage !== undefined) statEntries.push({ label: 'DMG', value: stats.damage });
                 if (stats.radius) statEntries.push({ label: 'RAD', value: stats.radius });
