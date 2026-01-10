@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Showcase - EVG Anthony</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #020617;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #game-container {
+            position: relative;
+            width: 960px;
+            height: 600px;
+            margin-top: 20px;
+            border: 2px solid #334155;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            background-color: #000;
+            background-image: url('../assets/fond/fond-ovule-dark.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        button {
+            padding: 12px 24px;
+            background-color: #0f172a;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background-color: #334155;
+            border-color: #00d4ff;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        button.active {
+            background-color: #00d4ff;
+            color: #0f172a;
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .warning-overlay {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #7f1d1d;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #f87171;
+            font-size: 12px;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="warning-overlay">
+        ⚠️ <strong>Note:</strong> Ce showcase nécessite un serveur local (Live Server, npx serve, etc.)
+    </div>
+
+    <div class="header">
+        <h1 style="margin: 0; color: #00d4ff;">🎮 UI Showcase</h1>
+        <p style="margin: 5px 0 0; color: #94a3b8;">Design System & Readability Test</p>
+    </div>
+
+    <div id="game-container">
+        <canvas id="ui-canvas"></canvas>
+    </div>
+
+    <div class="controls">
+        <button id="btn-MAIN_MENU" onclick="showScreen('MAIN_MENU')">🏠 Menu Principal</button>
+        <button id="btn-HUD" onclick="showScreen('HUD')">⚔️ HUD In-Game</button>
+        <button id="btn-LEVEL_UP" onclick="showScreen('LEVEL_UP')">⭐ Level Up</button>
+        <button id="btn-WEAPON" onclick="showScreen('WEAPON')">🔫 Menu Armes</button>
+    </div>
+
+    <div id="debug-log"
+        style="margin-top: 10px; color: #f87171; font-family: monospace; font-size: 12px; max-width: 960px; word-break: break-all;">
+    </div>
+
+    <script type="module">
+        const debug = (msg) => {
+            console.log(msg);
+            document.getElementById('debug-log').innerText += msg + '\n';
+        };
+
+        const init = async () => {
+            debug("Initialisation du showcase...");
+
+            if (window.location.protocol === 'file:') {
+                debug("\n⚠️ RAPPEL : Les modules JS ne fonctionnent pas avec le protocole 'file://'.");
+                debug("Veuillez utiliser un serveur local (Live Server ou npx serve).");
+                return;
+            }
+
+            try {
+                const { Colors, Typography } = await import('../js/ui/UIManager.js');
+                const { MainMenu } = await import('../js/ui/screens/MainMenu.js');
+                const { LevelUpScreen } = await import('../js/ui/screens/LevelUpScreen.js');
+                const { WeaponMenuScreen } = await import('../js/ui/screens/WeaponMenuScreen.js');
+
+                debug("Modules chargés avec succès.");
+
+                const canvas = document.getElementById('ui-canvas');
+                const ctx = canvas.getContext('2d');
+
+                canvas.width = 960;
+                canvas.height = 600;
+
+                let currentScreen = 'MAIN_MENU';
+                let mouseX = 0;
+                let mouseY = 0;
+
+                // Mock Game object
+                const game = {
+                    ctx: ctx,
+                    logicalWidth: 960,
+                    logicalHeight: 600,
+                    currentPhaseIndex: 1,
+                    currentPhase: {
+                        name: "Showcase Area",
+                        duration_before_boss: 180,
+                        menu_background: null // Prevent trying to load real images
+                    },
+                    phaseTimer: 145,
+                    killCount: 142,
+                    threatBudgets: { normal: 10 },
+                    boss: null,
+                    saveSystem: { getProgress: () => 0 }, // Mock pour MainMenu
+                    dataManager: {
+                        assetManager: {
+                            isLoaded: () => false,
+                            getImage: () => null
+                        }
+                    },
+                    player: {
+                        stats: {
+                            hp: 85,
+                            maxHp: 100,
+                            xp: 1450,
+                            xpNextLevel: 2000,
+                            level: 8
+                        },
+                        weapons: [
+                            { id: 'basic_shot', name: 'Lance capote', level: 3, upgrades: [{}, {}, {}] },
+                            { id: 'poison_shot', name: 'Lance capote moisie', level: 2, upgrades: [{}, {}] },
+                            { id: 'shield_orbit', name: 'Bouclier de Protection', level: 2, upgrades: [{}, {}] }
+                        ]
+                    },
+                    upgradeOptions: [],
+                    // Helper from Game.js
+                    roundRect: (ctx, x, y, width, height, radius) => {
+                        ctx.beginPath();
+                        ctx.moveTo(x + radius, y);
+                        ctx.lineTo(x + width - radius, y);
+                        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+                        ctx.lineTo(x + width, y + height - radius);
+                        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                        ctx.lineTo(x + radius, y + height);
+                        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+                        ctx.lineTo(x, y + radius);
+                        ctx.quadraticCurveTo(x, y, x + radius, y);
+                        ctx.closePath();
+                    },
+                    drawImageCover: (ctx, img, targetW, targetH) => {
+                        if (!img) return;
+                        const imgW = img.width;
+                        const imgH = img.height;
+                        const targetRatio = targetW / targetH;
+                        const imgRatio = imgW / imgH;
+                        let sX, sY, sW, sH;
+                        if (imgRatio > targetRatio) {
+                            sH = imgH; sW = imgH * targetRatio; sX = (imgW - sW) / 2; sY = 0;
+                        } else {
+                            sW = imgW; sH = imgW / targetRatio; sX = 0; sY = (imgH - sH) / 2;
+                        }
+                        ctx.drawImage(img, sX, sY, sW, sH, 0, 0, targetW, targetH);
+                    }
+                };
+
+                const screens = {
+                    MAIN_MENU: new MainMenu(game),
+                    LEVEL_UP: new LevelUpScreen(game),
+                    WEAPON: new WeaponMenuScreen(game)
+                };
+
+                const realLevelUpOptions = [
+                    { id: 'damage_boost', name: 'Force de la Nature', description: 'Augmente les dégâts globaux de 20%.', stat: 'damage', multiplier: 1.2 },
+                    { id: 'speed_boost', name: 'Chaussures de Sport', description: 'Augmente la vitesse de déplacement de 15%.', stat: 'speed', multiplier: 1.15 },
+                    { id: 'projectile_boost', name: 'Munitions Doubles', description: 'Ajoute +1 projectile à toutes vos armes de tir.', stat: 'projectileBonus', add: 1 }
+                ];
+
+                const realWeaponOptions = [
+                    { type: 'weapon', weaponId: 'smartphone_poison', name: 'Zone sperm empoisonné', description: 'Aura empoisonnée infligeant des dégâts.', stats: { range: 120, poisonDamage: 85 } },
+                    { type: 'upgrade', weaponId: 'basic_shot', name: 'Améliorer Lance capote', description: 'Tire des projectiles à distance plus rapidement.', stats: { fireRate: -100 } },
+                    { type: 'weapon', weaponId: 'shield_orbit', name: 'Bouclier de Protection', description: 'Satellites orbitaux protecteurs autour de vous.', stats: { projectileCount: 4, damage: 15 } }
+                ];
+
+                window.showScreen = (name) => {
+                    currentScreen = name;
+
+                    if (name === 'LEVEL_UP') {
+                        game.upgradeOptions = realLevelUpOptions;
+                    } else if (name === 'WEAPON') {
+                        game.upgradeOptions = realWeaponOptions;
+                    }
+
+                    // Reset animation progress if method exists
+                    if (screens[name] && typeof screens[name].reset === 'function') {
+                        screens[name].reset();
+                    }
+
+                    document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    const activeBtn = document.getElementById(`btn-${name}`);
+                    if (activeBtn) activeBtn.classList.add('active');
+                };
+
+                canvas.addEventListener('mousemove', (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                    mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                });
+
+                function drawMockHUD(ctx) {
+                    const w = canvas.width;
+                    const h = canvas.height;
+                    const p = game.player;
+
+                    ctx.fillStyle = "#020617";
+                    ctx.fillRect(0, 0, w, h);
+
+                    const xpBarH = 12;
+                    const xpBarW = w - 100;
+                    const xpRatio = p.stats.xp / p.stats.xpNextLevel;
+
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+                    game.roundRect(ctx, 50, 15, xpBarW, xpBarH, xpBarH / 2);
+                    ctx.fill();
+
+                    const gradient = ctx.createLinearGradient(50, 0, 50 + xpBarW, 0);
+                    gradient.addColorStop(0, '#22c55e');
+                    gradient.addColorStop(1, '#16a34a');
+                    ctx.fillStyle = gradient;
+                    game.roundRect(ctx, 50, 15, xpBarW * xpRatio, xpBarH, xpBarH / 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#1e293b';
+                    game.roundRect(ctx, 15, 10, 30, 22, 4);
+                    ctx.fill();
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 12px Inter';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(p.stats.level, 30, 26);
+
+                    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                    game.roundRect(ctx, w - 140, 40, 130, 50, 8);
+                    ctx.fill();
+                    ctx.textAlign = 'left';
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.font = 'bold 14px Inter';
+                    ctx.fillText(`⏱️ 02:25`, w - 130, 60);
+                    ctx.fillStyle = 'white';
+                    ctx.font = '12px Inter';
+                    ctx.fillText(`💀 ${game.killCount} Kills`, w - 130, 80);
+
+                    const weaponX = w - 180;
+                    const weaponY = 100;
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.6)';
+                    game.roundRect(ctx, weaponX, weaponY, 170, 120, 10);
+                    ctx.fill();
+                    ctx.fillStyle = Colors.PRIMARY;
+                    ctx.font = 'bold 11px Inter';
+                    ctx.fillText('ARMES ACTIVES', weaponX + 10, weaponY + 20);
+                    p.weapons.forEach((w, i) => {
+                        ctx.fillStyle = 'white';
+                        ctx.font = '13px Inter';
+                        ctx.fillText(`${w.name}`, weaponX + 10, weaponY + 45 + i * 25);
+                        ctx.fillStyle = Colors.ACCENT;
+                        ctx.font = 'bold 10px JetBrains Mono';
+                        ctx.fillText(`LV.${w.level}`, weaponX + 130, weaponY + 45 + i * 25);
+                    });
+
+                    const hpW = 300;
+                    const hpX = w / 2 - hpW / 2;
+                    const hpY = h - 60;
+                    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                    game.roundRect(ctx, hpX - 5, hpY - 5, hpW + 10, 35, 10);
+                    ctx.fill();
+                    ctx.fillStyle = '#1e293b';
+                    game.roundRect(ctx, hpX, hpY, hpW, 25, 6);
+                    ctx.fill();
+                    const hpRatio = p.stats.hp / p.stats.maxHp;
+                    ctx.fillStyle = hpRatio > 0.5 ? '#22c55e' : (hpRatio > 0.25 ? '#eab308' : '#ef4444');
+                    game.roundRect(ctx, hpX, hpY, hpW * hpRatio, 25, 6);
+                    ctx.fill();
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 13px JetBrains Mono';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`${p.stats.hp} / ${p.stats.maxHp}`, w / 2, hpY + 17);
+                }
+
+                function loop(timestamp) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const deltaTime = 16;
+                    if (currentScreen === 'HUD') {
+                        drawMockHUD(ctx);
+                    } else {
+                        const screen = screens[currentScreen];
+                        if (screen) {
+                            screen.update(deltaTime, mouseX, mouseY);
+                            screen.draw(ctx);
+                        }
+                    }
+                    requestAnimationFrame(loop);
+                }
+
+                requestAnimationFrame(loop);
+                window.showScreen('MAIN_MENU');
+            } catch (e) {
+                debug("ERREUR CRITIQUE : " + e.message);
+                debug("Détails : " + e.stack);
+            }
+        };
+
+        init();
+    </script>
+</body>
+
+</html>

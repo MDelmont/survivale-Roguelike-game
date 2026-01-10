@@ -27,6 +27,12 @@ export class MainMenu {
         this.setupButtons();
     }
 
+    reset() {
+        this.animationTime = 0;
+        this.titlePulse = 0;
+        this.hoveredButton = null;
+    }
+
     setupButtons() {
         this.buttons = [
             {
