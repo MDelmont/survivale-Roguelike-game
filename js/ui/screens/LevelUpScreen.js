@@ -198,15 +198,23 @@ export class LevelUpScreen {
 
         ctx.shadowBlur = 0;
 
-        // === TITRE (en haut, plus gros) ===
+        // === TITRE (en haut, taille adaptée) ===
         const titleY = y + 50;
         ctx.fillStyle = Colors.TEXT_PRIMARY;
-        ctx.font = `bold 22px ${Typography.FONT_PRIMARY}`;
+        let titleSize = 22;
+        ctx.font = `bold ${titleSize}px ${Typography.FONT_PRIMARY}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
         let title = data.name || 'Amélioration';
         const maxTitleWidth = width - padding * 2;
+
+        // Réduction dynamique si trop long avant de tronquer
+        while (ctx.measureText(title).width > maxTitleWidth && titleSize > 16) {
+            titleSize--;
+            ctx.font = `bold ${titleSize}px ${Typography.FONT_PRIMARY}`;
+        }
+
         if (ctx.measureText(title).width > maxTitleWidth) {
             while (ctx.measureText(title + '...').width > maxTitleWidth && title.length > 0) {
                 title = title.slice(0, -1);
@@ -225,11 +233,12 @@ export class LevelUpScreen {
         this.wrapText(ctx, desc, x + width / 2, descY, width - padding * 2, 22, 3);
 
         // === BADGE STAT (ajustement position) ===
-        const badgeHeight = 44;
-        const badgeY = y + 165;
-        const badgeWidth = width - padding * 2;
+        const statData = this.getStatDisplay(data);
+        const isAutoPreview = typeof statData === 'object' && statData.stats;
 
-        const statText = this.getStatDisplay(data);
+        const badgeHeight = isAutoPreview ? 75 : 44;
+        const badgeY = y + 155; // Remonté un peu pour le badge plus haut
+        const badgeWidth = width - padding * 2;
 
         // Fond du badge
         ctx.fillStyle = this.hexToRgba(borderColor, 0.2);
@@ -239,15 +248,51 @@ export class LevelUpScreen {
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Texte du badge
-        ctx.fillStyle = borderColor;
-        ctx.font = `bold 18px ${Typography.FONT_MONO}`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(statText, x + width / 2, badgeY + badgeHeight / 2);
+        if (!isAutoPreview) {
+            // Affichage classique (Upgrade ou Manuel)
+            ctx.fillStyle = borderColor;
+            ctx.font = `bold 18px ${Typography.FONT_MONO}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(statData, x + width / 2, badgeY + badgeHeight / 2);
+        } else {
+            // === MODE ERGONOMIQUE ÉPURÉ ===
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+
+            const startX = x + padding + 15;
+            const startY = badgeY + 14;
+
+            // Type à gauche
+            ctx.font = `bold 13px ${Typography.FONT_MONO}`;
+            ctx.fillStyle = borderColor;
+            ctx.fillText(statData.typeLabel, startX, startY);
+
+            // Grille de stats (mini-tableau)
+            const stats = statData.stats;
+            const gridY = startY + 22;
+            const colWidth = (badgeWidth - 30) / 2;
+
+            stats.forEach((stat, idx) => {
+                const col = idx % 2;
+                const row = Math.floor(idx / 2);
+                const drawX = startX + col * colWidth;
+                const drawY = gridY + row * 16;
+
+                ctx.textAlign = 'left';
+                ctx.font = `10px ${Typography.FONT_PRIMARY}`;
+                ctx.fillStyle = Colors.TEXT_MUTED;
+                ctx.fillText(stat.label, drawX, drawY);
+
+                ctx.textAlign = 'right';
+                ctx.font = `bold 11px ${Typography.FONT_MONO}`;
+                ctx.fillStyle = Colors.TEXT_PRIMARY;
+                ctx.fillText(stat.value.toString(), drawX + colWidth - 5, drawY);
+            });
+        }
 
         // === IMPACT HINT (remonté un peu) ===
-        const hintY = badgeY + badgeHeight + 22;
+        const hintY = badgeY + badgeHeight + 15;
         const impactHint = this.getImpactHint(data);
         ctx.fillStyle = Colors.TEXT_MUTED;
         ctx.font = `italic 14px ${Typography.FONT_PRIMARY}`;
@@ -279,24 +324,42 @@ export class LevelUpScreen {
         // Si c'est un retrait d'arme (nouvelle arme)
         if (opt.type === 'weapon' && opt.weaponData) {
             const data = opt.weaponData;
+            const stats = data.stats || {};
+            const statEntries = [];
+
+            if (data.type === 'attack') {
+                if (stats.damage !== undefined) statEntries.push({ label: 'DMG', value: stats.damage });
+                if (stats.fireRate) statEntries.push({ label: 'CD', value: stats.fireRate + 'ms' });
+                if (stats.projectileSpeed) statEntries.push({ label: 'SPD', value: stats.projectileSpeed });
+                if (stats.projectileCount > 1) statEntries.push({ label: 'QTY', value: 'x' + stats.projectileCount });
+                if (stats.piercingCount > 0) statEntries.push({ label: 'PIERCE', value: stats.piercingCount });
+            } else if (data.type === 'defense') {
+                if (stats.damage !== undefined) statEntries.push({ label: 'DMG', value: stats.damage });
+                if (stats.radius) statEntries.push({ label: 'RAD', value: stats.radius });
+                if (stats.orbitSpeed) statEntries.push({ label: 'ROT', value: stats.orbitSpeed });
+                if (stats.projectileCount) statEntries.push({ label: 'QTY', value: 'x' + stats.projectileCount });
+                if (stats.fireRate) statEntries.push({ label: 'DUR', value: stats.fireRate + 'ms' });
+            } else if (data.type === 'aoe') {
+                if (stats.isPoisonous) statEntries.push({ label: 'POISON', value: stats.poisonDamage || 0 });
+                else if (stats.damage) statEntries.push({ label: 'DMG', value: stats.damage });
+
+                if (stats.range) statEntries.push({ label: 'RNG', value: stats.range });
+                if (stats.slowMultiplier !== undefined && stats.slowMultiplier < 1) {
+                    const slowPct = Math.round((1 - stats.slowMultiplier) * 100);
+                    statEntries.push({ label: 'SLOW', value: '-' + slowPct + '%' });
+                }
+            }
+
             const categoryMap = {
                 'attack': 'PROJECTILE',
                 'defense': 'ORBITE',
                 'aoe': 'AURA'
             };
-            const typeLabel = categoryMap[data.type] || 'ARME';
 
-            const stats = data.stats || {};
-            const statParts = [];
-            if (stats.damage) statParts.push(`DMG: ${stats.damage}`);
-            if (stats.fireRate) statParts.push(`CD: ${stats.fireRate}ms`);
-            if (stats.range) statParts.push(`RNG: ${stats.range}`);
-            if (stats.radius) statParts.push(`RAD: ${stats.radius}`);
-
-            if (statParts.length > 0) {
-                return `${typeLabel}  |  ${statParts.slice(0, 2).join('  ')}`;
-            }
-            return typeLabel;
+            return {
+                typeLabel: categoryMap[data.type] || 'ARME',
+                stats: statEntries
+            };
         }
 
         if (opt.multiplier) {

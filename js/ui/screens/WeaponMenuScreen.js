@@ -218,14 +218,22 @@ export class WeaponMenuScreen {
 
         ctx.shadowBlur = 0;
 
-        // === TITRE (plus gros) ===
+        // === TITRE (plus gros, taille adaptée) ===
         const titleY = y + 45;
         ctx.fillStyle = Colors.TEXT_PRIMARY;
-        ctx.font = `bold 22px ${Typography.FONT_PRIMARY}`;
+        let titleSize = 22;
+        ctx.font = `bold ${titleSize}px ${Typography.FONT_PRIMARY}`;
         ctx.textAlign = 'center';
 
         let title = data.name || 'Arme';
         const maxTitleWidth = width - padding * 2;
+
+        // Réduction dynamique si trop long avant de tronquer
+        while (ctx.measureText(title).width > maxTitleWidth && titleSize > 16) {
+            titleSize--;
+            ctx.font = `bold ${titleSize}px ${Typography.FONT_PRIMARY}`;
+        }
+
         if (ctx.measureText(title).width > maxTitleWidth) {
             while (ctx.measureText(title + '...').width > maxTitleWidth && title.length > 0) {
                 title = title.slice(0, -1);
@@ -242,27 +250,53 @@ export class WeaponMenuScreen {
         const desc = data.description || 'Pas de description disponible.';
         this.wrapText(ctx, desc, x + width / 2, descY, width - padding * 2, 22, 3);
 
-        // === STATS (remontées un peu pour combler l'espace) ===
-        const statsY = y + 175;
-
-        // Titre stats
-        ctx.fillStyle = Colors.TEXT_MUTED;
-        ctx.font = `bold 14px ${Typography.FONT_PRIMARY}`;
-        ctx.textAlign = 'left';
-        ctx.fillText('📊 STATS', x + padding, statsY);
-
-        // Valeurs stats (plus grandes)
-        ctx.font = `bold 18px ${Typography.FONT_MONO}`;
-        const statsLineY = statsY + 30;
+        // === STATS (remontées pour combler l'espace) ===
+        const statsLineY = y + 185;
 
         if (isUpgrade) {
             const upgradeInfo = this.getUpgradeInfo(data);
             ctx.fillStyle = Colors.ACCENT;
+            ctx.font = `bold 18px ${Typography.FONT_MONO}`;
+            ctx.textAlign = 'left';
             ctx.fillText(upgradeInfo, x + padding, statsLineY);
         } else {
-            const previewText = this.getWeaponPreview(data);
-            ctx.fillStyle = Colors.PRIMARY;
-            ctx.fillText(previewText, x + padding, statsLineY);
+            const previewData = this.getWeaponPreview(data);
+
+            if (typeof previewData === 'string') {
+                ctx.fillStyle = Colors.PRIMARY;
+                ctx.font = `bold 18px ${Typography.FONT_MONO}`;
+                ctx.textAlign = 'left';
+                ctx.fillText(previewData, x + padding, statsLineY);
+            } else {
+                // === Ergonomie : Type à gauche ===
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.font = `bold 13px ${Typography.FONT_MONO}`;
+                ctx.fillStyle = Colors.PRIMARY;
+                ctx.fillText(previewData.typeLabel, x + padding + 10, statsLineY - 10);
+
+                // === Stats en grille (mini-tableau) ===
+                const stats = previewData.stats;
+                const gridY = statsLineY + 12;
+                const colWidth = (width - padding * 2) / 2;
+
+                stats.forEach((stat, idx) => {
+                    const col = idx % 2;
+                    const row = Math.floor(idx / 2);
+                    const drawX = x + padding + col * colWidth + (col === 0 ? 10 : 0);
+                    const drawY = gridY + row * 16;
+
+                    ctx.textAlign = 'left';
+                    ctx.font = `10px ${Typography.FONT_PRIMARY}`;
+                    ctx.fillStyle = Colors.TEXT_MUTED;
+                    ctx.fillText(stat.label, drawX, drawY);
+
+                    ctx.textAlign = 'right';
+                    ctx.font = `bold 11px ${Typography.FONT_MONO}`;
+                    ctx.fillStyle = Colors.TEXT_PRIMARY;
+                    ctx.fillText(stat.value.toString(), drawX + colWidth - 20, drawY);
+                });
+            }
         }
 
         // === SCHÉMA D'ÉVOLUTION (plus gros nœuds, descendu au fond) ===
@@ -318,7 +352,7 @@ export class WeaponMenuScreen {
         if (data.preview) return data.preview;
 
         const stats = data.stats || {};
-        const parts = [];
+        const statEntries = [];
 
         // Catégorie
         const categoryMap = {
@@ -329,33 +363,32 @@ export class WeaponMenuScreen {
         const typeLabel = categoryMap[data.type] || 'ARME';
 
         if (data.type === 'attack') {
-            if (stats.damage !== undefined) parts.push(`DMG: ${stats.damage}`);
-            if (stats.fireRate) parts.push(`CD: ${stats.fireRate}ms`);
-            if (stats.projectileSpeed) parts.push(`SPD: ${stats.projectileSpeed}`);
-            if (stats.projectileCount > 1) parts.push(`x${stats.projectileCount}`);
-            if (stats.piercingCount > 0) parts.push(`PIERCE: ${stats.piercingCount}`);
+            if (stats.damage !== undefined) statEntries.push({ label: 'DMG', value: stats.damage });
+            if (stats.fireRate) statEntries.push({ label: 'CD', value: stats.fireRate + 'ms' });
+            if (stats.projectileSpeed) statEntries.push({ label: 'SPD', value: stats.projectileSpeed });
+            if (stats.projectileCount > 1) statEntries.push({ label: 'QTY', value: 'x' + stats.projectileCount });
+            if (stats.piercingCount > 0) statEntries.push({ label: 'PIERCE', value: stats.piercingCount });
         } else if (data.type === 'defense') {
-            if (stats.damage !== undefined) parts.push(`DMG: ${stats.damage}`);
-            if (stats.radius) parts.push(`RAD: ${stats.radius}`);
-            if (stats.orbitSpeed) parts.push(`ROT: ${stats.orbitSpeed}`);
-            if (stats.projectileCount) parts.push(`x${stats.projectileCount}`);
-            if (stats.fireRate) parts.push(`DUR: ${stats.fireRate}ms`);
+            if (stats.damage !== undefined) statEntries.push({ label: 'DMG', value: stats.damage });
+            if (stats.radius) statEntries.push({ label: 'RAD', value: stats.radius });
+            if (stats.orbitSpeed) statEntries.push({ label: 'ROT', value: stats.orbitSpeed });
+            if (stats.projectileCount) statEntries.push({ label: 'QTY', value: 'x' + stats.projectileCount });
+            if (stats.fireRate) statEntries.push({ label: 'DUR', value: stats.fireRate + 'ms' });
         } else if (data.type === 'aoe') {
-            if (stats.isPoisonous) parts.push(`POISON: ${stats.poisonDamage || 0}`);
-            else if (stats.damage) parts.push(`DMG: ${stats.damage}`);
+            if (stats.isPoisonous) statEntries.push({ label: 'POISON', value: stats.poisonDamage || 0 });
+            else if (stats.damage) statEntries.push({ label: 'DMG', value: stats.damage });
 
-            if (stats.range) parts.push(`RNG: ${stats.range}`);
+            if (stats.range) statEntries.push({ label: 'RNG', value: stats.range });
             if (stats.slowMultiplier !== undefined && stats.slowMultiplier < 1) {
                 const slowPct = Math.round((1 - stats.slowMultiplier) * 100);
-                parts.push(`SLOW: -${slowPct}%`);
+                statEntries.push({ label: 'SLOW', value: '-' + slowPct + '%' });
             }
         }
 
-        if (parts.length > 0) {
-            return `${typeLabel}  |  ${parts.join('  ')}`;
-        }
-
-        return typeLabel;
+        return {
+            typeLabel: typeLabel,
+            stats: statEntries
+        };
     }
 
     drawEvolutionNodes(ctx, x, y, width, data, borderColor) {
