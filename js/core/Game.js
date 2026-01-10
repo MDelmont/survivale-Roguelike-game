@@ -10,6 +10,11 @@ import { DataManager } from './DataManager.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { WeaponFactory } from '../systems/WeaponFactory.js';
 
+// UI Screens
+import { MainMenu } from '../ui/screens/MainMenu.js';
+import { LevelUpScreen } from '../ui/screens/LevelUpScreen.js';
+import { WeaponMenuScreen } from '../ui/screens/WeaponMenuScreen.js';
+
 /**
  * GameState Enum
  */
@@ -63,6 +68,15 @@ class Game {
         this.storyPageIndex = 0;
         this.onStoryComplete = null;
 
+        // Mouse tracking for UI hover effects
+        this.mouseX = 0;
+        this.mouseY = 0;
+
+        // UI Screens
+        this.mainMenu = null;
+        this.levelUpScreen = null;
+        this.weaponMenuScreen = null;
+
         // Système de Résolution Logique
         this.baseWidth = 1600; // Largeur de référence fixe
         this.logicalWidth = this.baseWidth;
@@ -77,7 +91,21 @@ class Game {
         window.addEventListener('resize', () => this.handleResize());
         const success = await this.dataManager.loadAll();
         if (!success) return;
+
+        // Initialize UI Screens
+        this.mainMenu = new MainMenu(this);
+        this.levelUpScreen = new LevelUpScreen(this);
+        this.weaponMenuScreen = new WeaponMenuScreen(this);
+
         this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
+
+        // Mouse tracking for hover effects
+        this.canvas.addEventListener('mousemove', (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+            this.mouseX = (e.clientX - rect.left) / this.scale;
+            this.mouseY = (e.clientY - rect.top) / this.scale;
+        });
+
         requestAnimationFrame((time) => this.loop(time));
     }
 
@@ -165,40 +193,29 @@ class Game {
         const mouseX = (e.clientX - rect.left) / this.scale;
         const mouseY = (e.clientY - rect.top) / this.scale;
 
-        if (this.state === GameState.MENU) {
-            const btnW = 250;
-            const btnH = 60;
-            const centerX = this.logicalWidth / 2;
-
-            // Check Nouvelle Partie
-            const npY = this.logicalHeight / 2 + 50;
-            if (mouseX >= centerX - btnW / 2 && mouseX <= centerX + btnW / 2 &&
-                mouseY >= npY - btnH / 2 && mouseY <= npY + btnH / 2) {
+        if (this.state === GameState.MENU && this.mainMenu) {
+            const action = this.mainMenu.handleClick(mouseX, mouseY);
+            if (action === 'new_game') {
                 this.requestFullscreen();
                 this.startNewGame();
                 return;
-            }
-
-            // Check Continuer
-            if (this.saveSystem.getProgress() > 0) {
-                const cY = this.logicalHeight / 2 + 130;
-                if (mouseX >= centerX - btnW / 2 && mouseX <= centerX + btnW / 2 &&
-                    mouseY >= cY - btnH / 2 && mouseY <= cY + btnH / 2) {
-                    this.requestFullscreen();
-                    this.continueGame();
-                    return;
-                }
+            } else if (action === 'continue') {
+                this.requestFullscreen();
+                this.continueGame();
+                return;
             }
         } else if (this.state === GameState.STORY) {
             this.nextStoryPage();
-        } else if (this.state === GameState.UPGRADE) {
-            this.handleChoiceMenuClick(mouseX, mouseY, 80, (choice) => {
+        } else if (this.state === GameState.UPGRADE && this.levelUpScreen) {
+            const choice = this.levelUpScreen.handleClick(mouseX, mouseY);
+            if (choice) {
                 this.upgradeSystem.applyUpgrade(this.player, choice);
                 this.player.pendingUpgrade = false;
                 this.state = GameState.PLAYING;
-            });
-        } else if (this.state === GameState.WEAPON_MENU) {
-            this.handleChoiceMenuClick(mouseX, mouseY, 100, (choice) => {
+            }
+        } else if (this.state === GameState.WEAPON_MENU && this.weaponMenuScreen) {
+            const choice = this.weaponMenuScreen.handleClick(mouseX, mouseY);
+            if (choice) {
                 if (choice.type === 'upgrade') {
                     const weapon = this.player.weapons.find(w => w.id === choice.weaponId);
                     if (weapon) weapon.upgrade();
@@ -207,7 +224,7 @@ class Game {
                 }
                 this.player.pendingWeaponUpgrade = false;
                 this.state = GameState.PLAYING;
-            });
+            }
         } else if (this.state === GameState.VICTORY || this.state === GameState.GAMEOVER) {
             this.state = GameState.MENU;
         }
@@ -232,7 +249,18 @@ class Game {
     loop(currentTime) {
         const deltaTime = currentTime - this.lastTime;
         this.lastTime = currentTime;
-        if (this.state === GameState.PLAYING) this.update(deltaTime);
+
+        // Update UI screens based on state
+        if (this.state === GameState.MENU && this.mainMenu) {
+            this.mainMenu.update(deltaTime, this.mouseX, this.mouseY);
+        } else if (this.state === GameState.UPGRADE && this.levelUpScreen) {
+            this.levelUpScreen.update(deltaTime, this.mouseX, this.mouseY);
+        } else if (this.state === GameState.WEAPON_MENU && this.weaponMenuScreen) {
+            this.weaponMenuScreen.update(deltaTime, this.mouseX, this.mouseY);
+        } else if (this.state === GameState.PLAYING) {
+            this.update(deltaTime);
+        }
+
         this.draw();
         this.updateFPS(deltaTime);
         requestAnimationFrame((time) => this.loop(time));
@@ -437,7 +465,11 @@ class Game {
     }
 
     handleAOE(x, y, r, d) { CombatSystem.handleAOE({ x, y, radius: r, damage: d, enemies: this.enemies, boss: this.boss, explosions: this.explosions }); }
-    openUpgradeMenu() { this.state = GameState.UPGRADE; this.upgradeOptions = this.upgradeSystem.getRandomOptions(3); }
+    openUpgradeMenu() {
+        this.state = GameState.UPGRADE;
+        this.upgradeOptions = this.upgradeSystem.getRandomOptions(3);
+        if (this.levelUpScreen) this.levelUpScreen.reset();
+    }
     openWeaponMenu() {
         this.upgradeOptions = [];
 
@@ -469,6 +501,7 @@ class Game {
         }
 
         this.state = GameState.WEAPON_MENU;
+        if (this.weaponMenuScreen) this.weaponMenuScreen.reset();
     }
 
     spawnBoss() {
@@ -574,7 +607,11 @@ class Game {
         // Background Particles
         this.drawBackground();
 
-        if (this.state === GameState.MENU) { this.drawMenu(); this.ctx.restore(); return; }
+        if (this.state === GameState.MENU && this.mainMenu) {
+            this.mainMenu.draw(this.ctx);
+            this.ctx.restore();
+            return;
+        }
 
         // COUCHE 1 : Les zones d'auras (Tout en dessous)
         if (this.player) this.player.drawAuras(this.ctx);
@@ -608,11 +645,9 @@ class Game {
             this.drawUI();
         }
 
-
-
         if (this.state === GameState.STORY) this.drawStory();
-        if (this.state === GameState.UPGRADE) this.drawChoiceMenu('AMÉLIORATION DISPONIBLE', '#fbbf24', 80);
-        if (this.state === GameState.WEAPON_MENU) this.drawChoiceMenu('NOUVELLE ARME', '#3b82f6', 100);
+        if (this.state === GameState.UPGRADE && this.levelUpScreen) this.levelUpScreen.draw(this.ctx);
+        if (this.state === GameState.WEAPON_MENU && this.weaponMenuScreen) this.weaponMenuScreen.draw(this.ctx);
         if (this.state === GameState.VICTORY) this.drawEndScreen('VICTOIRE !', '#0f0');
         if (this.state === GameState.GAMEOVER) this.drawEndScreen('GAME OVER', '#f00');
 
@@ -818,54 +853,189 @@ class Game {
     drawUI() {
         const ctx = this.ctx;
         const p = this.player;
+        const w = this.logicalWidth;
+        const h = this.logicalHeight;
 
-        // HUD Bottom: HP
-        const hpW = 300;
-        const hpH = 30;
-        const hpX = this.logicalWidth / 2 - hpW / 2;
-        const hpY = this.logicalHeight - 60;
+        // === XP BAR (TOP - Full width with gradient) ===
+        const xpBarHeight = 16;
+        const xpBarY = 15;
+        const xpBarPadding = 60;
+        const xpBarWidth = w - xpBarPadding * 2;
+        const xpRatio = Math.min(1, p.stats.xp / p.stats.xpNextLevel);
 
-        ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        ctx.fillRect(hpX, hpY, hpW, hpH);
-        const ratio = p.stats.hp / p.stats.maxHp;
-        const grad = ctx.createLinearGradient(hpX, 0, hpX + hpW, 0);
-        grad.addColorStop(0, '#f00');
-        grad.addColorStop(1, '#f55');
-        ctx.fillStyle = grad;
-        ctx.fillRect(hpX, hpY, hpW * ratio, hpH);
-        ctx.strokeStyle = 'white';
-        ctx.strokeRect(hpX, hpY, hpW, hpH);
+        // XP Background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        this.roundRect(ctx, xpBarPadding, xpBarY, xpBarWidth, xpBarHeight, 8);
+        ctx.fill();
 
-        // XP Top
-        const xpW = this.logicalWidth - 100;
-        const xpH = 10;
-        ctx.fillStyle = 'rgba(255,255,255,0.1)';
-        ctx.fillRect(50, 20, xpW, xpH);
-        const xpRatio = p.stats.xp / p.stats.xpNextLevel;
-        ctx.fillStyle = '#0f0';
-        ctx.fillRect(50, 20, xpW * xpRatio, xpH);
-
-        // Stats & Phase
-        ctx.fillStyle = 'white';
-        ctx.font = '14px Inter, Arial';
-        ctx.textAlign = 'left';
-        ctx.fillText(`PHASE: ${this.currentPhaseIndex + 1} - ${this.currentPhase.name}`, 50, 50);
-        ctx.fillText(`KILLS: ${this.killCount}`, 50, 70);
-
-        // Debug info pour le budget de menace (Visible si ?debug=1 dans l'URL)
-        if (window.location.search.includes('debug')) {
-            ctx.fillStyle = '#ff5555';
-            const totalAcc = Math.floor(Object.values(this.threatBudgets).reduce((a, b) => a + b, 0));
-            ctx.fillText(`MENACE: ${totalAcc} PM (+${this.lastThreatGrowth || 0}/s)`, 50, 90);
-            ctx.fillStyle = 'white';
+        // XP Fill with gradient
+        if (xpRatio > 0) {
+            const xpGrad = ctx.createLinearGradient(xpBarPadding, 0, xpBarPadding + xpBarWidth, 0);
+            xpGrad.addColorStop(0, '#22C55E');
+            xpGrad.addColorStop(0.5, '#16A34A');
+            xpGrad.addColorStop(1, '#15803D');
+            ctx.fillStyle = xpGrad;
+            this.roundRect(ctx, xpBarPadding, xpBarY, xpBarWidth * xpRatio, xpBarHeight, 8);
+            ctx.fill();
         }
 
+        // XP Border
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 1;
+        this.roundRect(ctx, xpBarPadding, xpBarY, xpBarWidth, xpBarHeight, 8);
+        ctx.stroke();
+
+        // Level indicator
+        ctx.fillStyle = '#22C55E';
+        ctx.font = 'bold 14px Inter, Arial';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`LVL ${p.stats.level}`, w - xpBarPadding + 45, xpBarY + xpBarHeight / 2);
+
+        // === TOP LEFT: Phase Info & Boss Timer ===
+        const infoY = 50;
+
+        // Phase name with background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        this.roundRect(ctx, 20, infoY - 12, 280, 60, 8);
+        ctx.fill();
+
+        ctx.fillStyle = '#00D4FF';
+        ctx.font = 'bold 16px Inter, Arial';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText(`PHASE ${this.currentPhaseIndex + 1}`, 30, infoY);
+
+        ctx.fillStyle = '#F8FAFC';
+        ctx.font = '13px Inter, Arial';
+        ctx.fillText(this.currentPhase.name || 'En cours...', 30, infoY + 20);
+
+        // Boss timer or Kills counter
+        if (this.currentPhase.duration_before_boss && !this.boss) {
+            const timeLeft = Math.max(0, this.currentPhase.duration_before_boss - this.phaseTimer);
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = Math.floor(timeLeft % 60);
+            const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            ctx.fillStyle = timeLeft < 30 ? '#EF4444' : '#FBBF24';
+            ctx.font = 'bold 14px JetBrains Mono, monospace';
+            ctx.fillText(`⏱️ Boss dans ${timeStr}`, 30, infoY + 38);
+        } else if (this.boss) {
+            ctx.fillStyle = '#EF4444';
+            ctx.font = 'bold 14px Inter, Arial';
+            ctx.fillText(`👾 BOSS ACTIF!`, 30, infoY + 38);
+        } else {
+            ctx.fillStyle = '#94A3B8';
+            ctx.font = '13px Inter, Arial';
+            ctx.fillText(`💀 Kills: ${this.killCount}`, 30, infoY + 38);
+        }
+
+        // === TOP RIGHT: Weapons Panel ===
         if (this.player.weapons.length > 0) {
-            ctx.textAlign = 'right';
-            this.player.weapons.forEach((w, i) => {
-                ctx.fillText(`${w.name} (LVL ${w.level})`, this.logicalWidth - 50, 50 + i * 20);
+            const panelWidth = 220;
+            const panelX = w - panelWidth - 20;
+            const panelY = infoY - 12;
+            const lineHeight = 22;
+            const panelHeight = 30 + this.player.weapons.length * lineHeight;
+
+            // Panel background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            this.roundRect(ctx, panelX, panelY, panelWidth, panelHeight, 8);
+            ctx.fill();
+
+            // Header
+            ctx.fillStyle = '#A855F7';
+            ctx.font = 'bold 12px Inter, Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('⚔️ ARMES', panelX + 12, panelY + 14);
+
+            // Weapons list
+            ctx.font = '13px Inter, Arial';
+            this.player.weapons.forEach((weapon, i) => {
+                const lineY = panelY + 32 + i * lineHeight;
+
+                // Weapon name
+                ctx.fillStyle = '#F8FAFC';
+                ctx.textAlign = 'left';
+                let name = weapon.name;
+                if (name.length > 16) name = name.substring(0, 14) + '...';
+                ctx.fillText(name, panelX + 12, lineY);
+
+                // Level badge
+                ctx.fillStyle = '#00D4FF';
+                ctx.font = 'bold 11px JetBrains Mono, monospace';
+                ctx.textAlign = 'right';
+                ctx.fillText(`LV.${weapon.level}`, panelX + panelWidth - 12, lineY);
+                ctx.font = '13px Inter, Arial';
             });
         }
+
+        // === BOTTOM CENTER: HP Bar ===
+        const hpW = 350;
+        const hpH = 28;
+        const hpX = w / 2 - hpW / 2;
+        const hpY = h - 55;
+        const hpRatio = Math.max(0, Math.min(1, p.stats.hp / p.stats.maxHp));
+
+        // HP Background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        this.roundRect(ctx, hpX, hpY, hpW, hpH, 6);
+        ctx.fill();
+
+        // HP Fill with gradient (color changes based on health)
+        if (hpRatio > 0) {
+            const hpGrad = ctx.createLinearGradient(hpX, 0, hpX + hpW, 0);
+            if (hpRatio > 0.5) {
+                hpGrad.addColorStop(0, '#22C55E');
+                hpGrad.addColorStop(1, '#16A34A');
+            } else if (hpRatio > 0.25) {
+                hpGrad.addColorStop(0, '#FBBF24');
+                hpGrad.addColorStop(1, '#F59E0B');
+            } else {
+                hpGrad.addColorStop(0, '#EF4444');
+                hpGrad.addColorStop(1, '#DC2626');
+            }
+            ctx.fillStyle = hpGrad;
+            this.roundRect(ctx, hpX, hpY, hpW * hpRatio, hpH, 6);
+            ctx.fill();
+        }
+
+        // HP Border
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.lineWidth = 2;
+        this.roundRect(ctx, hpX, hpY, hpW, hpH, 6);
+        ctx.stroke();
+
+        // HP Text
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 14px JetBrains Mono, monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`${Math.ceil(p.stats.hp)} / ${p.stats.maxHp}`, w / 2, hpY + hpH / 2);
+
+        // Debug info (only if ?debug in URL)
+        if (window.location.search.includes('debug')) {
+            ctx.fillStyle = '#ff5555';
+            ctx.font = '12px JetBrains Mono, monospace';
+            ctx.textAlign = 'left';
+            const totalAcc = Math.floor(Object.values(this.threatBudgets).reduce((a, b) => a + b, 0));
+            ctx.fillText(`MENACE: ${totalAcc} PM (+${this.lastThreatGrowth || 0}/s)`, 30, h - 80);
+        }
+    }
+
+    // Helper for rounded rectangles
+    roundRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
     }
 
     drawChoiceMenu(title, color, optionHeight = 80) {

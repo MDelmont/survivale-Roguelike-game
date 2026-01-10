@@ -4,6 +4,8 @@
             "id": "basic_shot",
             "name": "Lance capote",
             "type": "attack",
+            "description": "Tire des projectiles à distance.",
+            "category": "projectile",
             "stats": {
                 "damage": 20,
                 "fireRate": 400,
@@ -20,12 +22,14 @@
             "upgrades": [
                 {
                     "name": "Vitesse Accrue",
+                    "preview": "Cadence +25%",
                     "stats": {
                         "fireRate": -100
                     }
                 },
                 {
                     "name": "Tir Cryogénique",
+                    "preview": "Ralentit les ennemis",
                     "stats": {
                         "isSlowing": true,
                         "slowMultiplier": 0.4
@@ -54,6 +58,8 @@
             "id": "poison_shot",
             "name": "Lance capote moisie",
             "type": "attack",
+            "description": "Empoisonne les ennemis touchés.",
+            "category": "poison",
             "stats": {
                 "damage": 0,
                 "fireRate": 500,
@@ -70,12 +76,14 @@
             "upgrades": [
                 {
                     "name": "Poison féroce",
+                    "preview": "Cadence +20%",
                     "stats": {
                         "fireRate": -100
                     }
                 },
                 {
                     "name": "Effet paralysant",
+                    "preview": "Ralentit les cibles",
                     "stats": {
                         "isSlowing": true,
                         "slowMultiplier": 0.4
@@ -103,6 +111,8 @@
             "id": "shield_orbit",
             "name": "Bouclier de Protection",
             "type": "defense",
+            "description": "Satellites orbitaux protecteurs.",
+            "category": "orbital",
             "stats": {
                 "damage": 15,
                 "radius": 60,
@@ -118,12 +128,14 @@
             "upgrades": [
                 {
                     "name": "Satellite Supplémentaire",
+                    "preview": "+1 Satellite",
                     "stats": {
                         "projectileCount": 1
                     }
                 },
                 {
                     "name": "Pointe Empoisonnée",
+                    "preview": "Poison au contact",
                     "stats": {
                         "isPoisonous": true
                     }
@@ -149,6 +161,8 @@
             "id": "smartphone_wave",
             "name": "Zone Sperm gluant",
             "type": "aoe",
+            "description": "Aura ralentissante autour du joueur.",
+            "category": "aura",
             "stats": {
                 "damage": 0,
                 "range": 85,
@@ -162,12 +176,14 @@
             "upgrades": [
                 {
                     "name": "Portée +",
+                    "preview": "Rayon +40px",
                     "stats": {
                         "range": 40
                     }
                 },
                 {
                     "name": "Ondes Toxiques",
+                    "preview": "Empoisonne les cibles",
                     "stats": {
                         "isPoisonous": true
                     }
@@ -188,17 +204,20 @@
                     }
                 },
                 "auraRotationSpeed": 0.1,
-                "auraPulseAlpha": false,
+                "auraPulseAlpha": true,
                 "auraPulseSize": true,
                 "auraAlphaSpeed": 200,
-                "auraAlphaMin": 0.8,
-                "auraAlphaMax": 1
+                "auraAlphaMin": 0.6,
+                "auraAlphaMax": 0.6,
+                "angleOffset": 0
             }
         },
         {
             "id": "smartphone_poison",
             "name": "Zone sperm empoisonné",
             "type": "aoe",
+            "description": "Aura empoisonnée infligeant des dégâts.",
+            "category": "aura",
             "stats": {
                 "poisonDuration": 2000,
                 "poisonDamage": 85,
@@ -232,11 +251,12 @@
                     }
                 },
                 "auraRotationSpeed": -0.1,
-                "auraPulseAlpha": false,
+                "auraPulseAlpha": true,
                 "auraPulseSize": true,
                 "auraAlphaSpeed": 200,
-                "auraAlphaMin": 0.2,
-                "auraAlphaMax": 1
+                "auraAlphaMin": 0.6,
+                "auraAlphaMax": 0.6,
+                "angleOffset": 0
             }
         },
         {
