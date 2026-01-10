@@ -5,7 +5,7 @@
             "hp": 5000,
             "speed": 50,
             "damage": 20,
-            "fireRate": 1500,
+            "fireRate": 1000,
             "attackPattern": "spray",
             "movePattern": "fixed",
             "radius": 80,
@@ -25,7 +25,7 @@
                         "loop": true
                     }
                 },
-                "pixelPerfect": false
+                "pixelPerfect": true
             },
             "projectileVisuals": {
                 "type": "sprite",

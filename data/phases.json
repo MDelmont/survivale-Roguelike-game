@@ -33,9 +33,16 @@
             "initial_threat_budget": 20,
             "max_threat_budget": 200,
             "threat_growth_rate": 15,
-            "weapon_drop_rate": 1,
+            "weapon_drop_rate": 0.05,
             "available_upgrades": [
-                "speed_boost"
+                "speed_boost",
+                "damage_boost",
+                "fire_rate_boost",
+                "max_hp_boost",
+                "pickup_range_boost",
+                "projectile_boost",
+                "aura_range_boost",
+                "piercing_boost"
             ],
             "transition_defeat_id": "transition_1768064926813"
         }
