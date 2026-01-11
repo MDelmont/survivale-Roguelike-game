@@ -35,12 +35,8 @@ class Game {
     constructor() {
         this.canvas = document.getElementById('game-canvas');
         this.ctx = this.canvas.getContext('2d');
-        this.fpsCounter = document.getElementById('fps-counter');
 
         this.lastTime = 0;
-        this.fps = 0;
-        this.frameCount = 0;
-        this.fpsTimer = 0;
 
         this.input = new Input();
         this.upgradeSystem = new UpgradeSystem(this);
@@ -265,7 +261,6 @@ class Game {
         }
 
         this.draw();
-        this.updateFPS(deltaTime);
         requestAnimationFrame((time) => this.loop(time));
     }
 
@@ -940,7 +935,7 @@ class Game {
 
         // Phase name with background
         ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        this.roundRect(ctx, 20, infoY - 12, 280, 60, 8);
+        this.roundRect(ctx, 20, infoY - 12, 280, 70, 8);
         ctx.fill();
 
         ctx.fillStyle = '#00D4FF';
@@ -962,7 +957,7 @@ class Game {
 
             ctx.fillStyle = timeLeft < 30 ? '#EF4444' : '#FBBF24';
             ctx.font = 'bold 14px JetBrains Mono, monospace';
-            ctx.fillText(`⏱️ Boss dans ${timeStr}`, 30, infoY + 38);
+            ctx.fillText(`Boss dans ${timeStr}`, 30, infoY + 38);
         } else if (this.boss) {
             ctx.fillStyle = '#EF4444';
             ctx.font = 'bold 14px Inter, Arial';
@@ -1141,9 +1136,5 @@ class Game {
         ctx.fillText('CLIQUE POUR RECOMMENCER', this.logicalWidth / 2, this.logicalHeight / 2 + 100);
     }
 
-    updateFPS(dt) {
-        this.frameCount++; this.fpsTimer += dt;
-        if (this.fpsTimer >= 1000) { this.fps = this.frameCount; this.frameCount = 0; this.fpsTimer = 0; this.fpsCounter.innerText = `FPS: ${this.fps}`; }
-    }
 }
 window.addEventListener('load', () => { new Game(); });
