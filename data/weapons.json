@@ -4,7 +4,7 @@
             "id": "basic_shot",
             "name": "Lance capote",
             "type": "attack",
-            "description": "Tire des projectiles à distance.",
+            "description": "Les protections c'est important",
             "category": "projectile",
             "stats": {
                 "damage": 20,
@@ -53,14 +53,14 @@
                     }
                 }
             },
-            "preview": "TEST"
+            "preview": ""
         },
         {
             "id": "poison_shot",
             "name": "Lance capote moisie",
             "type": "attack",
-            "description": "Empoisonne les ennemis touchés.",
-            "category": "poison",
+            "description": "Très usagé, trop usagé ..",
+            "category": "projectile",
             "stats": {
                 "damage": 0,
                 "fireRate": 500,
@@ -171,7 +171,7 @@
                 "damage": 0,
                 "range": 85,
                 "isSlowing": true,
-                "slowMultiplier": 0.6,
+                "slowMultiplier": 0.4,
                 "isPoisonous": false,
                 "poisonDamage": 10,
                 "poisonDuration": 2000,
@@ -214,7 +214,8 @@
                 "auraAlphaMin": 0.6,
                 "auraAlphaMax": 0.6,
                 "angleOffset": 0
-            }
+            },
+            "preview": ""
         },
         {
             "id": "smartphone_poison",
@@ -229,12 +230,13 @@
                 "damage": 0,
                 "range": 120,
                 "isPoisonous": true,
-                "slowMultiplier": 0.6,
+                "slowMultiplier": 0,
                 "isSlowing": false
             },
             "upgrades": [
                 {
                     "name": "Portée +",
+                    "preview": "",
                     "stats": {
                         "range": 40
                     }
@@ -261,7 +263,8 @@
                 "auraAlphaMin": 0.6,
                 "auraAlphaMax": 0.6,
                 "angleOffset": 0
-            }
+            },
+            "preview": ""
         },
         {
             "id": "new_weapon_mk4ajk29",

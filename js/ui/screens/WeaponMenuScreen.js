@@ -343,8 +343,16 @@ export class WeaponMenuScreen {
             if (stats.fireRate) parts.push(`CD ${stats.fireRate}ms`);
             if (stats.range) parts.push(`RNG +${stats.range}`);
             if (stats.projectileCount) parts.push(`+${stats.projectileCount} proj`);
+            if (stats.piercingCount) parts.push(`Percé +${stats.piercingCount}`);
             if (stats.isPoisonous) parts.push('Poison');
-            if (stats.isSlowing) parts.push('Ralentit');
+            if (stats.isSlowing) {
+                if (stats.slowMultiplier && stats.slowMultiplier > 0) {
+                    const slowImprovement = Math.round(stats.slowMultiplier * 100);
+                    parts.push(`Ralenti +${slowImprovement}%`);
+                } else {
+                    parts.push('Ralentit');
+                }
+            }
             return parts.join(', ') || 'Amélioration';
         }
         return 'Niveau suivant';
@@ -367,20 +375,8 @@ export class WeaponMenuScreen {
         if (data.type === 'attack') {
             if (stats.damage !== undefined) statEntries.push({ label: 'DMG', value: stats.damage });
             if (stats.fireRate) statEntries.push({ label: 'CD', value: stats.fireRate + 'ms' });
-
-            // Status effects (prioritaires pour le joueur)
-            if (stats.isPoisonous) {
-                statEntries.push({ label: 'POISON', value: stats.poisonDamage || 0 });
-            }
-            if (stats.slowMultiplier !== undefined && stats.slowMultiplier < 1) {
-                const slowPct = Math.round((1 - stats.slowMultiplier) * 100);
-                statEntries.push({ label: 'SLOW', value: '-' + slowPct + '%' });
-            }
-
             if (stats.projectileCount > 1) statEntries.push({ label: 'QTY', value: 'x' + stats.projectileCount });
             if (stats.piercingCount > 0) statEntries.push({ label: 'PIERCE', value: stats.piercingCount });
-
-            // On n'ajoute la vitesse que si on a encore de la place (max 6)
             if (stats.projectileSpeed && statEntries.length < 6) {
                 statEntries.push({ label: 'SPD', value: stats.projectileSpeed });
             }
@@ -391,14 +387,17 @@ export class WeaponMenuScreen {
             if (stats.projectileCount) statEntries.push({ label: 'QTY', value: 'x' + stats.projectileCount });
             if (stats.fireRate) statEntries.push({ label: 'DUR', value: stats.fireRate + 'ms' });
         } else if (data.type === 'aoe') {
-            if (stats.isPoisonous) statEntries.push({ label: 'POISON', value: stats.poisonDamage || 0 });
-            else if (stats.damage) statEntries.push({ label: 'DMG', value: stats.damage });
-
+            if (stats.damage) statEntries.push({ label: 'DMG', value: stats.damage });
             if (stats.range) statEntries.push({ label: 'RNG', value: stats.range });
-            if (stats.slowMultiplier !== undefined && stats.slowMultiplier < 1) {
-                const slowPct = Math.round((1 - stats.slowMultiplier) * 100);
-                statEntries.push({ label: 'SLOW', value: '-' + slowPct + '%' });
-            }
+        }
+
+        // Status effects (Communs à tous les types)
+        if (stats.isPoisonous) {
+            statEntries.push({ label: 'POISON', value: stats.poisonDamage || 0 });
+        }
+        if (stats.isSlowing && stats.slowMultiplier !== undefined && stats.slowMultiplier > 0) {
+            const slowPct = Math.round(stats.slowMultiplier * 100);
+            statEntries.push({ label: 'SLOW', value: '-' + slowPct + '%' });
         }
 
         return {

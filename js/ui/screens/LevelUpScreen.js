@@ -347,37 +347,34 @@ export class LevelUpScreen {
             if (data.type === 'attack') {
                 if (stats.damage !== undefined) statEntries.push({ label: 'DMG', value: stats.damage });
                 if (stats.fireRate) statEntries.push({ label: 'CD', value: stats.fireRate + 'ms' });
-
-                // Status effects
-                if (stats.isPoisonous) {
-                    statEntries.push({ label: 'POISON', value: stats.poisonDamage || 0 });
-                }
-                if (stats.slowMultiplier !== undefined && stats.slowMultiplier < 1) {
-                    const slowPct = Math.round((1 - stats.slowMultiplier) * 100);
-                    statEntries.push({ label: 'SLOW', value: '-' + slowPct + '%' });
-                }
-
-                if (stats.projectileCount > 1) statEntries.push({ label: 'QTY', value: 'x' + stats.projectileCount });
-                if (stats.piercingCount > 0) statEntries.push({ label: 'PIERCE', value: stats.piercingCount });
-
-                if (stats.projectileSpeed && statEntries.length < 6) {
-                    statEntries.push({ label: 'SPD', value: stats.projectileSpeed });
-                }
             } else if (data.type === 'defense') {
                 if (stats.damage !== undefined) statEntries.push({ label: 'DMG', value: stats.damage });
                 if (stats.radius) statEntries.push({ label: 'RAD', value: stats.radius });
                 if (stats.orbitSpeed) statEntries.push({ label: 'ROT', value: stats.orbitSpeed });
+            } else if (data.type === 'aoe') {
+                if (stats.damage) statEntries.push({ label: 'DMG', value: stats.damage });
+                if (stats.range) statEntries.push({ label: 'RNG', value: stats.range });
+            }
+
+            // Status effects (Communs)
+            if (stats.isPoisonous) {
+                statEntries.push({ label: 'POISON', value: stats.poisonDamage || 0 });
+            }
+            if (stats.isSlowing && stats.slowMultiplier !== undefined && stats.slowMultiplier > 0) {
+                const slowPct = Math.round(stats.slowMultiplier * 100);
+                statEntries.push({ label: 'SLOW', value: '-' + slowPct + '%' });
+            }
+
+            // Divers
+            if (data.type === 'attack') {
+                if (stats.projectileCount > 1) statEntries.push({ label: 'QTY', value: 'x' + stats.projectileCount });
+                if (stats.piercingCount > 0) statEntries.push({ label: 'PIERCE', value: stats.piercingCount });
+                if (stats.projectileSpeed && statEntries.length < 6) {
+                    statEntries.push({ label: 'SPD', value: stats.projectileSpeed });
+                }
+            } else if (data.type === 'defense') {
                 if (stats.projectileCount) statEntries.push({ label: 'QTY', value: 'x' + stats.projectileCount });
                 if (stats.fireRate) statEntries.push({ label: 'DUR', value: stats.fireRate + 'ms' });
-            } else if (data.type === 'aoe') {
-                if (stats.isPoisonous) statEntries.push({ label: 'POISON', value: stats.poisonDamage || 0 });
-                else if (stats.damage) statEntries.push({ label: 'DMG', value: stats.damage });
-
-                if (stats.range) statEntries.push({ label: 'RNG', value: stats.range });
-                if (stats.slowMultiplier !== undefined && stats.slowMultiplier < 1) {
-                    const slowPct = Math.round((1 - stats.slowMultiplier) * 100);
-                    statEntries.push({ label: 'SLOW', value: '-' + slowPct + '%' });
-                }
             }
 
             const categoryMap = {

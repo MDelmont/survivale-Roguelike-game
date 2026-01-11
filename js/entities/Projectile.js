@@ -54,7 +54,8 @@ export class Projectile {
 
         // Effet de ralentissement
         if (this.stats.isSlowing && target.applyEffect) {
-            target.applyEffect({ type: 'slowing', duration: 2000, multiplier: this.stats.slowMultiplier || 0.5 });
+            const slowMagnitude = this.stats.slowMultiplier || 0.4;
+            target.applyEffect({ type: 'slowing', duration: 2000, multiplier: 1 - slowMagnitude });
         }
 
         // Effet d'explosion (AOE)

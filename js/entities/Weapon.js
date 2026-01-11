@@ -96,7 +96,7 @@ export class OrbitalWeapon extends Weapon {
         this.assetManager = assetManager;
         this.satellites = [];
         this.spawnTimer = 0;
-        this.masterAngle = 0; 
+        this.masterAngle = 0;
     }
 
     update(deltaTime, owner, context) {
@@ -130,7 +130,7 @@ export class OrbitalWeapon extends Weapon {
 
             // Mise à jour de l'animateur du satellite
             if (s.animator) {
-                s.animator.update(deltaTime, { velocity: { x: 1, y: 1 } }); 
+                s.animator.update(deltaTime, { velocity: { x: 1, y: 1 } });
             }
 
             const checkCollision = (e) => {
@@ -145,7 +145,7 @@ export class OrbitalWeapon extends Weapon {
                     const baseDamage = (this.stats.damage || 0) * (owner.stats.damageMultiplier || 1.0);
                     const hitDamage = baseDamage * dt * 5;
                     if (hitDamage > 0) t.takeDamage(hitDamage);
-                    
+
                     // Application des effets
                     if (this.stats.isPoisonous && t.applyEffect) {
                         t.applyEffect({
@@ -156,10 +156,11 @@ export class OrbitalWeapon extends Weapon {
                         });
                     }
                     if (this.stats.isSlowing && t.applyEffect) {
+                        const slowMagnitude = this.stats.slowMultiplier || 0.4;
                         t.applyEffect({
                             type: 'slowing',
                             duration: 2000,
-                            multiplier: this.stats.slowMultiplier || 0.5
+                            multiplier: 1 - slowMagnitude
                         });
                     }
                 }
@@ -176,7 +177,7 @@ export class OrbitalWeapon extends Weapon {
 
             if (s.animator) {
                 // On oriente le satellite vers la tangente ou fixe selon directionMode
-                const drawAngle = this.visuals.directionMode === 'rotate' ? currentAngle + Math.PI/2 : 0;
+                const drawAngle = this.visuals.directionMode === 'rotate' ? currentAngle + Math.PI / 2 : 0;
                 s.animator.draw(ctx, sx, sy, drawAngle);
             } else {
                 ctx.save();
@@ -207,7 +208,7 @@ export class AreaWeapon extends Weapon {
     update(deltaTime, owner, context) {
         const range = (this.stats.range || 100) * (owner.stats.rangeMultiplier || 1.0);
         const dt = deltaTime / 1000;
-        
+
         const targets = [...(context.enemies || [])];
         if (context.boss) targets.push(context.boss);
         // Si context.player est présent et n'est pas déjà dans targets (cas spécifique ennemi)
@@ -237,10 +238,11 @@ export class AreaWeapon extends Weapon {
                     });
                 }
                 if (this.stats.isSlowing && t.applyEffect) {
+                    const slowMagnitude = this.stats.slowMultiplier || 0.4;
                     t.applyEffect({
                         type: 'slowing',
                         duration: 1000,
-                        multiplier: this.stats.slowMultiplier || 0.5
+                        multiplier: 1 - slowMagnitude
                     });
                 }
             }
@@ -258,12 +260,12 @@ export class AreaWeapon extends Weapon {
 
     draw(ctx, owner) {
         let range = (this.stats.range || 100) * (owner.stats.rangeMultiplier || 1.0);
-        
+
         // Effet de pulsation de taille (visuel uniquement)
         if (this.visuals && this.visuals.auraPulseSize) {
             range *= (0.95 + Math.sin(Date.now() / 300) * 0.05);
         }
-        
+
         // On dessine l'animateur si il existe ET qu'il a des images
         let hasSprite = false;
         if (this.animator) {
@@ -275,7 +277,7 @@ export class AreaWeapon extends Weapon {
 
         if (hasSprite) {
             ctx.save();
-            
+
             // Effet de clignotement / pulsation d'opacité
             if (this.visuals && this.visuals.auraPulseAlpha) {
                 const speed = this.visuals.auraAlphaSpeed || 200;
@@ -284,14 +286,14 @@ export class AreaWeapon extends Weapon {
                 const range = max - min;
                 const mid = min + range / 2;
                 const amplitude = range / 2;
-                
+
                 ctx.globalAlpha = mid + Math.sin(Date.now() / speed) * amplitude;
             }
 
             // On force la taille de l'animateur pour qu'elle corresponde exactement au diamètre de la zone (range * 2)
             // On passe l'angle de rotation interne
             this.animator.draw(ctx, owner.x, owner.y, this.angle, { width: range * 2, height: range * 2 });
-            
+
             ctx.restore();
         } else {
             // Dessin du cercle de secours si pas de sprite
@@ -299,7 +301,7 @@ export class AreaWeapon extends Weapon {
             ctx.beginPath();
             ctx.arc(owner.x, owner.y, range, 0, Math.PI * 2);
             const alpha = 0.1 + Math.sin(Date.now() / 200) * 0.05;
-            
+
             if (this.stats.isPoisonous) {
                 ctx.fillStyle = `rgba(0, 255, 0, ${alpha})`;
                 ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)';
@@ -310,7 +312,7 @@ export class AreaWeapon extends Weapon {
                 ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
             }
-            
+
             ctx.fill();
             ctx.lineWidth = 2;
             ctx.stroke();

@@ -368,13 +368,9 @@ class WeaponsModule {
             </div>`;
         } else if (w.type === 'aoe') {
             fields += `
-                <div class="form-group">
-                    <label class="form-label">Portée (range)</label>
+                <div class="form-group" style="flex: 2;">
+                    <label class="form-label">Portée de l'Aura (range)</label>
                     <input type="number" class="form-input stat-input" data-stat="range" value="${s.range || 100}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Multiplicateur Ralenti</label>
-                    <input type="number" step="0.1" class="form-input stat-input" data-stat="slowMultiplier" value="${s.slowMultiplier || 0.6}">
                 </div>
             </div>`;
         }
@@ -393,6 +389,10 @@ class WeaponsModule {
                         <input type="checkbox" class="stat-input" data-stat="isSlowing" ${s.isSlowing ? 'checked' : ''}>
                         Ralentissement
                     </label>
+                </div>
+                <div class="form-group" id="slowFields" style="flex: 1; ${s.isSlowing ? '' : 'display: none;'}">
+                    <label class="form-label">Puissance Ralenti (0-1)</label>
+                    <input type="number" step="0.05" min="0" max="1" class="form-input stat-input" data-stat="slowMultiplier" value="${s.slowMultiplier ?? 0.4}" placeholder="0.4 = -40%">
                 </div>
             </div>
             <div class="form-row poison-fields" style="${s.isPoisonous ? '' : 'display: none;'}">
@@ -423,7 +423,7 @@ class WeaponsModule {
         }
 
         return upgrades.map((upg, idx) => `
-            <div class="upgrade-item" data-index="${idx}">
+            < div class="upgrade-item" data - index="${idx}" >
                 <div class="upgrade-header">
                     <div class="form-group" style="flex: 1; margin: 0;">
                         <label class="form-label-xs">Nom de l'amélioration</label>
@@ -444,15 +444,15 @@ class WeaponsModule {
                         ${this.getAvailableStatsOptions()}
                     </select>
                 </div>
-            </div>
-        `).join('');
+            </div >
+            `).join('');
     }
 
     renderUpgradeStats(stats) {
         if (!stats || Object.keys(stats).length === 0) return '';
 
         return Object.entries(stats).map(([key, val]) => `
-            <div class="upg-stat-row" data-stat="${key}">
+            < div class="upg-stat-row" data - stat="${key}" >
                 <label>${key}</label>
                 <input type="${typeof val === 'boolean' ? 'checkbox' : 'number'}" 
                        step="0.1"
@@ -472,7 +472,7 @@ class WeaponsModule {
             'auraRotationSpeed', 'auraPulseAlpha', 'auraPulseSize', 'auraAlphaSpeed',
             'auraAlphaMin', 'auraAlphaMax'
         ];
-        return stats.map(s => `<option value="${s}">${s}</option>`).join('');
+        return stats.map(s => `< option value = "${s}" > ${s}</option > `).join('');
     }
 
     /**
@@ -504,6 +504,11 @@ class WeaponsModule {
         // Toggle poison fields
         editor.querySelector('[data-stat="isPoisonous"]')?.addEventListener('change', (e) => {
             editor.querySelector('.poison-fields').style.display = e.target.checked ? '' : 'none';
+        });
+
+        // Toggle slow fields
+        editor.querySelector('[data-stat="isSlowing"]')?.addEventListener('change', (e) => {
+            document.getElementById('slowFields').style.display = e.target.checked ? '' : 'none';
         });
 
         // Type change -> re-render stats
@@ -661,7 +666,7 @@ class WeaponsModule {
         const defaults = {
             isPoisonous: true,
             isSlowing: true,
-            slowMultiplier: -0.1,
+            slowMultiplier: 0.1, // +10% de ralenti par défaut pour une upgrade
             damage: 5,
             fireRate: -50,
             projectileCount: 1,
@@ -690,15 +695,15 @@ class WeaponsModule {
         const visuals = this.currentWeapon.visuals;
         if (!visuals || !visuals.path) {
             const color = this.currentWeapon.stats?.color || '#fff';
-            canvas.innerHTML = `<div style="width: 20px; height: 20px; background: ${color}; border-radius: 50%;"></div>`;
+            canvas.innerHTML = `< div style = "width: 20px; height: 20px; background: ${color}; border-radius: 50%;" ></div > `;
             return;
         }
 
         const url = await this.app.assetScanner.getAssetURL(visuals.path);
         if (url) {
             const rotation = (visuals.directionMode === 'rotate' || visuals.rotateWithVelocity) ? visuals.angleOffset : 0;
-            const hStyle = visuals.height ? `height: ${visuals.height}px;` : '';
-            canvas.innerHTML = `<img src="${url}" style="width: ${visuals.width}px; ${hStyle} transform: rotate(${rotation}deg)">`;
+            const hStyle = visuals.height ? `height: ${visuals.height} px; ` : '';
+            canvas.innerHTML = `< img src = "${url}" style = "width: ${visuals.width}px; ${hStyle} transform: rotate(${rotation}deg)" > `;
         } else {
             canvas.innerHTML = '<span style="color: var(--text-danger)">Asset non trouvé</span>';
         }
@@ -707,7 +712,7 @@ class WeaponsModule {
     updateJsonPreview() {
         const preview = document.getElementById('weaponJsonPreview');
         if (preview && this.currentWeapon) {
-            preview.innerHTML = `<pre>${JSON.stringify(this.currentWeapon, null, 4)}</pre>`;
+            preview.innerHTML = `< pre > ${JSON.stringify(this.currentWeapon, null, 4)}</pre > `;
         }
     }
 
@@ -762,10 +767,10 @@ class WeaponsModule {
             this.app.updateStats();
 
             document.getElementById('weaponEditor').innerHTML = `
-                <div class="empty-state">
+            < div class="empty-state" >
                     <div class="empty-state-icon">⚔️</div>
                     <h3 class="empty-state-title">Arme supprimée</h3>
-                </div>
+                </div >
             `;
 
             this.app.showNotification('Arme supprimée', 'info');
