@@ -111,7 +111,7 @@ export class WeaponMenuScreen {
         ctx.fillRect(0, 0, w, h);
 
         // Titre
-        this.drawTitle(ctx, w);
+        this.drawTitle(ctx, layout);
 
         // Cartes
         this.drawCards(ctx, options, layout);
@@ -120,9 +120,14 @@ export class WeaponMenuScreen {
         this.drawKeyboardHint(ctx, w, h);
     }
 
-    drawTitle(ctx, w) {
-        const titleY = 50;
+    drawTitle(ctx, layout) {
+        const { w, cardY } = layout;
+        const titleY = cardY - 180; // Positionné juste au dessus des badges
         const titleAlpha = Math.min(1, this.animationProgress * 2);
+
+        // Déterminer le texte du titre
+        const hasUpgrade = this.game.upgradeOptions.some(opt => opt.type === 'upgrade');
+        const titleText = hasUpgrade ? 'AMÉLIORATION' : 'NOUVELLE ARME';
 
         ctx.globalAlpha = titleAlpha;
 
@@ -138,8 +143,8 @@ export class WeaponMenuScreen {
 
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 7;
-        ctx.strokeText('NOUVELLE ARME', w / 2, titleY);
-        ctx.fillText('NOUVELLE ARME', w / 2, titleY);
+        ctx.strokeText(titleText, w / 2, titleY);
+        ctx.fillText(titleText, w / 2, titleY);
 
         ctx.restore();
 
@@ -182,14 +187,14 @@ export class WeaponMenuScreen {
         const padding = 22;
 
         // === BADGE AU-DESSUS DE LA CARTE ===
-        const badgeY = y - 20;
+        const badgeY = y - 40;
         const badgeText = isUpgrade ? '⬆ AMÉLIORATION' : '★ NOUVEAU';
 
         ctx.font = `bold 13px ${Typography.FONT_PRIMARY}`;
-        const badgeWidth = ctx.measureText(badgeText).width + 24;
+        const badgeWidth = ctx.measureText(badgeText).width + 30;
 
         ctx.fillStyle = this.hexToRgba(borderColor, 0.3);
-        this.roundRectPath(ctx, x + width / 2 - badgeWidth / 2, badgeY - 12, badgeWidth, 26, 13);
+        this.roundRectPath(ctx, x + width / 2 - badgeWidth / 2, badgeY - 12, badgeWidth, 32, 13);
         ctx.fill();
         ctx.strokeStyle = borderColor;
         ctx.lineWidth = 2;
@@ -198,7 +203,7 @@ export class WeaponMenuScreen {
         ctx.fillStyle = borderColor;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(badgeText, x + width / 2, badgeY + 1);
+        ctx.fillText(badgeText, x + width / 2, badgeY + 4);
 
         // === CARTE ===
         if (isHovered) {
@@ -242,17 +247,23 @@ export class WeaponMenuScreen {
         }
         ctx.fillText(title, x + width / 2, titleY);
 
-        // === DESCRIPTION (plus lisible, descendue un peu) ===
-        const descY = titleY + 40;
+        // === DESCRIPTION (centrée entre titre et stats) ===
+        // On définit d'abord la position des stats pour calculer le centre
+        const statsLineY = y + 215;
+        const descAreaTop = titleY + 30;
+        const descAreaBottom = statsLineY - 40;
+        const descCenterY = (descAreaTop + descAreaBottom) / 2;
+
         ctx.fillStyle = Colors.TEXT_SECONDARY;
         ctx.font = `16px ${Typography.FONT_PRIMARY}`;
+        ctx.textBaseline = 'middle'; // Pour centrage vertical
 
         const desc = data.description || 'Pas de description disponible.';
-        this.wrapText(ctx, desc, x + width / 2, descY, width - padding * 2, 22, 3);
+        // On ajuste wrapText pour qu'il puisse centrer verticalement un bloc de texte
+        this.wrapText(ctx, desc, x + width / 2, descCenterY - 11, width - padding * 2, 22, 3);
+        ctx.textBaseline = 'alphabetic'; // Reset
 
-        // === STATS (remontées pour combler l'espace) ===
-        const statsLineY = y + 185;
-
+        // === STATS (descendues) ===
         if (isUpgrade) {
             const upgradeInfo = this.getUpgradeInfo(data);
             ctx.fillStyle = Colors.ACCENT;
@@ -273,28 +284,36 @@ export class WeaponMenuScreen {
                 ctx.textBaseline = 'middle';
                 ctx.font = `bold 13px ${Typography.FONT_MONO}`;
                 ctx.fillStyle = Colors.PRIMARY;
-                ctx.fillText(previewData.typeLabel, x + padding + 10, statsLineY - 10);
+                ctx.fillText(previewData.typeLabel, x + padding + 15, statsLineY - 15); // Offset ajusté
 
                 // === Stats en grille (mini-tableau) ===
                 const stats = previewData.stats;
-                const gridY = statsLineY + 12;
-                const colWidth = (width - padding * 2) / 2;
+                const gridY = statsLineY + 22;
+
+                // Centering logic
+                const labelWidth = 55; // Enough for "POISON"
+                const valueWidth = 20;
+                const colWidth = labelWidth + valueWidth;
+                const gutter = 55;
+                const totalGridWidth = colWidth * 2 + gutter;
+                const innerPadding = (width - padding * 2 - totalGridWidth) / 2;
 
                 stats.forEach((stat, idx) => {
                     const col = idx % 2;
                     const row = Math.floor(idx / 2);
-                    const drawX = x + padding + col * colWidth + (col === 0 ? 10 : 0);
-                    const drawY = gridY + row * 16;
+                    const drawX = x + padding + innerPadding + col * (colWidth + gutter);
+                    const drawY = gridY + row * 20;
 
                     ctx.textAlign = 'left';
-                    ctx.font = `10px ${Typography.FONT_PRIMARY}`;
-                    ctx.fillStyle = Colors.TEXT_MUTED;
+                    ctx.font = `bold 11px ${Typography.FONT_PRIMARY}`;
+                    ctx.fillStyle = Colors.TEXT_SECONDARY;
                     ctx.fillText(stat.label, drawX, drawY);
 
+                    // Align values to the right of their specific column area
                     ctx.textAlign = 'right';
-                    ctx.font = `bold 11px ${Typography.FONT_MONO}`;
+                    ctx.font = `bold 12px ${Typography.FONT_MONO}`;
                     ctx.fillStyle = Colors.TEXT_PRIMARY;
-                    ctx.fillText(stat.value.toString(), drawX + colWidth - 20, drawY);
+                    ctx.fillText(stat.value.toString(), drawX + colWidth, drawY);
                 });
             }
         }
@@ -304,24 +323,7 @@ export class WeaponMenuScreen {
             this.drawEvolutionNodes(ctx, x, y + height - 85, width, data, borderColor);
         }
 
-        // === NUMÉRO DE CARTE ===
-        const numY = y + height + 28;
-        const numSize = isHovered ? 28 : 24;
 
-        ctx.textAlign = 'center';
-
-        ctx.fillStyle = 'rgba(30, 41, 59, 0.9)';
-        ctx.beginPath();
-        ctx.arc(x + width / 2, numY, numSize / 2 + 6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = borderColor;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.fillStyle = isHovered ? Colors.TEXT_PRIMARY : borderColor;
-        ctx.font = `bold ${numSize * 0.7}px ${Typography.FONT_MONO}`;
-        ctx.textBaseline = 'middle';
-        ctx.fillText(cardNum.toString(), x + width / 2, numY);
 
         ctx.restore();
     }
@@ -424,7 +426,15 @@ export class WeaponMenuScreen {
 
             // Ligne de connexion
             if (i < maxLevel) {
-                ctx.strokeStyle = i < currentLevel ? Colors.ACCENT : 'rgba(255,255,255,0.25)';
+                // La ligne entre i et i+1 est verte si le joueur a déjà atteint i+1
+                // Dans le cas de l'image (niv 1 vers 2), la barre entre 1 et 2 doit être verte si on est en train de l'acquérir
+                // currentLevel est le niveau AVANT l'amélioration affichée sur la carte ?
+                // Si on est Niv 1 et qu'on voit "Améliorer vers Niv 2", currentLevel est 1.
+                // L'utilisateur veut la barre entre 1 et 2 en vert.
+                const isReached = i < currentLevel;
+                const isImprovingTo = (i === currentLevel);
+
+                ctx.strokeStyle = (isReached || isImprovingTo) ? Colors.ACCENT : 'rgba(255,255,255,0.25)';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
                 ctx.moveTo(nodeX + nodeRadius, nodeY);

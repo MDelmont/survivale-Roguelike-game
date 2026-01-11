@@ -111,7 +111,7 @@ export class LevelUpScreen {
         ctx.fillRect(0, 0, w, h);
 
         // Titre
-        this.drawTitle(ctx, w, h);
+        this.drawTitle(ctx, layout);
 
         // Cartes
         this.drawCards(ctx, options, layout);
@@ -120,8 +120,9 @@ export class LevelUpScreen {
         this.drawKeyboardHint(ctx, w, h);
     }
 
-    drawTitle(ctx, w, h) {
-        const titleY = 50;
+    drawTitle(ctx, layout) {
+        const { w, cardY } = layout;
+        const titleY = cardY - 140; // Positionné au-dessus des cartes (un peu plus haut que WeaponMenu pour accommoder le texte long)
         const titleAlpha = Math.min(1, this.animationProgress * 2);
 
         ctx.globalAlpha = titleAlpha;
@@ -298,22 +299,7 @@ export class LevelUpScreen {
         ctx.font = `italic 14px ${Typography.FONT_PRIMARY}`;
         ctx.fillText(`💡 ${impactHint}`, x + width / 2, hintY);
 
-        // === NUMÉRO DE CARTE ===
-        const numY = y + height + 28;
-        const numSize = isHovered ? 28 : 24;
 
-        ctx.fillStyle = 'rgba(30, 41, 59, 0.9)';
-        ctx.beginPath();
-        ctx.arc(x + width / 2, numY, numSize / 2 + 6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = isHovered ? Colors.TEXT_PRIMARY : Colors.TEXT_SECONDARY;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.fillStyle = isHovered ? Colors.TEXT_PRIMARY : Colors.TEXT_SECONDARY;
-        ctx.font = `bold ${numSize * 0.7}px ${Typography.FONT_MONO}`;
-        ctx.textBaseline = 'middle';
-        ctx.fillText(cardNum.toString(), x + width / 2, numY);
 
         ctx.restore();
     }

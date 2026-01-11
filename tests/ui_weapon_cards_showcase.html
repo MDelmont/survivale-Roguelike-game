@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showcase - Cartes d'Armes - EVG Anthony</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #020617;
+            --surface-dark: #0f172a;
+            --primary: #00D4FF;
+            --accent: #22C55E;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: var(--primary);
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 60px 40px;
+            justify-items: center;
+        }
+
+        .card-container {
+            position: relative;
+            width: 290px;
+            height: 420px;
+            /* Un peu plus pour le numéro et le badge */
+        }
+
+        canvas {
+            display: block;
+            border-radius: 14px;
+        }
+
+        .controls {
+            background: var(--surface-dark);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #1e293b;
+            margin-bottom: 40px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #334155;
+            color: #f8fafc;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: rgba(51, 65, 85, 0.5);
+            border-color: var(--primary);
+        }
+
+        button.active {
+            background: var(--primary);
+            color: var(--bg-dark);
+            border-color: var(--primary);
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-top: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>WEAPON ARSENAL</h1>
+        <p class="subtitle">Visualisation de l'interface de sélection des armes et améliorations</p>
+    </header>
+
+    <div class="controls">
+        <span>Mode d'affichage :</span>
+        <button id="btn-new" class="active">Nouvelles Armes</button>
+        <button id="btn-upgrade">Améliorations (Niv 1 &rarr; 2)</button>
+    </div>
+
+    <div id="grid" class="grid">
+        <div class="loading">Chargement des données...</div>
+    </div>
+
+    <script type="module">
+        import { WeaponMenuScreen } from '../js/ui/screens/WeaponMenuScreen.js';
+        import { Colors } from '../js/ui/UIManager.js';
+
+        let weaponsData = [];
+        let currentMode = 'new'; // 'new' or 'upgrade'
+
+        async function init() {
+            try {
+                const response = await fetch('../data/weapons.json');
+                const data = await response.json();
+                weaponsData = data.weapons;
+
+                render();
+
+                document.getElementById('btn-new').onclick = () => {
+                    setMode('new');
+                };
+                document.getElementById('btn-upgrade').onclick = () => {
+                    setMode('upgrade');
+                };
+            } catch (err) {
+                console.error(err);
+                document.getElementById('grid').innerHTML = `<div style="color:red">Erreur lors du chargement des armes : ${err.message}</div>`;
+            }
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('btn-new').classList.toggle('active', mode === 'new');
+            document.getElementById('btn-upgrade').classList.toggle('active', mode === 'upgrade');
+            render();
+        }
+
+        function render() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+
+            // Mock minimal Game object
+            const mockGame = {
+                logicalWidth: 290,
+                logicalHeight: 320,
+                player: {
+                    weapons: weaponsData.map(w => ({
+                        id: w.id,
+                        level: 1,
+                        upgrades: w.upgrades || []
+                    }))
+                },
+                upgradeOptions: [] // Not used by drawSingleCard directly if we pass data
+            };
+
+            const menu = new WeaponMenuScreen(mockGame);
+            // On force l'animation à 1 pour voir le résultat final
+            menu.animationProgress = 1;
+            menu.isAnimating = false;
+
+            weaponsData.forEach((weapon, index) => {
+                const container = document.createElement('div');
+                container.className = 'card-container';
+
+                const cardWidth = 290;
+                const cardHeight = 320;
+                const topPadding = 60; // Espace pour le badge (badgeY est à -40)
+                const bottomPadding = 60; // Espace pour le numéro de carte
+
+                const canvas = document.createElement('canvas');
+                canvas.width = cardWidth;
+                canvas.height = cardHeight + topPadding + bottomPadding;
+
+                // Ajuster le container pour qu'il suive la taille du canvas
+                container.style.height = canvas.height + 'px';
+
+                container.appendChild(canvas);
+                grid.appendChild(container);
+
+                const ctx = canvas.getContext('2d');
+
+                const isUpgrade = currentMode === 'upgrade';
+                if (isUpgrade && (!weapon.upgrades || weapon.upgrades.length === 0)) {
+                    container.style.opacity = '0.3';
+                }
+
+                const data = { ...weapon };
+                if (isUpgrade) {
+                    data.type = 'upgrade';
+                    data.weaponId = weapon.id;
+                }
+
+                const borderColor = isUpgrade ? Colors.ACCENT : Colors.PRIMARY;
+
+                ctx.save();
+                ctx.translate(0, topPadding);
+                menu.drawSingleCard(ctx, 0, 0, cardWidth, cardHeight, data, false, borderColor, isUpgrade, index + 1);
+                ctx.restore();
+            });
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
