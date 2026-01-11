@@ -89,7 +89,7 @@ export class LevelUpScreen {
 
         // Cartes plus grandes pour lisibilité
         const cardWidth = 280;
-        const cardHeight = 300;
+        const cardHeight = 340; // Augmenté pour donner de l'air
         const gap = 40;
 
         const totalWidth = numCards * cardWidth + (numCards - 1) * gap;
@@ -235,17 +235,40 @@ export class LevelUpScreen {
         const badgeWidth = width - padding * 2;
 
         // === DESCRIPTION (centrée entre titre et badge) ===
-        const descAreaTop = titleY - 25
-        const descAreaBottom = badgeY - 10;
-        const descCenterY = (descAreaTop + descAreaBottom) / 2;
+        const descAreaTop = titleY + 30; // On descend pour laisser respirer le titre
+        const descAreaBottom = badgeY - 15; // On remonte pour laisser respirer le badge
 
         ctx.fillStyle = Colors.TEXT_SECONDARY;
-        ctx.font = `16px ${Typography.FONT_PRIMARY}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
         const desc = data.description || '';
-        this.wrapText(ctx, desc, x + width / 2, descCenterY, width - padding * 2, 22, 3);
+        const maxDescWidth = width - padding * 2;
+        const maxAreaHeight = descAreaBottom - descAreaTop;
+
+        // --- ADAPTATION DYNAMIQUE DE LA TAILLE ---
+        let fontSize = 15; // On part d'un peu plus petit pour plus d'air
+        let lineHeight = 20;
+        let lines = [];
+
+        // On cherche la taille qui permet de tout afficher sans dépasser la hauteur
+        while (fontSize >= 11) {
+            ctx.font = `${fontSize}px ${Typography.FONT_PRIMARY}`;
+            lines = this.getWrappedLines(ctx, desc, maxDescWidth);
+            if (lines.length * lineHeight <= maxAreaHeight) break;
+            fontSize--;
+            lineHeight = Math.max(16, fontSize * 1.5); // Espacement plus généreux
+        }
+
+        // Dessin des lignes centrées verticalement
+        const totalTextHeight = lines.length * lineHeight;
+        let lineY = descAreaTop + (maxAreaHeight - totalTextHeight) / 2 + lineHeight / 2;
+
+        lines.forEach(lineText => {
+            ctx.fillText(lineText, x + width / 2, lineY);
+            lineY += lineHeight;
+        });
+
         ctx.textBaseline = 'alphabetic'; // Reset
 
         // Dessin du fond du badge
@@ -436,6 +459,25 @@ export class LevelUpScreen {
 
     // === UTILITAIRES ===
 
+    getWrappedLines(ctx, text, maxWidth) {
+        const words = text.split(' ');
+        const lines = [];
+        let currentLine = '';
+
+        for (let n = 0; n < words.length; n++) {
+            const testLine = currentLine + words[n] + ' ';
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width > maxWidth && n > 0) {
+                lines.push(currentLine.trim());
+                currentLine = words[n] + ' ';
+            } else {
+                currentLine = testLine;
+            }
+        }
+        lines.push(currentLine.trim());
+        return lines;
+    }
+
     roundRectPath(ctx, x, y, width, height, radius) {
         ctx.beginPath();
         ctx.moveTo(x + radius, y);
@@ -450,32 +492,6 @@ export class LevelUpScreen {
         ctx.closePath();
     }
 
-    wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 3) {
-        const words = text.split(' ');
-        let line = '';
-        let lineCount = 0;
-
-        for (let n = 0; n < words.length; n++) {
-            const testLine = line + words[n] + ' ';
-            const metrics = ctx.measureText(testLine);
-
-            if (metrics.width > maxWidth && n > 0) {
-                lineCount++;
-                if (lineCount >= maxLines) {
-                    line = line.trim();
-                    if (line.length > 3) line = line.slice(0, -3) + '...';
-                    ctx.fillText(line, x, y);
-                    return;
-                }
-                ctx.fillText(line.trim(), x, y);
-                line = words[n] + ' ';
-                y += lineHeight;
-            } else {
-                line = testLine;
-            }
-        }
-        ctx.fillText(line.trim(), x, y);
-    }
 
     hexToRgba(hex, alpha) {
         const r = parseInt(hex.slice(1, 3), 16);
