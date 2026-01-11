@@ -5,8 +5,9 @@ import { AssetManager } from './AssetManager.js';
  * Gère le chargement et le stockage des configurations JSON, ainsi que des assets associés.
  */
 export class DataManager {
-    constructor() {
-        this.assetManager = new AssetManager();
+    constructor(basePath = '') {
+        this.basePath = basePath;
+        this.assetManager = new AssetManager(basePath);
         this.data = {
             player: null,
             enemies: null,
@@ -24,13 +25,13 @@ export class DataManager {
     async loadAll() {
         try {
             const [playerRes, enemiesRes, phasesRes, weaponsRes, bossesRes, upgradesRes, transitionsRes] = await Promise.all([
-                fetch('./data/player.json'),
-                fetch('./data/enemies.json'),
-                fetch('./data/phases.json'),
-                fetch('./data/weapons.json'),
-                fetch('./data/bosses.json'),
-                fetch('./data/upgrades.json'),
-                fetch('./data/transitions.json')
+                fetch(`${this.basePath}data/player.json`),
+                fetch(`${this.basePath}data/enemies.json`),
+                fetch(`${this.basePath}data/phases.json`),
+                fetch(`${this.basePath}data/weapons.json`),
+                fetch(`${this.basePath}data/bosses.json`),
+                fetch(`${this.basePath}data/upgrades.json`),
+                fetch(`${this.basePath}data/transitions.json`)
             ]);
 
             this.data.player = await playerRes.json();
