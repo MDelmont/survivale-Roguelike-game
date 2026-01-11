@@ -23,6 +23,7 @@ class ConfigModule {
 
         const phasesData = this.app.gameData.phasesFull || {};
         const menuBackground = phasesData.menu_background || '';
+        const victoryBackground = phasesData.victory_background || '';
 
         section.innerHTML = `
             <div class="section-header">
@@ -41,16 +42,27 @@ class ConfigModule {
                         <div class="panel-body">
                             <div class="editor-form">
                                 <div class="form-section">
-                                    <h3 class="form-section-title">Écran d'Accueil</h3>
+                                    <h3 class="form-section-title">Écrans Centraux</h3>
+                                    
                                     <div class="form-group">
-                                        <label class="form-label">Image de Fond du Menu Principal</label>
+                                        <label class="form-label">Fond Menu Principal</label>
                                         <div class="form-row">
-                                            <select class="form-select" id="configMenuBackground" style="flex: 1;">
+                                            <select class="form-select config-bg-select" id="configMenuBackground" data-preview="menuBgPreview" style="flex: 1;">
                                                 <option value="">-- Par défaut (Noir/Dégradé) --</option>
                                                 ${this.app.assetScanner.getAssetPathsForSelect('fond').map(path => `<option value="${path}" ${menuBackground === path ? 'selected' : ''}>${path.split('/').pop()}</option>`).join('')}
                                             </select>
                                         </div>
-                                        <small class="form-help">Cette image s'affiche derrière le titre "EVG ANTHONY" au lancement du jeu.</small>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Fond Écran Victoire</label>
+                                        <div class="form-row">
+                                            <select class="form-select config-bg-select" id="configVictoryBackground" data-preview="victoryBgPreview" style="flex: 1;">
+                                                <option value="">-- Par défaut --</option>
+                                                ${this.app.assetScanner.getAssetPathsForSelect('fond').map(path => `<option value="${path}" ${victoryBackground === path ? 'selected' : ''}>${path.split('/').pop()}</option>`).join('')}
+                                            </select>
+                                        </div>
+                                        <small class="form-help">Image affichée lors de la victoire finale.</small>
                                     </div>
                                 </div>
 
@@ -62,14 +74,25 @@ class ConfigModule {
                     </div>
                 </div>
 
-                <div class="editor-preview" style="width: 300px;">
+                <div class="editor-preview" style="width: 300px; display: flex; flex-direction: column; gap: 20px;">
                     <div class="panel">
                         <div class="panel-header">
-                            <span class="panel-title">Aperçu du Fond</span>
+                            <span class="panel-title">Aperçu Menu</span>
                         </div>
                         <div class="panel-body">
-                            <div id="menuBgPreview" class="preview-canvas" style="height: 200px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                            <div id="menuBgPreview" class="preview-canvas" style="height: 150px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #1e293b;">
                                 ${menuBackground ? '' : '<span style="color: var(--text-muted)">Aucun fond</span>'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span class="panel-title">Aperçu Victoire</span>
+                        </div>
+                        <div class="panel-body">
+                            <div id="victoryBgPreview" class="preview-canvas" style="height: 150px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #1e293b;">
+                                ${victoryBackground ? '' : '<span style="color: var(--text-muted)">Par défaut</span>'}
                             </div>
                         </div>
                     </div>
@@ -77,19 +100,20 @@ class ConfigModule {
             </div>
         `;
 
-        this.updatePreview(menuBackground);
+        this.updatePreview('configMenuBackground');
+        this.updatePreview('configVictoryBackground');
     }
 
     /**
      * Bindings
      */
     bindEvents() {
-        const select = document.getElementById('configMenuBackground');
-        if (select) {
-            select.addEventListener('change', (e) => {
-                this.updatePreview(e.target.value);
+        const selects = document.querySelectorAll('.config-bg-select');
+        selects.forEach(select => {
+            select.addEventListener('change', () => {
+                this.updatePreview(select.id);
             });
-        }
+        });
 
         const saveBtn = document.getElementById('saveConfigBtn');
         if (saveBtn) {
@@ -104,10 +128,15 @@ class ConfigModule {
     }
 
     /**
-     * Met à jour la prévisualisation
+     * Met à jour la prévisualisation pour un select spécifique
      */
-    async updatePreview(path) {
-        const preview = document.getElementById('menuBgPreview');
+    async updatePreview(selectId) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        const path = select.value;
+        const previewId = select.dataset.preview;
+        const preview = document.getElementById(previewId);
         if (!preview) return;
 
         if (path) {
@@ -116,7 +145,7 @@ class ConfigModule {
             preview.innerHTML = '';
         } else {
             preview.style.backgroundImage = 'none';
-            preview.innerHTML = '<span style="color: var(--text-muted)">Aucun fond</span>';
+            preview.innerHTML = `<span style="color: var(--text-muted)">${selectId.includes('Victory') ? 'Par défaut' : 'Aucun fond'}</span>`;
         }
     }
 
@@ -125,12 +154,14 @@ class ConfigModule {
      */
     async saveConfig() {
         const menuBackground = document.getElementById('configMenuBackground').value;
+        const victoryBackground = document.getElementById('configVictoryBackground').value;
 
         // Mettre à jour les données dans l'objet complet
         if (!this.app.gameData.phasesFull) {
             this.app.gameData.phasesFull = { phases: this.app.gameData.phases || [] };
         }
         this.app.gameData.phasesFull.menu_background = menuBackground;
+        this.app.gameData.phasesFull.victory_background = victoryBackground;
 
         try {
             this.app.showNotification('Sauvegarde de la configuration...', 'info');

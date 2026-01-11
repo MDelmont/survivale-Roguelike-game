@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showcase - Victoire - EVG Anthony</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #020617;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #game-container {
+            position: relative;
+            box-shadow: 0 0 100px rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+
+        button {
+            background: #00D4FF;
+            color: #020617;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            filter: brightness(1.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="controls">
+        <div style="font-weight: bold; margin-bottom: 5px;">Showcase Victoire</div>
+        <div style="font-size: 12px; color: #94a3b8;">Prévisualisation de l'écran de fin</div>
+        <button id="resetBtn">Relancer l'Animation</button>
+    </div>
+
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <script type="module">
+        import { VictoryScreen } from '../js/ui/screens/VictoryScreen.js';
+        import { DataManager } from '../js/core/DataManager.js';
+
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Dimensions logiques
+        const WIDTH = 1024;
+        const HEIGHT = 768;
+        canvas.width = WIDTH;
+        canvas.height = HEIGHT;
+
+        let dataManager = new DataManager();
+        let screen = null;
+
+        async function init() {
+            // Charger les données pour avoir les backgrounds
+            await dataManager.loadAll();
+
+            const mockGame = {
+                logicalWidth: WIDTH,
+                logicalHeight: HEIGHT,
+                killCount: 157,
+                phaseTimer: 485,
+                dataManager: dataManager,
+                drawImageCover: (ctx, img, targetW, targetH) => {
+                    const imgW = img.width;
+                    const imgH = img.height;
+                    const targetRatio = targetW / targetH;
+                    const imgRatio = imgW / imgH;
+                    let sX, sY, sW, sH;
+                    if (imgRatio > targetRatio) {
+                        sH = imgH; sW = imgH * targetRatio; sX = (imgW - sW) / 2; sY = 0;
+                    } else {
+                        sW = imgW; sH = imgW / targetRatio; sX = 0; sY = (imgH - sH) / 2;
+                    }
+                    ctx.drawImage(img, sX, sY, sW, sH, 0, 0, targetW, targetH);
+                },
+                player: {
+                    stats: {
+                        level: 12,
+                        damage: 25,
+                        speed: 320,
+                        maxHp: 150,
+                        pickupRadius: 180,
+                        appliedUpgrades: [
+                            { name: 'Munitions Doubles', id: 'upg_doubles', stat: 'projectileBonus', add: 1 },
+                            { name: 'Munitions Doubles', id: 'upg_doubles', stat: 'projectileBonus', add: 1 },
+                            { name: 'Munitions Doubles', id: 'upg_doubles', stat: 'projectileBonus', add: 1 },
+                            { name: 'Gros Coeur', id: 'upg_heart', stat: 'maxHp', add: 20 },
+                            { name: 'Vitesse de déplacement', stat: 'speed', add: 2.5 },
+                            { name: 'Dégâts augmentés', stat: 'damage', multiplier: 1.2 },
+                            { name: 'Dégâts augmentés', stat: 'damage', multiplier: 1.2 },
+                            { name: 'aaaaaa', stat: 'damage', multiplier: 1.2 }
+                        ]
+                    },
+                    weapons: [
+                        { name: 'Lance Capote', level: 5, id: 'weapon_1' },
+                        { name: 'Smartphone Wave', level: 3, id: 'weapon_2' },
+                        { name: 'Zone Sperm gluante', level: 2, id: 'weapon_3' }
+                    ]
+                }
+            };
+
+            screen = new VictoryScreen(mockGame);
+            screen.reset();
+
+            // Boucle de rendu
+            let lastTime = 0;
+            function loop(time) {
+                const dt = time - lastTime;
+                lastTime = time;
+
+                update(dt);
+                draw();
+                requestAnimationFrame(loop);
+            }
+            requestAnimationFrame(loop);
+        }
+
+        function update(dt) {
+            if (screen) screen.update(dt);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, WIDTH, HEIGHT);
+            if (screen) screen.draw(ctx);
+        }
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            if (screen) screen.reset();
+        });
+
+        init();
+    </script>
+</body>
+
+</html>

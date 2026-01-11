@@ -62,6 +62,9 @@ export class DataManager {
             if (this.data.phases.menu_background) {
                 this.assetManager.loadImage(this.data.phases.menu_background);
             }
+            if (this.data.phases.victory_background) {
+                this.assetManager.loadImage(this.data.phases.victory_background);
+            }
 
             if (this.data.phases.phases) {
                 this.data.phases.phases.forEach(phase => {

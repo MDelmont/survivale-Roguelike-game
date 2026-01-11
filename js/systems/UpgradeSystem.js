@@ -51,6 +51,9 @@ export class UpgradeSystem {
                     player.stats.hp += upgrade.add; // Soit soigné du montant ajouté
                 }
             }
+            // Suivi pour le récapitulatif de fin
+            if (!player.stats.appliedUpgrades) player.stats.appliedUpgrades = [];
+            player.stats.appliedUpgrades.push(upgrade);
         }
         console.log(`Statistique augmentée : ${upgrade.name}`);
     }

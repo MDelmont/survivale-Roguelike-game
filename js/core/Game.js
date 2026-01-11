@@ -14,6 +14,7 @@ import { WeaponFactory } from '../systems/WeaponFactory.js';
 import { MainMenu } from '../ui/screens/MainMenu.js';
 import { LevelUpScreen } from '../ui/screens/LevelUpScreen.js';
 import { WeaponMenuScreen } from '../ui/screens/WeaponMenuScreen.js';
+import { VictoryScreen } from '../ui/screens/VictoryScreen.js';
 
 /**
  * GameState Enum
@@ -95,6 +96,7 @@ class Game {
         this.mainMenu = new MainMenu(this);
         this.levelUpScreen = new LevelUpScreen(this);
         this.weaponMenuScreen = new WeaponMenuScreen(this);
+        this.victoryScreen = new VictoryScreen(this);
 
         this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
 
@@ -256,6 +258,8 @@ class Game {
             this.levelUpScreen.update(deltaTime, this.mouseX, this.mouseY);
         } else if (this.state === GameState.WEAPON_MENU && this.weaponMenuScreen) {
             this.weaponMenuScreen.update(deltaTime, this.mouseX, this.mouseY);
+        } else if (this.state === GameState.VICTORY && this.victoryScreen) {
+            this.victoryScreen.update(deltaTime);
         } else if (this.state === GameState.PLAYING) {
             this.update(deltaTime);
         }
@@ -443,8 +447,8 @@ class Game {
             const transition = this.dataManager.getTransitionData(this.currentPhase.transition_outro_id);
             if (transition) {
                 this.openStory(transition.pages, () => {
-                    this.exitFullscreen();
                     this.state = GameState.VICTORY;
+                    if (this.victoryScreen) this.victoryScreen.reset();
                 });
                 return;
             }
@@ -452,12 +456,12 @@ class Game {
 
         if (this.currentPhase.story_outro && this.currentPhase.story_outro.length > 0) {
             this.openStory(this.currentPhase.story_outro, () => {
-                this.exitFullscreen();
                 this.state = GameState.VICTORY;
+                if (this.victoryScreen) this.victoryScreen.reset();
             });
         } else {
-            this.exitFullscreen();
             this.state = GameState.VICTORY;
+            if (this.victoryScreen) this.victoryScreen.reset();
         }
     }
 
@@ -682,7 +686,7 @@ class Game {
         if (this.state === GameState.STORY) this.drawStory();
         if (this.state === GameState.UPGRADE && this.levelUpScreen) this.levelUpScreen.draw(this.ctx);
         if (this.state === GameState.WEAPON_MENU && this.weaponMenuScreen) this.weaponMenuScreen.draw(this.ctx);
-        if (this.state === GameState.VICTORY) this.drawEndScreen('VICTOIRE !', '#0f0');
+        if (this.state === GameState.VICTORY && this.victoryScreen) this.victoryScreen.draw(this.ctx);
         if (this.state === GameState.GAMEOVER) {
             // On ne dessine pas le "GAME OVER" si on utilise déjà une image de défaite (normalement déjà passé au MENU)
             // Mais au cas où, on garde l'affichage standard

@@ -10,19 +10,22 @@ export class Player {
         this.y = y;
         this.radius = 20;
         this.stats = {
-            speed: stats.speed || 200,
+            speed: stats.speed || 250,
             hp: stats.hp || 100,
             maxHp: stats.hp || 100,
+            damage: stats.damage || 10,
+            fireRate: stats.fireRate || 300,
             xp: 0,
             level: 1,
             xpNextLevel: 50,
-            pickupRadius: 100,
+            pickupRadius: stats.pickupRadius || 100,
             // Stats globales pouvant influencer les armes
             fireRateMultiplier: 1.0,
             damageMultiplier: 1.0,
             projectileBonus: 0,
             rangeMultiplier: 1.0,
-            piercingBonus: 0
+            piercingBonus: 0,
+            appliedUpgrades: []
         };
 
         this.color = '#0af';
@@ -112,12 +115,12 @@ export class Player {
         const dt = deltaTime / 1000;
         this.velocity.x = movement.dx * (this.stats.speed * speedMultiplier);
         this.velocity.y = movement.dy * (this.stats.speed * speedMultiplier);
-        
+
         // Mise à jour de l'angle si le joueur bouge
         if (movement.dx !== 0 || movement.dy !== 0) {
             this.angle = Math.atan2(movement.dy, movement.dx);
         }
-        
+
         this.x += this.velocity.x * dt;
         this.y += this.velocity.y * dt;
 
@@ -193,7 +196,7 @@ export class Player {
         this.stats.hp -= amount;
         if (this.stats.hp < 0) this.stats.hp = 0;
         this.isHurt = true;
-        
+
         // Flash rouge de secours si pas d'animator
         if (!this.animator) {
             this.color = '#f00';
