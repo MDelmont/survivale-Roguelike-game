@@ -43,7 +43,13 @@ export class UpgradeSystem {
     applyUpgrade(player, upgrade) {
         if (upgrade.type === 'stat') {
             if (upgrade.multiplier) {
-                player.stats[upgrade.stat] *= upgrade.multiplier;
+                if (upgrade.stat === 'fireRate') {
+                    // Pour le fireRate (délai), on divise par le multiplicateur de fréquence
+                    // Ex: x1.15 signifie "15% plus de tirs", donc on réduit le délai
+                    player.stats[upgrade.stat] /= upgrade.multiplier;
+                } else {
+                    player.stats[upgrade.stat] *= upgrade.multiplier;
+                }
             }
             if (upgrade.add) {
                 player.stats[upgrade.stat] += upgrade.add;

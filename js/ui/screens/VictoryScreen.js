@@ -202,8 +202,8 @@ export class VictoryScreen {
         ctx.fillStyle = Colors.WARNING;
         let valStr = '';
         if (upgrade.multiplier) {
-            const m = Math.round(upgrade.multiplier * 100) / 100;
-            valStr = `x${m}`;
+            const pct = Math.round((upgrade.multiplier - 1) * 100);
+            valStr = (pct >= 0 ? '+' : '') + pct + '%';
         } else if (upgrade.add) {
             valStr = `+${Math.round(upgrade.add * 10) / 10}`;
         }
