@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showcase - Améliorations de Niveau - EVG Anthony</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #020617;
+            --surface-dark: #0f172a;
+            --primary: #00D4FF;
+            --accent: #22C55E;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --secondary: #A855F7;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: var(--warning);
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 40px;
+            justify-items: center;
+        }
+
+        .card-container {
+            position: relative;
+            width: 280px;
+            height: 380px;
+        }
+
+        canvas {
+            display: block;
+            border-radius: 14px;
+        }
+
+        .controls {
+            background: var(--surface-dark);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #1e293b;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>UPGRADE SHOWCASE</h1>
+        <p class="subtitle">Visualisation de l'interface de montée en niveau</p>
+    </header>
+
+    <div class="controls">
+        <span>Aperçu des différents types de bonus disponibles lors du passage de niveau.</span>
+    </div>
+
+    <div id="grid" class="grid"></div>
+
+    <script type="module">
+        import { LevelUpScreen } from '../js/ui/screens/LevelUpScreen.js';
+        import { Colors } from '../js/ui/UIManager.js';
+
+        async function init() {
+            try {
+                const response = await fetch('../data/upgrades.json');
+                const data = await response.json();
+
+                // On n'affiche que les bonus de stats de upgrades.json
+                const allOptions = [
+                    ...data.upgrades
+                ];
+
+                render(allOptions);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('grid').innerHTML = `<div style="color:red">Erreur lors du chargement des données : ${err.message}</div>`;
+            }
+        }
+
+        function render(options) {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+
+            const mockGame = {
+                logicalWidth: 280,
+                logicalHeight: 300,
+                upgradeOptions: options
+            };
+
+            const screen = new LevelUpScreen(mockGame);
+            screen.animationProgress = 1;
+            screen.isAnimating = false;
+
+            options.forEach((upgrade, index) => {
+                const container = document.createElement('div');
+                container.className = 'card-container';
+
+                const canvas = document.createElement('canvas');
+                canvas.width = 280;
+                canvas.height = 360; // Extra room for shadows/glows
+
+                container.appendChild(canvas);
+                grid.appendChild(container);
+
+                const ctx = canvas.getContext('2d');
+                const borderColor = screen.getCardColor(upgrade);
+
+                // On dessine la carte
+                screen.drawSingleCard(ctx, 0, 0, 280, 300, upgrade, false, borderColor, index + 1);
+            });
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

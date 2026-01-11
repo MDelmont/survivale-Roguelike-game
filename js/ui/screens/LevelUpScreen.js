@@ -200,7 +200,7 @@ export class LevelUpScreen {
         ctx.shadowBlur = 0;
 
         // === TITRE (en haut, taille adaptée) ===
-        const titleY = y + 50;
+        const titleY = y + 40;
         ctx.fillStyle = Colors.TEXT_PRIMARY;
         let titleSize = 22;
         ctx.font = `bold ${titleSize}px ${Typography.FONT_PRIMARY}`;
@@ -224,24 +224,31 @@ export class LevelUpScreen {
         }
         ctx.fillText(title, x + width / 2, titleY);
 
-        // === DESCRIPTION (remplissage espace central) ===
-        const descY = titleY + 45;
-        ctx.fillStyle = Colors.TEXT_SECONDARY;
-        ctx.font = `16px ${Typography.FONT_PRIMARY}`;
-        ctx.textAlign = 'center';
-
-        const desc = data.description || '';
-        this.wrapText(ctx, desc, x + width / 2, descY, width - padding * 2, 22, 3);
-
-        // === BADGE STAT (ajustement position) ===
+        // === BADGE STAT (tout en bas) ===
         const statData = this.getStatDisplay(data);
         const isAutoPreview = typeof statData === 'object' && statData.stats;
 
         const badgeHeight = isAutoPreview ? 75 : 44;
-        const badgeY = y + 155; // Remonté un peu pour le badge plus haut
+        const hintHeight = 30;
+        const bottomOffset = padding + hintHeight + 5;
+        const badgeY = y + height - bottomOffset - badgeHeight;
         const badgeWidth = width - padding * 2;
 
-        // Fond du badge
+        // === DESCRIPTION (centrée entre titre et badge) ===
+        const descAreaTop = titleY - 25
+        const descAreaBottom = badgeY - 10;
+        const descCenterY = (descAreaTop + descAreaBottom) / 2;
+
+        ctx.fillStyle = Colors.TEXT_SECONDARY;
+        ctx.font = `16px ${Typography.FONT_PRIMARY}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const desc = data.description || '';
+        this.wrapText(ctx, desc, x + width / 2, descCenterY, width - padding * 2, 22, 3);
+        ctx.textBaseline = 'alphabetic'; // Reset
+
+        // Dessin du fond du badge
         ctx.fillStyle = this.hexToRgba(borderColor, 0.2);
         this.roundRectPath(ctx, x + padding, badgeY, badgeWidth, badgeHeight, 8);
         ctx.fill();
@@ -292,9 +299,10 @@ export class LevelUpScreen {
             });
         }
 
-        // === IMPACT HINT (remonté un peu) ===
-        const hintY = badgeY + badgeHeight + 15;
+        // === IMPACT HINT (tout en bas) ===
+        const hintY = y + height - padding - 2;
         const impactHint = this.getImpactHint(data);
+        ctx.textAlign = 'center';
         ctx.fillStyle = Colors.TEXT_MUTED;
         ctx.font = `italic 14px ${Typography.FONT_PRIMARY}`;
         ctx.fillText(`💡 ${impactHint}`, x + width / 2, hintY);
@@ -423,7 +431,7 @@ export class LevelUpScreen {
         ctx.font = `15px ${Typography.FONT_PRIMARY}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('Cliquez sur une carte ou appuyez sur 1, 2, 3', w / 2, h - 30);
+        ctx.fillText('Sélectionnez votre amélioration', w / 2, h - 30);
     }
 
     // === UTILITAIRES ===
