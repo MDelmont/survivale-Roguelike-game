@@ -308,8 +308,19 @@ class Game {
 
         // Explosions éphémères
         for (let i = this.explosions.length - 1; i >= 0; i--) {
-            this.explosions[i].timer -= deltaTime;
-            if (this.explosions[i].timer <= 0) this.explosions.splice(i, 1);
+            const exp = this.explosions[i];
+            exp.timer -= deltaTime;
+
+            // Si l'explosion a un animateur, on le met à jour
+            if (exp.visuals && !exp.animator) {
+                exp.animator = new Animator(exp.visuals, this.dataManager.assetManager);
+            }
+
+            if (exp.animator) {
+                exp.animator.update(deltaTime, { velocity: { x: 0, y: 0 } });
+            }
+
+            if (exp.timer <= 0) this.explosions.splice(i, 1);
         }
 
         // Spawns (Système de Jauges Parallèles)
@@ -668,17 +679,33 @@ class Game {
         if (this.boss) this.boss.draw(this.ctx);
         if (this.player) {
             this.player.draw(this.ctx);
-            // Explosions avec dégradé
+            // Explosions avec dégradé ou sprite
             this.explosions.forEach(exp => {
-                const a = exp.timer / exp.maxTimer;
-                const grad = this.ctx.createRadialGradient(exp.x, exp.y, 0, exp.x, exp.y, exp.radius);
-                grad.addColorStop(0, `rgba(255, 200, 50, ${a})`);
-                grad.addColorStop(0.5, `rgba(255, 50, 0, ${a * 0.5})`);
-                grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                this.ctx.beginPath();
-                this.ctx.arc(exp.x, exp.y, exp.radius, 0, Math.PI * 2);
-                this.ctx.fillStyle = grad;
-                this.ctx.fill();
+                const progress = 1 - (exp.timer / exp.maxTimer); // 0 (start) to 1 (end)
+                const growthFactor = Math.min(1, progress * 5); // Arrive à 100% de taille en 20% du temps
+                const currentRadius = exp.radius * growthFactor;
+                const alpha = exp.timer / exp.maxTimer;
+
+                if (exp.animator) {
+                    // Rendu via l'animateur si disponible
+                    this.ctx.save();
+                    this.ctx.globalAlpha = alpha;
+                    exp.animator.draw(this.ctx, exp.x, exp.y, 0, {
+                        width: currentRadius * 2,
+                        height: currentRadius * 2
+                    });
+                    this.ctx.restore();
+                } else {
+                    // Fallback sur le dégradé standard
+                    const grad = this.ctx.createRadialGradient(exp.x, exp.y, 0, exp.x, exp.y, currentRadius);
+                    grad.addColorStop(0, `rgba(255, 200, 50, ${alpha})`);
+                    grad.addColorStop(0.5, `rgba(255, 50, 0, ${alpha * 0.5})`);
+                    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                    this.ctx.beginPath();
+                    this.ctx.arc(exp.x, exp.y, currentRadius, 0, Math.PI * 2);
+                    this.ctx.fillStyle = grad;
+                    this.ctx.fill();
+                }
             });
             this.drawUI();
         }

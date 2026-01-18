@@ -106,8 +106,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
@@ -128,6 +133,7 @@
         import { WeaponFactory } from '../js/systems/WeaponFactory.js';
         import { CombatSystem } from '../js/systems/CombatSystem.js';
         import { AssetManager } from '../js/core/AssetManager.js';
+        import { Animator } from '../js/entities/Animator.js';
 
         // Initialisation du gestionnaire d'assets
         const assetManager = new AssetManager();
@@ -172,12 +178,12 @@
                 // Dans le jeu ils sont 'assets/...', ici aussi ils devraient l'être
                 // l'AssetManager chargera via fetch('../' + path) si besoin ? non
                 // AssetManager charge via fetch(path).
-                
+
                 // On va modifier temporairement l'AssetManager pour chercher au bon endroit si besoin
                 // Mais normalement si on lance depuis le serveur à la racine
                 // tests/weapons_showcase.html -> assets/... c'est pas bon.
                 // Il faut '../assets/...'
-                
+
                 // Patch de l'AssetManager pour chercher au bon endroit par rapport au dossier tests/
                 assetManager.loadImage = (originalPath) => {
                     if (assetManager.images.has(originalPath)) {
@@ -213,8 +219,8 @@
 
                     if (weapon.type === 'attack') {
                         // Seulement deux ennemis en ligne
-                        for(let i=0; i<2; i++) {
-                            enemies.push({ x: 220 + i*80, y: 150, hp: 1000 });
+                        for (let i = 0; i < 2; i++) {
+                            enemies.push({ x: 220 + i * 80, y: 150, hp: 1000 });
                         }
                         desc += "Tire des projectiles en ligne droite.";
                     } else if (weapon.type === 'defense') {
@@ -262,11 +268,11 @@
                         this.player = new Player(80, 150, this.config.playerStats, assetManager);
                         this.player.weapons = [];
                         this.player.addWeapon(WeaponFactory.create(this.config.weaponData, assetManager));
-                        
-                        this.enemies = this.config.enemyPositions.map(pos => 
+
+                        this.enemies = this.config.enemyPositions.map(pos =>
                             new Enemy(pos.x, pos.y, { ...this.config.enemyStats, speed: 0 }, assetManager)
                         );
-                        
+
                         this.projectiles = [];
                         this.explosions = [];
                     }
@@ -281,17 +287,17 @@
 
                     update(dt) {
                         const targetDir = { dx: 1, dy: 0 };
-                        
+
                         this.player.update(dt, { dx: 0, dy: 0 }, {
                             targetDir: targetDir,
                             onShoot: (x, y, dx, dy, stats) => this.projectiles.push(new Projectile(x, y, dx, dy, stats, assetManager)),
                             enemies: this.enemies,
                             boss: null,
                             explosions: this.explosions,
-                            handleAOE: (x, y, r, d) => CombatSystem.handleAOE({ 
-                                x, y, radius: r, damage: d, 
-                                enemies: this.enemies, 
-                                explosions: this.explosions 
+                            handleAOE: (x, y, r, d) => CombatSystem.handleAOE({
+                                x, y, radius: r, damage: d,
+                                enemies: this.enemies,
+                                explosions: this.explosions
                             })
                         });
 
@@ -314,13 +320,23 @@
 
                         // Explosions
                         for (let i = this.explosions.length - 1; i >= 0; i--) {
-                            this.explosions[i].timer -= dt;
-                            if (this.explosions[i].timer <= 0) this.explosions.splice(i, 1);
+                            const exp = this.explosions[i];
+                            exp.timer -= dt;
+
+                            if (exp.visuals && !exp.animator) {
+                                exp.animator = new Animator(exp.visuals, assetManager);
+                            }
+
+                            if (exp.animator) {
+                                exp.animator.update(dt, { velocity: { x: 0, y: 0 } });
+                            }
+
+                            if (exp.timer <= 0) this.explosions.splice(i, 1);
                         }
 
                         this.enemies.forEach(e => {
                             e.update(dt, this.player);
-                            
+
                             // RÉGÉNÉRATION : Si l'ennemi meurt, on le ressuscite instantanément
                             // pour qu'il soit là "tout le temps" sur la trajectoire
                             if (e.hp <= 0) {
@@ -344,7 +360,7 @@
 
                         // COUCHE 1 : Auras
                         if (this.player.drawAuras) this.player.drawAuras(ctx);
-                        this.enemies.forEach(e => { if(e.drawAuras) e.drawAuras(ctx); });
+                        this.enemies.forEach(e => { if (e.drawAuras) e.drawAuras(ctx); });
 
                         // COUCHE 2 : Projectiles
                         this.projectiles.forEach(p => p.draw(ctx));
@@ -363,15 +379,26 @@
 
                         // COUCHE 4 : Explosions
                         this.explosions.forEach(exp => {
-                            const a = exp.timer / exp.maxTimer;
-                            const grad = ctx.createRadialGradient(exp.x, exp.y, 0, exp.x, exp.y, exp.radius);
-                            grad.addColorStop(0, `rgba(255, 200, 50, ${a})`);
-                            grad.addColorStop(0.5, `rgba(255, 50, 0, ${a * 0.5})`);
-                            grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                            ctx.beginPath();
-                            ctx.arc(exp.x, exp.y, exp.radius, 0, Math.PI * 2);
-                            ctx.fillStyle = grad;
-                            ctx.fill();
+                            const progress = 1 - (exp.timer / (exp.maxTimer || 300));
+                            const growthFactor = Math.min(1, progress * 4); // Rapide croissance
+                            const currentRadius = exp.radius * growthFactor;
+                            const alpha = Math.max(0, exp.timer / (exp.maxTimer || 300));
+
+                            if (exp.animator) {
+                                ctx.save();
+                                ctx.globalAlpha = alpha;
+                                exp.animator.draw(ctx, exp.x, exp.y, 0, { width: currentRadius * 2, height: currentRadius * 2 });
+                                ctx.restore();
+                            } else {
+                                const grad = ctx.createRadialGradient(exp.x, exp.y, 0, exp.x, exp.y, currentRadius);
+                                grad.addColorStop(0, `rgba(255, 200, 50, ${alpha})`);
+                                grad.addColorStop(0.5, `rgba(255, 50, 0, ${alpha * 0.5})`);
+                                grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                                ctx.beginPath();
+                                ctx.arc(exp.x, exp.y, currentRadius, 0, Math.PI * 2);
+                                ctx.fillStyle = grad;
+                                ctx.fill();
+                            }
                         });
                     }
                 }

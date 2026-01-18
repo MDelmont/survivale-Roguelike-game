@@ -9,6 +9,7 @@ class AssetScanner {
             monster: [],
             boss: [],
             projectile: [],
+            explosion: [],
             fond: [],
             other: []
         };
@@ -29,6 +30,7 @@ class AssetScanner {
             monster: [],
             boss: [],
             projectile: [],
+            explosion: [],
             fond: [],
             other: []
         };
@@ -65,6 +67,8 @@ class AssetScanner {
                         this.assets.boss.push(assetInfo);
                     } else if (path.includes('projectile')) {
                         this.assets.projectile.push(assetInfo);
+                    } else if (path.includes('explosion')) {
+                        this.assets.explosion.push(assetInfo);
                     } else if (path.includes('fond')) {
                         this.assets.fond.push(assetInfo);
                     } else {
@@ -84,6 +88,7 @@ class AssetScanner {
             ...this.assets.monster,
             ...this.assets.boss,
             ...this.assets.projectile,
+            ...this.assets.explosion,
             ...this.assets.fond,
             ...this.assets.other
         ];

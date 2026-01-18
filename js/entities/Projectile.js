@@ -60,14 +60,36 @@ export class Projectile {
 
         // Effet d'explosion (AOE)
         if (this.isExplosive && combatContext) {
+            const effects = [];
+
+            if (this.isPoisonous) {
+                effects.push({
+                    type: 'poison',
+                    duration: this.stats.poisonDuration || 3000,
+                    damagePerTick: this.stats.poisonDamage || this.damage * 0.2,
+                    tickRate: this.stats.poisonTickRate || 500
+                });
+            }
+
+            if (this.stats.isSlowing) {
+                const slowMagnitude = this.stats.slowMultiplier || 0.4;
+                effects.push({
+                    type: 'slowing',
+                    duration: 2000,
+                    multiplier: 1 - slowMagnitude
+                });
+            }
+
             CombatSystem.handleAOE({
                 x: this.x,
                 y: this.y,
-                radius: 80,
-                damage: this.damage * 0.5,
+                radius: this.stats.explosionRadius || 80,
+                damage: this.damage * (this.stats.explosionDamageMultiplier || 0.5),
                 enemies: combatContext.enemies,
                 boss: combatContext.boss,
-                explosions: combatContext.explosions
+                explosions: combatContext.explosions,
+                effects: effects,
+                visuals: this.stats.explosionVisuals || null // Utilise les visuels d'explosion spécifiques si définis
             });
         }
 

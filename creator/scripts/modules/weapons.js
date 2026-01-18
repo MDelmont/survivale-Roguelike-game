@@ -166,6 +166,7 @@ class WeaponsModule {
 
         const w = this.currentWeapon;
         const projectileAssets = this.app.assetScanner.getAssetPathsForSelect('projectile');
+        const explosionAssets = this.app.assetScanner.getAssetPathsForSelect('explosion');
 
         editor.innerHTML = `
             <div class="editor-form">
@@ -281,6 +282,30 @@ class WeaponsModule {
                                 <input type="number" step="0.1" min="0" max="1" class="form-input" id="auraAlphaMax" value="${w.visuals?.auraAlphaMax ?? 1.0}">
                             </div>
                             <div class="form-group"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section explosion-visuals-section" style="${w.stats?.isExplosive ? '' : 'display: none;'}">
+                    <h3 class="form-section-title">Visuels de l'Explosion</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Image Explosion (Asset)</label>
+                            <select class="form-select" id="explosionVisualPath">
+                                <option value="">-- Aucun (Dégradé par défaut) --</option>
+                                ${explosionAssets.map(path => `<option value="${path}" ${w.stats?.explosionVisuals?.path === path ? 'selected' : ''}>${path.split('/').pop()}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Taille Explosion (px)</label>
+                            <input type="number" class="form-input" id="explosionVisualSize" value="${w.stats?.explosionVisuals?.width || 80}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Direction Mode</label>
+                            <select class="form-select" id="explosionDirMode">
+                                <option value="none" ${w.stats?.explosionVisuals?.directionMode === 'none' ? 'selected' : ''}>None (Fixe)</option>
+                                <option value="rotate" ${w.stats?.explosionVisuals?.directionMode === 'rotate' ? 'selected' : ''}>Rotate (Orienté)</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -409,6 +434,24 @@ class WeaponsModule {
                     <input type="number" class="form-input stat-input" data-stat="poisonTickRate" value="${s.poisonTickRate || 500}">
                 </div>
             </div>
+
+            <!-- Effet d'Explosion -->
+            <div class="form-row" style="margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px dashed rgba(255,255,255,0.1);">
+                <div class="form-group">
+                    <label class="form-label form-check">
+                        <input type="checkbox" class="stat-input" data-stat="isExplosive" ${s.isExplosive ? 'checked' : ''}>
+                        Explosif
+                    </label>
+                </div>
+                <div class="form-group explosion-fields" style="flex: 1; ${s.isExplosive ? '' : 'display: none;'}">
+                    <label class="form-label">Rayon Explosion</label>
+                    <input type="number" class="form-input stat-input" data-stat="explosionRadius" value="${s.explosionRadius || 80}">
+                </div>
+                <div class="form-group explosion-fields" style="flex: 1; ${s.isExplosive ? '' : 'display: none;'}">
+                    <label class="form-label">Multiplicateur Dégâts AOE</label>
+                    <input type="number" step="0.1" class="form-input stat-input" data-stat="explosionDamageMultiplier" value="${s.explosionDamageMultiplier || 0.5}">
+                </div>
+            </div>
         `;
 
         return fields;
@@ -423,7 +466,7 @@ class WeaponsModule {
         }
 
         return upgrades.map((upg, idx) => `
-            < div class="upgrade-item" data - index="${idx}" >
+            <div class="upgrade-item" data-index="${idx}">
                 <div class="upgrade-header">
                     <div class="form-group" style="flex: 1; margin: 0;">
                         <label class="form-label-xs">Nom de l'amélioration</label>
@@ -444,7 +487,7 @@ class WeaponsModule {
                         ${this.getAvailableStatsOptions()}
                     </select>
                 </div>
-            </div >
+            </div>
             `).join('');
     }
 
@@ -452,7 +495,7 @@ class WeaponsModule {
         if (!stats || Object.keys(stats).length === 0) return '';
 
         return Object.entries(stats).map(([key, val]) => `
-            < div class="upg-stat-row" data - stat="${key}" >
+            <div class="upg-stat-row" data-stat="${key}">
                 <label>${key}</label>
                 <input type="${typeof val === 'boolean' ? 'checkbox' : 'number'}" 
                        step="0.1"
@@ -469,10 +512,11 @@ class WeaponsModule {
             'damage', 'fireRate', 'projectileSpeed', 'projectileCount', 'piercingCount',
             'radius', 'orbitSpeed', 'range', 'slowMultiplier', 'isPoisonous',
             'poisonDamage', 'poisonDuration', 'poisonTickRate', 'isSlowing',
+            'isExplosive', 'explosionRadius', 'explosionDamageMultiplier',
             'auraRotationSpeed', 'auraPulseAlpha', 'auraPulseSize', 'auraAlphaSpeed',
             'auraAlphaMin', 'auraAlphaMax'
         ];
-        return stats.map(s => `< option value = "${s}" > ${s}</option > `).join('');
+        return stats.map(s => `<option value="${s}">${s}</option>`).join('');
     }
 
     /**
@@ -509,6 +553,12 @@ class WeaponsModule {
         // Toggle slow fields
         editor.querySelector('[data-stat="isSlowing"]')?.addEventListener('change', (e) => {
             document.getElementById('slowFields').style.display = e.target.checked ? '' : 'none';
+        });
+
+        // Toggle explosion fields
+        editor.querySelector('[data-stat="isExplosive"]')?.addEventListener('change', (e) => {
+            editor.querySelectorAll('.explosion-fields').forEach(f => f.style.display = e.target.checked ? '' : 'none');
+            editor.querySelector('.explosion-visuals-section').style.display = e.target.checked ? '' : 'none';
         });
 
         // Type change -> re-render stats
@@ -611,7 +661,35 @@ class WeaponsModule {
             delete w.visuals.auraPulseSize;
             delete w.visuals.auraAlphaSpeed;
             delete w.visuals.auraAlphaMin;
+            delete w.visuals.auraAlphaMin;
             delete w.visuals.auraAlphaMax;
+        }
+
+        // Explosion Visuals
+        if (w.stats.isExplosive) {
+            const expPath = document.getElementById('explosionVisualPath').value;
+            const expSize = parseInt(document.getElementById('explosionVisualSize').value) || 80;
+            const expDirMode = document.getElementById('explosionDirMode').value;
+
+            if (expPath) {
+                w.stats.explosionVisuals = {
+                    path: expPath,
+                    width: expSize,
+                    height: expSize,
+                    directionMode: expDirMode,
+                    animations: {
+                        idle: {
+                            frames: [expPath],
+                            frameRate: 10,
+                            loop: true
+                        }
+                    }
+                };
+            } else {
+                delete w.stats.explosionVisuals;
+            }
+        } else {
+            delete w.stats.explosionVisuals;
         }
 
         w.visuals.animations = {
@@ -695,15 +773,15 @@ class WeaponsModule {
         const visuals = this.currentWeapon.visuals;
         if (!visuals || !visuals.path) {
             const color = this.currentWeapon.stats?.color || '#fff';
-            canvas.innerHTML = `< div style = "width: 20px; height: 20px; background: ${color}; border-radius: 50%;" ></div > `;
+            canvas.innerHTML = `<div style="width: 20px; height: 20px; background: ${color}; border-radius: 50%;"></div>`;
             return;
         }
 
         const url = await this.app.assetScanner.getAssetURL(visuals.path);
         if (url) {
             const rotation = (visuals.directionMode === 'rotate' || visuals.rotateWithVelocity) ? visuals.angleOffset : 0;
-            const hStyle = visuals.height ? `height: ${visuals.height} px; ` : '';
-            canvas.innerHTML = `< img src = "${url}" style = "width: ${visuals.width}px; ${hStyle} transform: rotate(${rotation}deg)" > `;
+            const hStyle = visuals.height ? `height: ${visuals.height}px;` : '';
+            canvas.innerHTML = `<img src="${url}" style="width: ${visuals.width}px; ${hStyle} transform: rotate(${rotation}deg)">`;
         } else {
             canvas.innerHTML = '<span style="color: var(--text-danger)">Asset non trouvé</span>';
         }
@@ -712,7 +790,7 @@ class WeaponsModule {
     updateJsonPreview() {
         const preview = document.getElementById('weaponJsonPreview');
         if (preview && this.currentWeapon) {
-            preview.innerHTML = `< pre > ${JSON.stringify(this.currentWeapon, null, 4)}</pre > `;
+            preview.innerHTML = `<pre>${JSON.stringify(this.currentWeapon, null, 4)}</pre>`;
         }
     }
 
@@ -767,10 +845,10 @@ class WeaponsModule {
             this.app.updateStats();
 
             document.getElementById('weaponEditor').innerHTML = `
-            < div class="empty-state" >
+            <div class="empty-state">
                     <div class="empty-state-icon">⚔️</div>
                     <h3 class="empty-state-title">Arme supprimée</h3>
-                </div >
+                </div>
             `;
 
             this.app.showNotification('Arme supprimée', 'info');

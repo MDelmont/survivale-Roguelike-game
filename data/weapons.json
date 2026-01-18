@@ -284,6 +284,112 @@
                 "rotateWithVelocity": true,
                 "angleOffset": 0
             }
+        },
+        {
+            "id": "Lance_tetine",
+            "name": "Lance_tetine",
+            "type": "attack",
+            "stats": {
+                "damage": 10,
+                "fireRate": 500,
+                "projectileSpeed": 400,
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500
+            },
+            "upgrades": [],
+            "visuals": {
+                "path": "assets/projectiles/tetine.png",
+                "width": 20,
+                "height": 20,
+                "rotateWithVelocity": true,
+                "angleOffset": 0,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/tetine.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "",
+            "category": "",
+            "preview": ""
+        },
+        {
+            "id": "Lance_bombe_toxique",
+            "name": "Lance-bombe toxique",
+            "type": "attack",
+            "description": "Explose à l'impact en libérant un nuage toxique et ralentissant.",
+            "category": "projectile",
+            "stats": {
+                "damage": 30,
+                "fireRate": 800,
+                "projectileSpeed": 300,
+                "projectileCount": 1,
+                "isExplosive": true,
+                "explosionRadius": 100,
+                "explosionDamageMultiplier": 0.8,
+                "isPoisonous": true,
+                "poisonDamage": 15,
+                "poisonDuration": 3000,
+                "poisonTickRate": 500,
+                "isSlowing": true,
+                "slowMultiplier": 0.5,
+                "piercingCount": 0,
+                "color": null,
+                "explosionVisuals": {
+                    "path": "assets/explosion/zone-caca.png",
+                    "width": 10,
+                    "height": 10,
+                    "directionMode": "none",
+                    "animations": {
+                        "idle": {
+                            "frames": [
+                                "assets/explosion/zone-caca.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                }
+            },
+            "upgrades": [
+                {
+                    "name": "Rayon accru",
+                    "preview": "Rayon +40px",
+                    "stats": {
+                        "explosionRadius": 40
+                    }
+                }
+            ],
+            "visuals": {
+                "path": "assets/projectiles/couche.png",
+                "width": 30,
+                "height": 30,
+                "rotateWithVelocity": true,
+                "angleOffset": 0,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/couche.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "preview": ""
         }
     ]
 }
