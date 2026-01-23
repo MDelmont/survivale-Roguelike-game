@@ -980,10 +980,13 @@ class BossesModule {
         let transform = '';
         if (dirMode === 'flip' && direction === 'left') {
             transform = 'scaleX(-1)';
+            if (visuals.angleOffset) transform += ` rotate(${visuals.angleOffset}deg)`;
         } else if (dirMode === 'rotate') {
             const angles = { right: 0, down: 90, left: 180, up: 270 };
             const angle = (angles[direction] || 0) + (visuals.angleOffset || 0);
             transform = `rotate(${angle}deg)`;
+        } else if (visuals.angleOffset) {
+            transform = `rotate(${visuals.angleOffset}deg)`;
         }
 
         return { frames, frameRate, transform };

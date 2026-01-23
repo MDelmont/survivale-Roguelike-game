@@ -6,18 +6,18 @@ export class Animator {
     constructor(visuals, assetManager) {
         this.visuals = visuals;
         this.assetManager = assetManager;
-        
+
         this.currentState = 'idle';
         this.currentDirection = 'down'; // Pour les modes 4_way/8_way
         this.currentFrameIndex = 0;
         this.timer = 0;
-        
+
         this.width = visuals.width;
         this.height = visuals.height;
         this.displayOffset = visuals.displayOffset || { x: 0, y: 0 };
         this.angleOffset = (visuals.angleOffset || 0) * (Math.PI / 180); // Conversion en radians
         this.directionMode = visuals.directionMode || 'none'; // none, flip, rotate, 4_way, 8_way
-        
+
         this.isHurt = false;
         this.hurtTimer = 0;
     }
@@ -33,7 +33,7 @@ export class Animator {
             this.isHurt = true;
             this.hurtTimer = 200; // Durée fixe du flash/état hurt
         }
-        
+
         if (this.hurtTimer > 0) {
             this.hurtTimer -= deltaTime;
             if (this.hurtTimer <= 0) this.isHurt = false;
@@ -71,7 +71,7 @@ export class Animator {
         if (anim && anim.frames && anim.frames.length > 0) {
             this.timer += deltaTime;
             const frameDuration = 1000 / (anim.frameRate || 10);
-            
+
             if (this.timer >= frameDuration) {
                 this.timer = 0;
                 this.currentFrameIndex++;
@@ -125,7 +125,7 @@ export class Animator {
 
         const imagePath = anim.frames[this.currentFrameIndex];
         const img = this.assetManager.getImage(imagePath);
-        
+
         if (!img) return;
 
         // Calcul dynamique des dimensions pour garder l'aspect ratio (Bounding Box)
@@ -154,9 +154,16 @@ export class Animator {
         ctx.save();
         ctx.translate(posX + this.displayOffset.x, posY + this.displayOffset.y);
 
-        // Rotation pour le mode rotate OU si un angle est explicitement fourni (ex: aura)
-        if (this.directionMode === 'rotate' || angle !== 0) {
+        // Rotation : 
+        // 1. En mode 'rotate', on suit l'angle de mouvement + offset
+        // 2. En mode 'none', on peut forcer un angle (ex: projectiles, auras)
+        // 3. En mode '4_way' / 'flip', on n'applique QUE l'offset statique (pas l'angle de mouvement)
+        const isDirectionalMode = ['4_way', '8_way', 'flip'].includes(this.directionMode);
+
+        if (this.directionMode === 'rotate' || (!isDirectionalMode && angle !== 0)) {
             ctx.rotate(angle + this.angleOffset);
+        } else if (this.angleOffset !== 0) {
+            ctx.rotate(this.angleOffset);
         }
 
         // Flip horizontal pour le mode flip
@@ -170,10 +177,10 @@ export class Animator {
         }
 
         ctx.drawImage(
-            img, 
-            -drawW / 2, 
-            -drawH / 2, 
-            drawW, 
+            img,
+            -drawW / 2,
+            -drawH / 2,
+            drawW,
             drawH
         );
 
@@ -233,7 +240,7 @@ export class Animator {
         }
 
         const alpha = alphaMask.data[imgY * alphaMask.width + imgX];
-        return alpha > 10; 
+        return alpha > 10;
     }
 }
 
