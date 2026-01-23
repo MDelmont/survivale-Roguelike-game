@@ -342,11 +342,11 @@ class BossesModule {
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Largeur (px)</label>
-                            <input type="number" class="form-input" id="bossWidth" value="${b.visuals?.width || 128}">
+                            <label class="form-label">Largeur (px, optionnel)</label>
+                            <input type="number" class="form-input" id="bossWidth" value="${b.visuals?.width || ''}">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Hauteur (px)</label>
+                            <label class="form-label">Hauteur (px, optionnel)</label>
                             <input type="number" class="form-input" id="bossHeight" value="${b.visuals?.height || ''}">
                         </div>
                     </div>
@@ -410,12 +410,12 @@ class BossesModule {
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Largeur (px)</label>
-                            <input type="number" class="form-input" id="projWidth" value="${b.projectileVisuals?.width || 16}">
+                            <label class="form-label">Largeur (px, optionnel)</label>
+                            <input type="number" class="form-input" id="projWidth" value="${b.projectileVisuals?.width || ''}">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Hauteur (px)</label>
-                            <input type="number" class="form-input" id="projHeight" value="${b.projectileVisuals?.height || 16}">
+                            <label class="form-label">Hauteur (px, optionnel)</label>
+                            <input type="number" class="form-input" id="projHeight" value="${b.projectileVisuals?.height || ''}">
                         </div>
                     </div>
                     <div class="form-row">
@@ -757,7 +757,11 @@ class BossesModule {
         // Visuels boss
         if (!b.visuals) b.visuals = {};
         b.visuals.type = document.getElementById('bossVisualType')?.value || 'sprite';
-        b.visuals.width = parseInt(document.getElementById('bossWidth')?.value) || 128;
+
+        const bWidth = document.getElementById('bossWidth')?.value;
+        if (bWidth) b.visuals.width = parseInt(bWidth);
+        else delete b.visuals.width;
+
         const bHeight = document.getElementById('bossHeight')?.value;
         if (bHeight) b.visuals.height = parseInt(bHeight);
         else delete b.visuals.height;
@@ -774,7 +778,11 @@ class BossesModule {
         b.projectileVisuals.type = document.getElementById('projVisualType')?.value || 'sprite';
         const pPath = document.getElementById('projVisualPath')?.value;
         b.projectileVisuals.path = pPath;
-        b.projectileVisuals.width = parseInt(document.getElementById('projWidth')?.value) || 16;
+
+        const pWidth = document.getElementById('projWidth')?.value;
+        if (pWidth) b.projectileVisuals.width = parseInt(pWidth);
+        else delete b.projectileVisuals.width;
+
         const pHeight = document.getElementById('projHeight')?.value;
         if (pHeight) b.projectileVisuals.height = parseInt(pHeight);
         else delete b.projectileVisuals.height;
@@ -1015,13 +1023,31 @@ class BossesModule {
         if (params?.frames?.length > 0) {
             const url = await this.app.assetScanner.getAssetURL(params.frames[0]);
             if (url) {
-                const width = Math.min(visuals.width || 128, 150);
-                const height = Math.min(visuals.height || width, 150);
-                canvas.innerHTML = `<img src="${url}" alt="preview" style="width: ${width}px; height: ${height}px; image-rendering: pixelated; transform: ${params.transform}">`;
+                const img = new Image();
+                img.src = url;
+                img.onload = () => {
+                    let drawW = visuals.width;
+                    let drawH = visuals.height;
+                    const imgRatio = img.width / img.height;
 
-                document.getElementById('playIdleBtn').disabled = !idleParams || idleParams.frames.length === 0;
-                document.getElementById('playWalkBtn').disabled = !walkParams || walkParams.frames.length === 0;
-                document.getElementById('stopAnimBtn').disabled = false;
+                    if (drawW && drawH) { }
+                    else if (drawW) drawH = drawW / imgRatio;
+                    else if (drawH) drawW = drawH * imgRatio;
+                    else { drawW = img.width; drawH = img.height; }
+
+                    const maxPreview = 150;
+                    if (drawW > maxPreview || drawH > maxPreview) {
+                        const ratio = Math.min(maxPreview / drawW, maxPreview / drawH);
+                        drawW *= ratio;
+                        drawH *= ratio;
+                    }
+
+                    canvas.innerHTML = `<img src="${url}" alt="preview" style="width: ${drawW}px; height: ${drawH}px; image-rendering: pixelated; transform: ${params.transform}">`;
+
+                    document.getElementById('playIdleBtn').disabled = !idleParams || idleParams.frames.length === 0;
+                    document.getElementById('playWalkBtn').disabled = !walkParams || walkParams.frames.length === 0;
+                    document.getElementById('stopAnimBtn').disabled = false;
+                };
                 return;
             }
         }
@@ -1049,10 +1075,21 @@ class BossesModule {
 
         const url = await this.app.assetScanner.getAssetURL(path);
         if (url) {
-            const width = projVisuals.width || 16;
-            const height = projVisuals.height || width;
-            const angle = projVisuals.angleOffset || 0;
-            canvas.innerHTML = `<img src="${url}" alt="projectile" style="width: ${width * 2}px; height: ${height * 2}px; transform: rotate(${angle}deg); image-rendering: pixelated;">`;
+            const img = new Image();
+            img.src = url;
+            img.onload = () => {
+                let drawW = projVisuals.width;
+                let drawH = projVisuals.height;
+                const imgRatio = img.width / img.height;
+
+                if (drawW && drawH) { }
+                else if (drawW) drawH = drawW / imgRatio;
+                else if (drawH) drawW = drawH * imgRatio;
+                else { drawW = img.width; drawH = img.height; }
+
+                const angle = projVisuals.angleOffset || 0;
+                canvas.innerHTML = `<img src="${url}" alt="projectile" style="width: ${drawW * 2}px; height: ${drawH * 2}px; transform: rotate(${angle}deg); image-rendering: pixelated;">`;
+            };
         }
     }
 
@@ -1068,8 +1105,7 @@ class BossesModule {
         const canvas = document.getElementById('bossPreviewCanvas');
         if (!canvas) return;
 
-        const width = Math.min(this.currentBoss.visuals?.width || 128, 150);
-        const height = Math.min(this.currentBoss.visuals?.height || width, 150);
+
 
         const urls = [];
         for (const frame of params.frames) {
@@ -1080,10 +1116,30 @@ class BossesModule {
         if (urls.length === 0) return;
 
         this.currentFrameIndex = 0;
-        this.animationInterval = setInterval(() => {
-            canvas.innerHTML = `<img src="${urls[this.currentFrameIndex]}" alt="frame" style="width: ${width}px; height: ${height}px; image-rendering: pixelated; transform: ${params.transform}">`;
-            this.currentFrameIndex = (this.currentFrameIndex + 1) % urls.length;
-        }, 1000 / params.frameRate);
+        const img = new Image();
+        img.src = urls[0];
+        img.onload = () => {
+            let drawW = this.currentBoss.visuals.width;
+            let drawH = this.currentBoss.visuals.height;
+            const imgRatio = img.width / img.height;
+
+            if (drawW && drawH) { }
+            else if (drawW) drawH = drawW / imgRatio;
+            else if (drawH) drawW = drawH * imgRatio;
+            else { drawW = img.width; drawH = img.height; }
+
+            const maxPreview = 150;
+            if (drawW > maxPreview || drawH > maxPreview) {
+                const ratio = Math.min(maxPreview / drawW, maxPreview / drawH);
+                drawW *= ratio;
+                drawH *= ratio;
+            }
+
+            this.animationInterval = setInterval(() => {
+                canvas.innerHTML = `<img src="${urls[this.currentFrameIndex]}" alt="frame" style="width: ${drawW}px; height: ${drawH}px; image-rendering: pixelated; transform: ${params.transform}">`;
+                this.currentFrameIndex = (this.currentFrameIndex + 1) % urls.length;
+            }, 1000 / params.frameRate);
+        };
     }
 
     /**

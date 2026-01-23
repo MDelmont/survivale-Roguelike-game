@@ -267,8 +267,8 @@ class PlayersModule {
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Largeur (px)</label>
-                            <input type="number" class="form-input" id="playerWidth" value="${p.visuals?.width || 64}">
+                            <label class="form-label">Largeur (px, optionnel)</label>
+                            <input type="number" class="form-input" id="playerWidth" value="${p.visuals?.width || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Hauteur (px, optionnel)</label>
@@ -617,7 +617,10 @@ class PlayersModule {
         // Visuels
         if (!p.visuals) p.visuals = {};
         p.visuals.type = document.getElementById('playerVisualType')?.value || 'sprite';
-        p.visuals.width = parseInt(document.getElementById('playerWidth')?.value) || 64;
+
+        const width = document.getElementById('playerWidth')?.value;
+        if (width) p.visuals.width = parseInt(width);
+        else delete p.visuals.width;
 
         const height = document.getElementById('playerHeight')?.value;
         if (height) p.visuals.height = parseInt(height);
@@ -890,7 +893,35 @@ class PlayersModule {
         if (params?.frames?.length > 0) {
             const url = await this.app.assetScanner.getAssetURL(params.frames[0]);
             if (url) {
-                canvas.innerHTML = `<img src="${url}" alt="preview" style="transform: ${params.transform}">`;
+                const img = new Image();
+                img.src = url;
+                img.onload = () => {
+                    let drawW = this.currentPlayer.visuals.width;
+                    let drawH = this.currentPlayer.visuals.height;
+                    const imgRatio = img.width / img.height;
+
+                    // Calcul de la taille de prévisualisation cohérente
+                    if (drawW && drawH) {
+                        // On garde les deux si spécifiés
+                    } else if (drawW) {
+                        drawH = drawW / imgRatio;
+                    } else if (drawH) {
+                        drawW = drawH * imgRatio;
+                    } else {
+                        drawW = img.width;
+                        drawH = img.height;
+                    }
+
+                    // On borne pour la prévisualisation
+                    const maxPreview = 150;
+                    if (drawW > maxPreview || drawH > maxPreview) {
+                        const ratio = Math.min(maxPreview / drawW, maxPreview / drawH);
+                        drawW *= ratio;
+                        drawH *= ratio;
+                    }
+
+                    canvas.innerHTML = `<img src="${url}" alt="preview" style="width: ${drawW}px; height: ${drawH}px; transform: ${params.transform}; image-rendering: pixelated;">`;
+                };
             }
         } else {
             canvas.innerHTML = `<span style="color: var(--text-muted)">Aucun sprite</span>`;
@@ -923,10 +954,31 @@ class PlayersModule {
         this.currentFrameIndex = 0;
         const canvas = document.getElementById('playerPreviewCanvas');
 
-        this.animationInterval = setInterval(() => {
-            canvas.innerHTML = `<img src="${urls[this.currentFrameIndex]}" alt="frame" style="transform: ${params.transform}">`;
-            this.currentFrameIndex = (this.currentFrameIndex + 1) % urls.length;
-        }, 1000 / params.frameRate);
+        // Charger la première image pour avoir le ratio
+        const img = new Image();
+        img.src = urls[0];
+        img.onload = () => {
+            let drawW = this.currentPlayer.visuals.width;
+            let drawH = this.currentPlayer.visuals.height;
+            const imgRatio = img.width / img.height;
+
+            if (drawW && drawH) { }
+            else if (drawW) drawH = drawW / imgRatio;
+            else if (drawH) drawW = drawH * imgRatio;
+            else { drawW = img.width; drawH = img.height; }
+
+            const maxPreview = 150;
+            if (drawW > maxPreview || drawH > maxPreview) {
+                const ratio = Math.min(maxPreview / drawW, maxPreview / drawH);
+                drawW *= ratio;
+                drawH *= ratio;
+            }
+
+            this.animationInterval = setInterval(() => {
+                canvas.innerHTML = `<img src="${urls[this.currentFrameIndex]}" alt="frame" style="width: ${drawW}px; height: ${drawH}px; transform: ${params.transform}; image-rendering: pixelated;">`;
+                this.currentFrameIndex = (this.currentFrameIndex + 1) % urls.length;
+            }, 1000 / params.frameRate);
+        };
     }
 
     /**

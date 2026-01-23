@@ -306,8 +306,8 @@ class EnemiesModule {
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Largeur (px)</label>
-                            <input type="number" class="form-input" id="enemyWidth" value="${e.visuals?.width || 48}">
+                            <label class="form-label">Largeur (px, optionnel)</label>
+                            <input type="number" class="form-input" id="enemyWidth" value="${e.visuals?.width || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Hauteur (px, optionnel)</label>
@@ -651,7 +651,10 @@ class EnemiesModule {
         // Visuels
         if (!e.visuals) e.visuals = {};
         e.visuals.type = document.getElementById('enemyVisualType')?.value || 'sprite';
-        e.visuals.width = parseInt(document.getElementById('enemyWidth')?.value) || 48;
+
+        const width = document.getElementById('enemyWidth')?.value;
+        if (width) e.visuals.width = parseInt(width);
+        else delete e.visuals.width;
 
         const height = document.getElementById('enemyHeight')?.value;
         if (height) e.visuals.height = parseInt(height);
@@ -925,24 +928,41 @@ class EnemiesModule {
         if (params?.frames?.length > 0) {
             const url = await this.app.assetScanner.getAssetURL(params.frames[0]);
             if (url) {
-                const width = visuals.width || 48;
-                const height = visuals.height || width;
-                canvas.innerHTML = `<img src="${url}" alt="preview" style="width: ${width}px; height: ${height}px; image-rendering: pixelated; transform: ${params.transform}">`;
+                const img = new Image();
+                img.src = url;
+                img.onload = () => {
+                    let drawW = visuals.width;
+                    let drawH = visuals.height;
+                    const imgRatio = img.width / img.height;
 
-                // Activer les contrôles d'animation
-                document.getElementById('playIdleBtn').disabled = !idleParams || idleParams.frames.length === 0;
-                document.getElementById('playWalkBtn').disabled = !walkParams || walkParams.frames.length === 0;
-                document.getElementById('stopAnimBtn').disabled = false;
-                return;
+                    if (drawW && drawH) { }
+                    else if (drawW) drawH = drawW / imgRatio;
+                    else if (drawH) drawW = drawH * imgRatio;
+                    else { drawW = img.width; drawH = img.height; }
+
+                    const maxPreview = 150;
+                    if (drawW > maxPreview || drawH > maxPreview) {
+                        const ratio = Math.min(maxPreview / drawW, maxPreview / drawH);
+                        drawW *= ratio;
+                        drawH *= ratio;
+                    }
+
+                    canvas.innerHTML = `<img src="${url}" alt="preview" style="width: ${drawW}px; height: ${drawH}px; image-rendering: pixelated; transform: ${params.transform}">`;
+
+                    // Activer les contrôles d'animation
+                    document.getElementById('playIdleBtn').disabled = !idleParams || idleParams.frames.length === 0;
+                    document.getElementById('playWalkBtn').disabled = !walkParams || walkParams.frames.length === 0;
+                    document.getElementById('stopAnimBtn').disabled = false;
+                };
             }
+        } else {
+            // Fallback couleur
+            const color = this.currentEnemy.color || '#fff';
+            const radius = this.currentEnemy.radius || 20;
+            canvas.innerHTML = `
+                <div style="width: ${radius * 2}px; height: ${radius * 2}px; background: ${color}; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3);"></div>
+            `;
         }
-
-        // Fallback couleur
-        const color = this.currentEnemy.color || '#fff';
-        const radius = this.currentEnemy.radius || 20;
-        canvas.innerHTML = `
-            <div style="width: ${radius * 2}px; height: ${radius * 2}px; background: ${color}; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3);"></div>
-        `;
     }
 
     /**
@@ -957,9 +977,6 @@ class EnemiesModule {
         const canvas = document.getElementById('enemyPreviewCanvas');
         if (!canvas) return;
 
-        const width = this.currentEnemy.visuals?.width || 48;
-        const height = this.currentEnemy.visuals?.height || width;
-
         // Précharger les URLs
         const urls = [];
         for (const frame of params.frames) {
@@ -971,10 +988,30 @@ class EnemiesModule {
 
         this.currentFrameIndex = 0;
 
-        this.animationInterval = setInterval(() => {
-            canvas.innerHTML = `<img src="${urls[this.currentFrameIndex]}" alt="frame" style="width: ${width}px; height: ${height}px; image-rendering: pixelated; transform: ${params.transform}">`;
-            this.currentFrameIndex = (this.currentFrameIndex + 1) % urls.length;
-        }, 1000 / params.frameRate);
+        const img = new Image();
+        img.src = urls[0];
+        img.onload = () => {
+            let drawW = this.currentEnemy.visuals.width;
+            let drawH = this.currentEnemy.visuals.height;
+            const imgRatio = img.width / img.height;
+
+            if (drawW && drawH) { }
+            else if (drawW) drawH = drawW / imgRatio;
+            else if (drawH) drawW = drawH * imgRatio;
+            else { drawW = img.width; drawH = img.height; }
+
+            const maxPreview = 150;
+            if (drawW > maxPreview || drawH > maxPreview) {
+                const ratio = Math.min(maxPreview / drawW, maxPreview / drawH);
+                drawW *= ratio;
+                drawH *= ratio;
+            }
+
+            this.animationInterval = setInterval(() => {
+                canvas.innerHTML = `<img src="${urls[this.currentFrameIndex]}" alt="frame" style="width: ${drawW}px; height: ${drawH}px; image-rendering: pixelated; transform: ${params.transform}">`;
+                this.currentFrameIndex = (this.currentFrameIndex + 1) % urls.length;
+            }, 1000 / params.frameRate);
+        };
     }
 
     /**

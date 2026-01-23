@@ -1,7 +1,7 @@
 {
     "players": {
-        "anthony": {
-            "name": "Anthony",
+        "ony_sperm": {
+            "name": "ony sperm",
             "speed": 250,
             "hp": 100,
             "maxHp": 100,
@@ -21,15 +21,15 @@
                 "animations": {
                     "idle": {
                         "frames": [
-                            "assets/players/Spermateozoide-Anthony-1.png"
+                            "assets/players/spermateozoide/Spermateozoide-Anthony-1.png"
                         ],
                         "frameRate": 1,
-                        "loop": true
+                        "loop": false
                     },
                     "walk": {
                         "frames": [
-                            "assets/players/Spermateozoide-Anthony-1.png",
-                            "assets/players/Spermateozoide-Anthony-2.png"
+                            "assets/players/spermateozoide/Spermateozoide-Anthony-1.png",
+                            "assets/players/spermateozoide/Spermateozoide-Anthony-2.png"
                         ],
                         "frameRate": 10,
                         "loop": true
@@ -37,8 +37,8 @@
                 }
             }
         },
-        "player_1769196186249": {
-            "name": "playmobil_ony",
+        "playmobile_ony": {
+            "name": "playmobil ony",
             "speed": 250,
             "hp": 100,
             "maxHp": 100,
@@ -49,7 +49,6 @@
             "xpNextLevel": 50,
             "visuals": {
                 "type": "sprite",
-                "width": 64,
                 "directionMode": "4_way",
                 "hitFlash": true,
                 "animations": {
@@ -122,7 +121,44 @@
                         }
                     }
                 },
-                "angleOffset": 0
+                "angleOffset": 0,
+                "height": 80
+            }
+        },
+        "player_1769198989474": {
+            "name": "test",
+            "speed": 250,
+            "hp": 100,
+            "maxHp": 100,
+            "fireRate": 300,
+            "damage": 10,
+            "projectileSpeed": 400,
+            "pickupRadius": 100,
+            "xpNextLevel": 50,
+            "visuals": {
+                "type": "sprite",
+                "directionMode": "flip",
+                "hitFlash": true,
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/players/playmobil/droite/playmobil_player_droite_i 1.png"
+                        ],
+                        "frameRate": 1,
+                        "loop": true
+                    },
+                    "walk": {
+                        "frames": [
+                            "assets/players/playmobil/droite/playmobil_player_droite_w_1.png",
+                            "assets/players/playmobil/droite/playmobil_player_droite_i 1.png",
+                            "assets/players/playmobil/droite/playmobil_player_droite_w_2.png"
+                        ],
+                        "frameRate": 15,
+                        "loop": true
+                    }
+                },
+                "angleOffset": 0,
+                "height": 80
             }
         }
     }
