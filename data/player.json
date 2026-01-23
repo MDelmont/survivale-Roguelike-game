@@ -36,6 +36,90 @@
                     }
                 }
             }
+        },
+        "player_1769196186249": {
+            "name": "playmobil_ony",
+            "speed": 250,
+            "hp": 100,
+            "maxHp": 100,
+            "fireRate": 300,
+            "damage": 10,
+            "projectileSpeed": 400,
+            "pickupRadius": 100,
+            "xpNextLevel": 50,
+            "visuals": {
+                "type": "sprite",
+                "width": 64,
+                "directionMode": "4_way",
+                "hitFlash": true,
+                "animations": {
+                    "idle": {
+                        "up": {
+                            "frames": [
+                                "assets/players/playmobil/dos/playmobil_player_dos_i.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": false
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/players/playmobil/face/playmobil_player_face_i.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": false
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/players/playmobil/gauche/playmobil_player_gauche_i.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": false
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/players/playmobil/droite/playmobil_player_droite_i 1.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": false
+                        }
+                    },
+                    "walk": {
+                        "up": {
+                            "frames": [
+                                "assets/players/playmobil/dos/playmobil_player_dos_w_1.png",
+                                "assets/players/playmobil/dos/playmobil_player_dos_w_2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/players/playmobil/face/playmobil_player_face_w_2.png",
+                                "assets/players/playmobil/face/playmobil_player_face_w_1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/players/playmobil/gauche/playmobil_player_gauche_w_1.png",
+                                "assets/players/playmobil/gauche/playmobil_player_gauche_w_2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/players/playmobil/droite/playmobil_player_droite_w_1.png",
+                                "assets/players/playmobil/droite/playmobil_player_droite_w_2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0
+            }
         }
     }
 }
