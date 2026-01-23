@@ -1,6 +1,39 @@
 {
     "phases": [
         {
+            "id": 2,
+            "name": "playmobile-dog",
+            "duration_before_boss": 60,
+            "enemy_types": [
+                "basic_cell"
+            ],
+            "player_id": "playmobile_ony",
+            "spawn_rate": 1000,
+            "default_weapon": "basic_shot",
+            "weapon_drop_rate": 0.25,
+            "available_weapons": [
+                "basic_shot"
+            ],
+            "boss_id": "",
+            "background_image": "assets/fond/playmobile/fond-playmobile-storm.png",
+            "xp_visual": "",
+            "xp_size": 20,
+            "weapon_visual": "",
+            "weapon_size": 30,
+            "story_intro": [],
+            "story_outro": [],
+            "difficulty_multiplier": 1,
+            "initial_threat_budget": 20,
+            "max_threat_budget": 200,
+            "threat_growth_rate": 0.5,
+            "transition_intro_id": "transition_1769206056996",
+            "transition_outro_id": "transition_1769206097596",
+            "available_upgrades": [
+                "sperm_hp"
+            ],
+            "transition_defeat_id": "transition_1769206080497"
+        },
+        {
             "id": 1,
             "name": "La Conception",
             "duration_before_boss": 60,
@@ -22,7 +55,7 @@
             "boss_id": "ovule_geant",
             "story_intro": [],
             "story_outro": [],
-            "background_image": "assets/fond/fond-ovule-dark.png",
+            "background_image": "assets/fond/conception/fond-ovule-dark.png",
             "transition_intro_id": "transition_1767784600979",
             "transition_outro_id": "transition_1767806453330",
             "xp_visual": "assets/experiences/exp-sperm.png",
@@ -47,6 +80,6 @@
             "transition_defeat_id": "transition_1768064926813"
         }
     ],
-    "menu_background": "assets/fond/fond-ovule-dark.png",
-    "victory_background": "assets/fond/fond-ovule-dark.png"
+    "menu_background": "assets/fond/conception/fond-ovule-dark.png",
+    "victory_background": "assets/fond/conception/fond-ovule.png"
 }

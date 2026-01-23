@@ -2,7 +2,7 @@
     "transitions": [
         {
             "id": "transition_1767784600979",
-            "name": "Fécondé et survivre",
+            "name": "conception-start",
             "pages": [
                 {
                     "title": "Le commencement",
@@ -14,7 +14,7 @@
                     "textColor": "#ffffff",
                     "hideText": true,
                     "image": "",
-                    "background": "assets/fond/La-conception-start.png",
+                    "background": "assets/fond/conception/La-conception-start.png",
                     "duration": 5000,
                     "music": "",
                     "animation": "none"
@@ -23,7 +23,7 @@
         },
         {
             "id": "transition_1767806453330",
-            "name": "fin fécond survie",
+            "name": "conception-fin-win",
             "pages": [
                 {
                     "title": "Nouveau Titre",
@@ -35,7 +35,7 @@
                     "textColor": "#ffffff",
                     "hideText": true,
                     "image": "",
-                    "background": "assets/fond/La-conception-end.png",
+                    "background": "assets/fond/conception/La-conception-end.png",
                     "duration": 5000,
                     "music": "",
                     "animation": "fade"
@@ -44,7 +44,7 @@
         },
         {
             "id": "transition_1768064926813",
-            "name": "Fin féconde loose",
+            "name": "conception loose",
             "pages": [
                 {
                     "title": "loose",
@@ -56,7 +56,70 @@
                     "textColor": "#ffffff",
                     "hideText": true,
                     "image": "",
-                    "background": "assets/fond/La-conception-end-loose.png",
+                    "background": "assets/fond/conception/La-conception-end-loose.png",
+                    "duration": 5000,
+                    "music": "",
+                    "animation": "fade"
+                }
+            ]
+        },
+        {
+            "id": "transition_1769206056996",
+            "name": "playmobile-start",
+            "pages": [
+                {
+                    "title": "Nouveau Titre",
+                    "titleSize": 24,
+                    "titleColor": "#6366f1",
+                    "hideTitle": true,
+                    "text": "Nouveau texte...",
+                    "textSize": 16,
+                    "textColor": "#ffffff",
+                    "hideText": true,
+                    "image": "",
+                    "background": "assets/fond/playmobile/fond-playmobile-storm-start.png",
+                    "duration": 5000,
+                    "music": "",
+                    "animation": "fade"
+                }
+            ]
+        },
+        {
+            "id": "transition_1769206080497",
+            "name": "playmobile-end-loose",
+            "pages": [
+                {
+                    "title": "Nouveau Titre",
+                    "titleSize": 24,
+                    "titleColor": "#6366f1",
+                    "hideTitle": true,
+                    "text": "Nouveau texte...",
+                    "textSize": 16,
+                    "textColor": "#ffffff",
+                    "hideText": true,
+                    "image": "",
+                    "background": "assets/fond/playmobile/fond-playmobile-storm-end.png",
+                    "duration": 5000,
+                    "music": "",
+                    "animation": "fade"
+                }
+            ]
+        },
+        {
+            "id": "transition_1769206097596",
+            "name": "playmobile-end-win",
+            "pages": [
+                {
+                    "title": "Nouveau Titre",
+                    "titleSize": 24,
+                    "titleColor": "#6366f1",
+                    "hideTitle": true,
+                    "text": "Nouveau texte...",
+                    "textSize": 16,
+                    "textColor": "#ffffff",
+                    "hideText": true,
+                    "image": "",
+                    "background": "assets/fond/playmobile/fond-playmobile-sun-end.png",
                     "duration": 5000,
                     "music": "",
                     "animation": "fade"

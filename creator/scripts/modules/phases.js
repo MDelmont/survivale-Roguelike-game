@@ -99,14 +99,44 @@ class PhasesModule {
             const item = document.createElement('div');
             item.className = 'list-item';
             item.dataset.index = phase.originalIndex;
+
+            // Disable reordering if searching
+            const reorderControls = !this.searchQuery ? `
+                <div class="list-item-actions" style="display: flex; flex-direction: column; gap: 2px; margin-left: 10px;">
+                    <button class="btn btn-sm btn-ghost move-phase-btn" data-action="-1" data-index="${phase.originalIndex}" style="padding: 0 5px; font-size: 10px; line-height: 1;" title="Monter">▲</button>
+                    <button class="btn btn-sm btn-ghost move-phase-btn" data-action="1" data-index="${phase.originalIndex}" style="padding: 0 5px; font-size: 10px; line-height: 1;" title="Descendre">▼</button>
+                </div>
+            ` : '';
+
             item.innerHTML = `
-                <div class="list-item-icon">#${phase.id}</div>
-                <div class="list-item-info">
-                    <div class="list-item-name">${phase.name}</div>
-                    <div class="list-item-meta">${Math.floor(phase.duration_before_boss / 60)}m ${phase.duration_before_boss % 60}s | ${phase.enemy_types?.length || 0} ennemis</div>
+                <div style="display: flex; align-items: center; width: 100%; pointer-events: none;">
+                    <div class="list-item-icon">#${phase.id}</div>
+                    <div class="list-item-info" style="flex: 1; min-width: 0;">
+                        <div class="list-item-name text-truncate">${phase.name}</div>
+                        <div class="list-item-meta">${Math.floor(phase.duration_before_boss / 60)}m ${phase.duration_before_boss % 60}s | ${phase.enemy_types?.length || 0} ennemis</div>
+                    </div>
+                    <div style="pointer-events: auto;">
+                        ${reorderControls}
+                    </div>
                 </div>
             `;
-            item.addEventListener('click', () => this.selectPhase(phase.originalIndex));
+
+            item.addEventListener('click', (e) => {
+                if (e.target.closest('.move-phase-btn')) return; // Ignore clicks on buttons
+                this.selectPhase(phase.originalIndex)
+            });
+
+            // Bind button events
+            const btns = item.querySelectorAll('.move-phase-btn');
+            btns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(btn.dataset.index);
+                    const dir = parseInt(btn.dataset.action);
+                    this.movePhase(idx, dir);
+                });
+            });
+
             list.appendChild(item);
         }
 
@@ -597,6 +627,44 @@ class PhasesModule {
         this.loadPhasesList();
         this.selectPhase(this.currentPhaseIndex);
         this.app.showNotification('Nouvelle phase créée', 'success');
+    }
+
+    /**
+     * Déplace une phase dans la liste
+     */
+    async movePhase(index, direction) {
+        const newIndex = index + direction;
+        // Vérification des bornes
+        if (newIndex < 0 || newIndex >= this.app.gameData.phases.length) return;
+
+        // Swap dans le tableau
+        const temp = this.app.gameData.phases[newIndex];
+        this.app.gameData.phases[newIndex] = this.app.gameData.phases[index];
+        this.app.gameData.phases[index] = temp;
+
+        // Mettre à jour la sélection si nécessaire
+        if (this.currentPhaseIndex === index) {
+            this.currentPhaseIndex = newIndex;
+        } else if (this.currentPhaseIndex === newIndex) {
+            this.currentPhaseIndex = index;
+        }
+
+        try {
+            // Sauvegarde silencieuse
+            this.app.gameData.phasesFull.phases = this.app.gameData.phases;
+            await this.app.fileManager.writeJSON('phases.json', this.app.gameData.phasesFull);
+
+            // Rafraîchir l'interface
+            this.loadPhasesList();
+
+            // Garder la sélection visuelle
+            if (this.currentPhaseIndex !== null) {
+                this.selectPhase(this.currentPhaseIndex);
+            }
+        } catch (error) {
+            console.error('Erreur lors du déplacement:', error);
+            this.app.showNotification('Erreur de sauvegarde', 'error');
+        }
     }
 
     async deletePhase() {
