@@ -23,14 +23,14 @@ class BossesModule {
         this.currentBoss = null;
         this.animationInterval = null;
         this.currentFrameIndex = 0;
-        
+
         // Patterns disponibles selon la documentation
         this.attackPatterns = [
-            'circle', 'spiral', 'double_spiral', 'spray', 'wave_spray', 
-            'cross', 'vortex', 'flower', 'barrage', 'star', 
+            'circle', 'spiral', 'double_spiral', 'spray', 'wave_spray',
+            'cross', 'vortex', 'flower', 'barrage', 'star',
             'oscillator', 'wall', 'web'
         ];
-        
+
         this.movePatterns = [
             { value: 'constant', label: 'Constant - Suit le joueur' },
             { value: 'fixed', label: 'Fixed - Reste à une position fixe' },
@@ -163,7 +163,7 @@ class BossesModule {
 
             // Récupérer une image de prévisualisation
             const spriteUrl = await this.getEntityThumbnail(boss);
-            
+
             let iconHtml;
             if (spriteUrl) {
                 iconHtml = `<img src="${spriteUrl}" alt="${boss.name}" class="list-item-sprite">`;
@@ -201,18 +201,18 @@ class BossesModule {
 
         const animations = visuals.animations;
         const animOrder = ['idle', 'walk', ...Object.keys(animations)];
-        
+
         for (const animName of animOrder) {
             const anim = animations[animName];
             if (!anim) continue;
-            
+
             if (anim.down?.frames?.length > 0) {
                 return await this.app.assetScanner.getAssetURL(anim.down.frames[0]);
             } else if (anim.frames?.length > 0) {
                 return await this.app.assetScanner.getAssetURL(anim.frames[0]);
             }
         }
-        
+
         return null;
     }
 
@@ -310,17 +310,17 @@ class BossesModule {
                         <div class="form-group">
                             <label class="form-label">Pattern d'attaque</label>
                             <select class="form-select" id="bossAttackPattern">
-                                ${this.attackPatterns.map(p => 
-                                    `<option value="${p}" ${b.attackPattern === p ? 'selected' : ''}>${p}</option>`
-                                ).join('')}
+                                ${this.attackPatterns.map(p =>
+            `<option value="${p}" ${b.attackPattern === p ? 'selected' : ''}>${p}</option>`
+        ).join('')}
                             </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Pattern de mouvement</label>
                             <select class="form-select" id="bossMovePattern">
-                                ${this.movePatterns.map(p => 
-                                    `<option value="${p.value}" ${b.movePattern === p.value ? 'selected' : ''}>${p.label}</option>`
-                                ).join('')}
+                                ${this.movePatterns.map(p =>
+            `<option value="${p.value}" ${b.movePattern === p.value ? 'selected' : ''}>${p.label}</option>`
+        ).join('')}
                             </select>
                         </div>
                         <div class="form-group">
@@ -463,10 +463,10 @@ class BossesModule {
         const existing = Object.keys(existingAnims || {});
         const standard = this.getStandardAnimations();
         const available = standard.filter(a => !existing.includes(a));
-        
+
         let options = available.map(a => `<option value="${a}">${a.charAt(0).toUpperCase() + a.slice(1)}</option>`).join('');
         options += '<option value="_custom">-- Personnalisée --</option>';
-        
+
         return options;
     }
 
@@ -477,9 +477,9 @@ class BossesModule {
         if (!animations || Object.keys(animations).length === 0) {
             return '<p style="color: var(--text-muted); font-size: 0.9rem;">Aucune animation.</p>';
         }
-        
+
         const dirMode = this.currentBoss?.visuals?.directionMode || 'none';
-        
+
         return Object.entries(animations)
             .map(([name, data]) => this.renderAnimationEditor(name, data, assets, dirMode, prefix))
             .join('');
@@ -490,11 +490,11 @@ class BossesModule {
      */
     renderAnimationEditor(animName, animData, assets, dirMode, prefix) {
         const is4Way = dirMode === '4_way' || (animData && (animData.up || animData.down));
-        
+
         if (is4Way) {
             return this.render4WayAnimationEditor(animName, animData, assets, prefix);
         }
-        
+
         const frames = animData?.frames || [];
         const frameRate = animData?.frameRate || 10;
         const loop = animData?.loop !== false;
@@ -530,7 +530,7 @@ class BossesModule {
      */
     render4WayAnimationEditor(animName, animData, assets, prefix) {
         const directions = ['up', 'down', 'left', 'right'];
-        
+
         return `
             <div class="animation-editor animation-editor-4way" data-anim="${animName}" data-prefix="${prefix}" data-mode="4way">
                 <div class="animation-header">
@@ -555,7 +555,7 @@ class BossesModule {
         const loop = dirData?.loop !== false;
         const dirKey = `${animName}_${direction}`;
         const dirLabels = { up: '↑ Haut', down: '↓ Bas', left: '← Gauche', right: '→ Droite' };
-        
+
         return `
             <div class="direction-section" data-anim="${animName}" data-direction="${direction}" data-prefix="${prefix}">
                 <div class="direction-header">
@@ -656,8 +656,42 @@ class BossesModule {
      * Binding événements éditeur
      */
     bindEditorEvents() {
+        const editor = document.getElementById('bossEditor');
+        if (!editor) return;
+
+        // Delegation pour les clics
+        if (!editor.dataset.delegated) {
+            editor.addEventListener('click', (e) => {
+                const target = e.target.closest('button');
+                if (!target) return;
+
+                if (target.classList.contains('add-frame-btn')) {
+                    const anim = target.dataset.anim;
+                    const prefix = target.dataset.prefix;
+                    const direction = target.dataset.direction || null;
+                    this.addFrame(anim, prefix, direction);
+                }
+
+                if (target.classList.contains('remove-frame-btn')) {
+                    const anim = target.dataset.anim;
+                    const index = parseInt(target.dataset.index);
+                    const prefix = target.dataset.prefix;
+                    this.removeFrame(anim, index, prefix);
+                }
+
+                if (target.classList.contains('remove-anim-btn')) {
+                    const anim = target.dataset.anim;
+                    const prefix = target.dataset.prefix;
+                    this.removeAnimation(anim, prefix);
+                }
+            });
+            editor.dataset.delegated = 'true';
+        }
+
         // Inputs -> mise à jour
-        document.querySelectorAll('#bossEditor input, #bossEditor select').forEach(input => {
+        editor.querySelectorAll('input, select').forEach(input => {
+            if (input.dataset.bound) return;
+
             if (input.id === 'bossDirMode') {
                 input.addEventListener('change', () => {
                     this.updateBossFromForm();
@@ -673,46 +707,20 @@ class BossesModule {
                 input.addEventListener('change', () => this.updateBossFromForm());
                 input.addEventListener('input', () => this.updateBossFromForm());
             }
+
+            input.dataset.bound = 'true';
         });
 
-        // Ajouter frame
-        document.querySelectorAll('.add-frame-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const anim = e.target.dataset.anim;
-                const prefix = e.target.dataset.prefix;
-                const direction = e.target.dataset.direction || null;
-                this.addFrame(anim, prefix, direction);
-            });
+        // Boutons fixes
+        ['addBossAnimationBtn', 'saveBossBtn', 'deleteBossBtn'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn && !btn.dataset.bound) {
+                if (id === 'addBossAnimationBtn') btn.addEventListener('click', () => this.addNewAnimation('boss'));
+                if (id === 'saveBossBtn') btn.addEventListener('click', () => this.saveBoss());
+                if (id === 'deleteBossBtn') btn.addEventListener('click', () => this.deleteBoss());
+                btn.dataset.bound = 'true';
+            }
         });
-
-        // Supprimer frame
-        document.querySelectorAll('.remove-frame-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const target = e.target.closest('.remove-frame-btn');
-                const anim = target.dataset.anim;
-                const index = parseInt(target.dataset.index);
-                const prefix = target.dataset.prefix;
-                this.removeFrame(anim, index, prefix);
-            });
-        });
-
-        // Supprimer animation
-        document.querySelectorAll('.remove-anim-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const anim = e.target.dataset.anim;
-                const prefix = e.target.dataset.prefix;
-                this.removeAnimation(anim, prefix);
-            });
-        });
-
-        // Ajouter animation boss
-        document.getElementById('addBossAnimationBtn')?.addEventListener('click', () => this.addNewAnimation('boss'));
-
-        // Sauvegarder
-        document.getElementById('saveBossBtn')?.addEventListener('click', () => this.saveBoss());
-
-        // Supprimer
-        document.getElementById('deleteBossBtn')?.addEventListener('click', () => this.deleteBoss());
 
         // Charger les previews
         this.loadFramePreviews();
@@ -772,9 +780,9 @@ class BossesModule {
         else delete b.projectileVisuals.height;
         b.projectileVisuals.directionMode = document.getElementById('projDirMode')?.value || 'rotate';
         b.projectileVisuals.angleOffset = parseInt(document.getElementById('projAngleOffset')?.value) || 0;
-        
+
         const projAnimations = this.collectAnimations('proj');
-        
+
         // Si l'utilisateur n'a pas défini d'animation manuellement mais a choisi un asset
         if ((!projAnimations.idle || !projAnimations.idle.frames || projAnimations.idle.frames.length === 0) && pPath) {
             projAnimations.idle = {
@@ -783,7 +791,7 @@ class BossesModule {
                 loop: true
             };
         }
-        
+
         b.projectileVisuals.animations = projAnimations;
 
         this.updateJsonPreview();
@@ -903,9 +911,8 @@ class BossesModule {
         const list = document.getElementById(listId);
         if (!list) return;
 
-        const assets = prefix === 'proj' 
-            ? this.app.assetScanner.getAssetPathsForSelect('projectile')
-            : this.app.assetScanner.getAssetPathsForSelect('boss');
+        const assetType = prefix === 'proj' ? 'projectile' : 'boss';
+        const assets = this.app.assetScanner.getAssetPathsForSelect(assetType);
         const index = list.children.length;
         const key = direction ? `${animName}_${direction}` : animName;
 
@@ -1028,10 +1035,10 @@ class BossesModule {
         if (!canvas || !this.currentBoss) return;
 
         const projVisuals = this.currentBoss.projectileVisuals;
-        
+
         // Priorité : frames de l'animation idle, sinon le path direct
         const path = projVisuals?.animations?.idle?.frames?.[0] || projVisuals?.path;
-        
+
         if (!path) {
             canvas.innerHTML = '<span style="color: var(--text-muted); font-size: 0.8rem;">Aucun</span>';
             return;

@@ -87,33 +87,37 @@
                         "up": {
                             "frames": [
                                 "assets/players/playmobil/dos/playmobil_player_dos_w_1.png",
+                                "assets/players/playmobil/dos/playmobil_player_dos_i.png",
                                 "assets/players/playmobil/dos/playmobil_player_dos_w_2.png"
                             ],
-                            "frameRate": 10,
+                            "frameRate": 15,
                             "loop": true
                         },
                         "down": {
                             "frames": [
-                                "assets/players/playmobil/face/playmobil_player_face_w_2.png",
-                                "assets/players/playmobil/face/playmobil_player_face_w_1.png"
+                                "assets/players/playmobil/face/playmobil_player_face_w_1.png",
+                                "assets/players/playmobil/face/playmobil_player_face_i.png",
+                                "assets/players/playmobil/face/playmobil_player_face_w_2.png"
                             ],
-                            "frameRate": 10,
+                            "frameRate": 15,
                             "loop": true
                         },
                         "left": {
                             "frames": [
                                 "assets/players/playmobil/gauche/playmobil_player_gauche_w_1.png",
+                                "assets/players/playmobil/gauche/playmobil_player_gauche_i.png",
                                 "assets/players/playmobil/gauche/playmobil_player_gauche_w_2.png"
                             ],
-                            "frameRate": 10,
+                            "frameRate": 15,
                             "loop": true
                         },
                         "right": {
                             "frames": [
                                 "assets/players/playmobil/droite/playmobil_player_droite_w_1.png",
+                                "assets/players/playmobil/droite/playmobil_player_droite_i 1.png",
                                 "assets/players/playmobil/droite/playmobil_player_droite_w_2.png"
                             ],
-                            "frameRate": 10,
+                            "frameRate": 15,
                             "loop": true
                         }
                     }

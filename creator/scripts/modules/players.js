@@ -122,8 +122,8 @@ class PlayersModule {
 
             // Récupérer la première frame de idle ou walk pour la prévisualisation
             const spriteUrl = await this.getEntityThumbnail(player);
-            
-            const iconHtml = spriteUrl 
+
+            const iconHtml = spriteUrl
                 ? `<img src="${spriteUrl}" alt="${player.name}" class="list-item-sprite">`
                 : '<span style="font-size: 1.5rem;">🧬</span>';
 
@@ -152,11 +152,11 @@ class PlayersModule {
         const animations = visuals.animations;
         // Priorité : idle, puis walk, puis la première animation disponible
         const animOrder = ['idle', 'walk', ...Object.keys(animations)];
-        
+
         for (const animName of animOrder) {
             const anim = animations[animName];
             if (!anim) continue;
-            
+
             // Gérer mode 4_way (prendre 'down' par défaut)
             if (anim.down?.frames?.length > 0) {
                 return await this.app.assetScanner.getAssetURL(anim.down.frames[0]);
@@ -164,7 +164,7 @@ class PlayersModule {
                 return await this.app.assetScanner.getAssetURL(anim.frames[0]);
             }
         }
-        
+
         return null;
     }
 
@@ -335,10 +335,10 @@ class PlayersModule {
         const existing = Object.keys(existingAnims || {});
         const standard = this.getStandardAnimations();
         const available = standard.filter(a => !existing.includes(a));
-        
+
         let options = available.map(a => `<option value="${a}">${a.charAt(0).toUpperCase() + a.slice(1)}</option>`).join('');
         options += '<option value="_custom">-- Personnalisée --</option>';
-        
+
         return options;
     }
 
@@ -349,9 +349,9 @@ class PlayersModule {
         if (!animations || Object.keys(animations).length === 0) {
             return '<p style="color: var(--text-muted); font-size: 0.9rem;">Aucune animation. Ajoutez-en une ci-dessous.</p>';
         }
-        
+
         const dirMode = this.currentPlayer?.visuals?.directionMode || 'rotate';
-        
+
         return Object.entries(animations)
             .map(([name, data]) => this.renderAnimationEditor(name, data, assets, dirMode))
             .join('');
@@ -363,11 +363,11 @@ class PlayersModule {
     renderAnimationEditor(animName, animData, assets, dirMode = 'rotate') {
         // Détecter si c'est une animation 4_way (contient up/down/left/right)
         const is4Way = dirMode === '4_way' || (animData && (animData.up || animData.down || animData.left || animData.right));
-        
+
         if (is4Way) {
             return this.render4WayAnimationEditor(animName, animData, assets);
         }
-        
+
         // Mode simple (rotate, flip, none)
         const frames = animData?.frames || [];
         const frameRate = animData?.frameRate || 10;
@@ -398,13 +398,13 @@ class PlayersModule {
             </div>
         `;
     }
-    
+
     /**
      * Rendu d'un éditeur d'animation 4_way (4 directions)
      */
     render4WayAnimationEditor(animName, animData, assets) {
         const directions = ['up', 'down', 'left', 'right'];
-        
+
         return `
             <div class="animation-editor animation-editor-4way" data-anim="${animName}" data-mode="4way">
                 <div class="animation-header">
@@ -419,7 +419,7 @@ class PlayersModule {
             </div>
         `;
     }
-    
+
     /**
      * Rendu d'une direction pour 4_way
      */
@@ -428,9 +428,9 @@ class PlayersModule {
         const frameRate = dirData?.frameRate || 10;
         const loop = dirData?.loop !== false;
         const dirKey = `${animName}_${direction}`;
-        
+
         const dirLabels = { up: '↑ Haut', down: '↓ Bas', left: '← Gauche', right: '→ Droite' };
-        
+
         return `
             <div class="direction-section" data-anim="${animName}" data-direction="${direction}">
                 <div class="direction-header">
@@ -478,14 +478,14 @@ class PlayersModule {
      */
     convertAnimationsToMode(newMode) {
         if (!this.currentPlayer?.visuals?.animations) return;
-        
+
         const animations = this.currentPlayer.visuals.animations;
         const isNew4Way = newMode === '4_way';
-        
+
         for (const animName in animations) {
             const data = animations[animName];
             const isCurrently4Way = !!(data.up || data.down || data.left || data.right);
-            
+
             if (isNew4Way && !isCurrently4Way) {
                 // Convert simple to 4_way (on duplique pour aider l'utilisateur)
                 animations[animName] = {
@@ -508,8 +508,43 @@ class PlayersModule {
      * Bindind des événements de l'éditeur
      */
     bindEditorEvents() {
+        const editor = document.getElementById('playerEditor');
+        if (!editor) return;
+
+        // Une seule fois : delegation pour les boutons dynamiques
+        if (!editor.dataset.delegated) {
+            editor.addEventListener('click', (e) => {
+                const target = e.target;
+
+                // Ajouter frame
+                if (target.classList.contains('add-frame-btn')) {
+                    const anim = target.dataset.anim;
+                    const direction = target.dataset.direction || null;
+                    this.addFrame(anim, direction);
+                }
+
+                // Supprimer frame
+                if (target.classList.contains('remove-frame-btn')) {
+                    const anim = target.dataset.anim;
+                    const index = parseInt(target.dataset.index);
+                    this.removeFrame(anim, index);
+                }
+
+                // Supprimer animation
+                if (target.classList.contains('remove-anim-btn')) {
+                    const anim = target.dataset.anim;
+                    this.removeAnimation(anim);
+                }
+            });
+
+            editor.dataset.delegated = 'true';
+        }
+
         // Tous les inputs -> mise à jour
-        document.querySelectorAll('#playerEditor input, #playerEditor select').forEach(input => {
+        editor.querySelectorAll('input, select').forEach(input => {
+            // Éviter les doubles bindings sur les inputs statiques
+            if (input.dataset.bound) return;
+
             if (input.id === 'playerDirMode') {
                 input.addEventListener('change', (e) => {
                     const newMode = e.target.value;
@@ -525,42 +560,30 @@ class PlayersModule {
                 input.addEventListener('change', () => this.updatePlayerFromForm());
                 input.addEventListener('input', () => this.updatePlayerFromForm());
             }
+
+            input.dataset.bound = 'true';
         });
 
-        // Ajouter frame
-        document.querySelectorAll('.add-frame-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const anim = e.target.dataset.anim;
-                const direction = e.target.dataset.direction || null;
-                this.addFrame(anim, direction);
-            });
-        });
-
-        // Supprimer frame
-        document.querySelectorAll('.remove-frame-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const anim = e.target.dataset.anim;
-                const index = parseInt(e.target.dataset.index);
-                this.removeFrame(anim, index);
-            });
-        });
-
-        // Supprimer animation
-        document.querySelectorAll('.remove-anim-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const anim = e.target.dataset.anim;
-                this.removeAnimation(anim);
-            });
-        });
-
-        // Ajouter animation
-        document.getElementById('addAnimationBtn')?.addEventListener('click', () => this.addNewAnimation());
+        // Ajouter animation (bouton unique hors delegation interieure si necessaire, mais ici on peut l'isoler)
+        const addAnimBtn = document.getElementById('addAnimationBtn');
+        if (addAnimBtn && !addAnimBtn.dataset.bound) {
+            addAnimBtn.addEventListener('click', () => this.addNewAnimation());
+            addAnimBtn.dataset.bound = 'true';
+        }
 
         // Sauvegarder
-        document.getElementById('savePlayerBtn')?.addEventListener('click', () => this.savePlayer());
+        const saveBtn = document.getElementById('savePlayerBtn');
+        if (saveBtn && !saveBtn.dataset.bound) {
+            saveBtn.addEventListener('click', () => this.savePlayer());
+            saveBtn.dataset.bound = 'true';
+        }
 
         // Supprimer
-        document.getElementById('deletePlayerBtn')?.addEventListener('click', () => this.deletePlayer());
+        const deleteBtn = document.getElementById('deletePlayerBtn');
+        if (deleteBtn && !deleteBtn.dataset.bound) {
+            deleteBtn.addEventListener('click', () => this.deletePlayer());
+            deleteBtn.dataset.bound = 'true';
+        }
 
         // Charger les previews des frames
         this.loadFramePreviews();
@@ -595,7 +618,7 @@ class PlayersModule {
         if (!p.visuals) p.visuals = {};
         p.visuals.type = document.getElementById('playerVisualType')?.value || 'sprite';
         p.visuals.width = parseInt(document.getElementById('playerWidth')?.value) || 64;
-        
+
         const height = document.getElementById('playerHeight')?.value;
         if (height) p.visuals.height = parseInt(height);
         else delete p.visuals.height;
@@ -606,22 +629,22 @@ class PlayersModule {
 
         // Animations - collecter toutes les animations visibles
         if (!p.visuals.animations) p.visuals.animations = {};
-        
+
         const dirMode = p.visuals.directionMode;
         const is4Way = dirMode === '4_way';
-        
+
         // Réinitialiser et reconstruire depuis le DOM
         const newAnimations = {};
-        
+
         document.querySelectorAll('.animation-editor').forEach(editor => {
             const animName = editor.dataset.anim;
             const mode = editor.dataset.mode;
-            
+
             if (mode === '4way' || is4Way) {
                 // Mode 4_way - collecter par direction
                 const directions = ['up', 'down', 'left', 'right'];
                 const animObj = {};
-                
+
                 directions.forEach(dir => {
                     const dirSection = editor.querySelector(`.direction-section[data-direction="${dir}"]`);
                     if (dirSection) {
@@ -629,14 +652,14 @@ class PlayersModule {
                         dirSection.querySelectorAll('.frame-select').forEach(select => {
                             if (select.value) frames.push(select.value);
                         });
-                        
+
                         const frameRate = parseInt(dirSection.querySelector('.anim-framerate')?.value) || 10;
                         const loop = dirSection.querySelector('.anim-loop')?.checked ?? true;
-                        
+
                         animObj[dir] = { frames, frameRate, loop };
                     }
                 });
-                
+
                 if (Object.keys(animObj).length > 0) {
                     newAnimations[animName] = animObj;
                 }
@@ -667,27 +690,27 @@ class PlayersModule {
     addNewAnimation() {
         const select = document.getElementById('newAnimSelect');
         let animName = select?.value;
-        
+
         if (!animName) return;
-        
+
         if (animName === '_custom') {
             animName = prompt('Nom de l\'animation (ex: jump, special):');
             if (!animName) return;
             animName = animName.trim().toLowerCase().replace(/\s+/g, '_');
         }
-        
+
         // Vérifier si elle existe déjà
         if (this.currentPlayer.visuals?.animations?.[animName]) {
             this.app.showNotification(`L'animation "${animName}" existe déjà`, 'warning');
             return;
         }
-        
+
         // Ajouter l'animation vide
         if (!this.currentPlayer.visuals) this.currentPlayer.visuals = {};
         if (!this.currentPlayer.visuals.animations) this.currentPlayer.visuals.animations = {};
-        
+
         const dirMode = this.currentPlayer.visuals?.directionMode;
-        
+
         if (dirMode === '4_way') {
             // Structure 4_way
             this.currentPlayer.visuals.animations[animName] = {
@@ -704,7 +727,7 @@ class PlayersModule {
                 loop: true
             };
         }
-        
+
         // Re-render l'éditeur
         this.renderEditor();
         this.updateJsonPreview();
@@ -715,11 +738,11 @@ class PlayersModule {
      */
     removeAnimation(animName) {
         if (!confirm(`Supprimer l'animation "${animName}" ?`)) return;
-        
+
         if (this.currentPlayer.visuals?.animations?.[animName]) {
             delete this.currentPlayer.visuals.animations[animName];
         }
-        
+
         // Re-render l'éditeur
         this.renderEditor();
         this.updateJsonPreview();
@@ -734,7 +757,7 @@ class PlayersModule {
         if (direction) {
             frameListId = `frames-${animName}_${direction}`;
         }
-        
+
         const framesList = document.getElementById(frameListId);
         if (!framesList) return;
 
@@ -744,7 +767,8 @@ class PlayersModule {
         const frameHtml = this.renderFrame(direction ? `${animName}_${direction}` : animName, '', index, assets, direction);
         framesList.insertAdjacentHTML('beforeend', frameHtml);
 
-        // Re-bind events
+        // On ne re-bind plus tout, la delegation s'en charge pour les clics
+        // Mais on doit quand meme s'assurer que les nouveaux selects sont bindés pour le changement
         this.bindEditorEvents();
     }
 
@@ -768,7 +792,7 @@ class PlayersModule {
             const anim = select.dataset.anim;
             const index = select.dataset.index;
             const path = select.value;
-            
+
             const previewEl = document.getElementById(`frame-preview-${anim}-${index}`);
             if (!previewEl) continue;
 
@@ -818,23 +842,23 @@ class PlayersModule {
      */
     getAnimationParams(animName) {
         if (!this.currentPlayer?.visuals?.animations) return null;
-        
+
         const visuals = this.currentPlayer.visuals;
         const animations = visuals.animations;
         const dirMode = visuals.directionMode;
         const direction = document.getElementById('previewDirection')?.value || 'down';
-        
+
         let animData = animations[animName];
         if (!animData) return null;
-        
+
         // Mode 4_way : on cherche la sous-direction
         if (dirMode === '4_way' && animData[direction]) {
             animData = animData[direction];
         }
-        
+
         const frames = animData.frames || [];
         const frameRate = animData.frameRate || 10;
-        
+
         // Calcul de la transformation CSS
         let transform = '';
         if (dirMode === 'flip' && direction === 'left') {
@@ -844,7 +868,7 @@ class PlayersModule {
             const angle = (angles[direction] || 0) + (visuals.angleOffset || 0);
             transform = `rotate(${angle}deg)`;
         }
-        
+
         return { frames, frameRate, transform };
     }
 
@@ -857,7 +881,7 @@ class PlayersModule {
 
         const walkParams = this.getAnimationParams('walk');
         const idleParams = this.getAnimationParams('idle');
-        
+
         const params = (walkParams?.frames?.length > 0) ? walkParams : idleParams;
 
         if (params?.frames?.length > 0) {
@@ -921,7 +945,7 @@ class PlayersModule {
         try {
             // Vérifier si l'ID a changé
             const idChanged = this.originalPlayerId && this.originalPlayerId !== this.currentPlayerId;
-            
+
             // Vérifier que le nouvel ID n'existe pas déjà (sauf si c'est le même)
             if (idChanged && this.app.gameData.players[this.currentPlayerId]) {
                 this.app.showNotification(`L'ID "${this.currentPlayerId}" existe déjà!`, 'error');

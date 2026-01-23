@@ -134,8 +134,8 @@ class EnemiesModule {
         const filteredEntries = Object.entries(enemies).filter(([id, enemy]) => {
             if (!this.searchQuery) return true;
             const query = this.searchQuery.toLowerCase();
-            return id.toLowerCase().includes(query) || 
-                   (enemy.name && enemy.name.toLowerCase().includes(query));
+            return id.toLowerCase().includes(query) ||
+                (enemy.name && enemy.name.toLowerCase().includes(query));
         });
 
         for (const [id, enemy] of filteredEntries) {
@@ -145,7 +145,7 @@ class EnemiesModule {
 
             // Récupérer la première frame de walk ou idle pour la prévisualisation
             const spriteUrl = await this.getEntityThumbnail(enemy);
-            
+
             let iconHtml;
             if (spriteUrl) {
                 iconHtml = `<img src="${spriteUrl}" alt="${enemy.name}" class="list-item-sprite">`;
@@ -185,11 +185,11 @@ class EnemiesModule {
         const animations = visuals.animations;
         // Priorité : walk (plus commun pour les ennemis), puis idle, puis la première animation
         const animOrder = ['walk', 'idle', ...Object.keys(animations)];
-        
+
         for (const animName of animOrder) {
             const anim = animations[animName];
             if (!anim) continue;
-            
+
             // Gérer mode 4_way (prendre 'down' par défaut)
             if (anim.down?.frames?.length > 0) {
                 return await this.app.assetScanner.getAssetURL(anim.down.frames[0]);
@@ -197,7 +197,7 @@ class EnemiesModule {
                 return await this.app.assetScanner.getAssetURL(anim.frames[0]);
             }
         }
-        
+
         return null;
     }
 
@@ -380,10 +380,10 @@ class EnemiesModule {
         const existing = Object.keys(existingAnims || {});
         const standard = this.getStandardAnimations();
         const available = standard.filter(a => !existing.includes(a));
-        
+
         let options = available.map(a => `<option value="${a}">${a.charAt(0).toUpperCase() + a.slice(1)}</option>`).join('');
         options += '<option value="_custom">-- Personnalisée --</option>';
-        
+
         return options;
     }
 
@@ -394,9 +394,9 @@ class EnemiesModule {
         if (!animations || Object.keys(animations).length === 0) {
             return '<p style="color: var(--text-muted); font-size: 0.9rem;">Aucune animation. Ajoutez-en une ci-dessous.</p>';
         }
-        
+
         const dirMode = this.currentEnemy?.visuals?.directionMode || 'rotate';
-        
+
         return Object.entries(animations)
             .map(([name, data]) => this.renderAnimationEditor(name, data, assets, dirMode))
             .join('');
@@ -408,11 +408,11 @@ class EnemiesModule {
     renderAnimationEditor(animName, animData, assets, dirMode = 'rotate') {
         // Détecter si c'est une animation 4_way
         const is4Way = dirMode === '4_way' || (animData && (animData.up || animData.down || animData.left || animData.right));
-        
+
         if (is4Way) {
             return this.render4WayAnimationEditor(animName, animData, assets);
         }
-        
+
         // Mode simple
         const frames = animData?.frames || [];
         const frameRate = animData?.frameRate || 10;
@@ -443,13 +443,13 @@ class EnemiesModule {
             </div>
         `;
     }
-    
+
     /**
      * Rendu d'un éditeur d'animation 4_way (4 directions)
      */
     render4WayAnimationEditor(animName, animData, assets) {
         const directions = ['up', 'down', 'left', 'right'];
-        
+
         return `
             <div class="animation-editor animation-editor-4way" data-anim="${animName}" data-mode="4way">
                 <div class="animation-header">
@@ -464,7 +464,7 @@ class EnemiesModule {
             </div>
         `;
     }
-    
+
     /**
      * Rendu d'une direction pour 4_way
      */
@@ -473,9 +473,9 @@ class EnemiesModule {
         const frameRate = dirData?.frameRate || 10;
         const loop = dirData?.loop !== false;
         const dirKey = `${animName}_${direction}`;
-        
+
         const dirLabels = { up: '↑ Haut', down: '↓ Bas', left: '← Gauche', right: '→ Droite' };
-        
+
         return `
             <div class="direction-section" data-anim="${animName}" data-direction="${direction}">
                 <div class="direction-header">
@@ -523,14 +523,14 @@ class EnemiesModule {
      */
     convertAnimationsToMode(newMode) {
         if (!this.currentEnemy?.visuals?.animations) return;
-        
+
         const animations = this.currentEnemy.visuals.animations;
         const isNew4Way = newMode === '4_way';
-        
+
         for (const animName in animations) {
             const data = animations[animName];
             const isCurrently4Way = !!(data.up || data.down || data.left || data.right);
-            
+
             if (isNew4Way && !isCurrently4Way) {
                 // Convert simple to 4_way
                 animations[animName] = {
@@ -552,8 +552,38 @@ class EnemiesModule {
      * Bindind des événements de l'éditeur
      */
     bindEditorEvents() {
+        const editor = document.getElementById('enemyEditor');
+        if (!editor) return;
+
+        // Delegation pour les boutons dynamiques
+        if (!editor.dataset.delegated) {
+            editor.addEventListener('click', (e) => {
+                const target = e.target;
+
+                if (target.classList.contains('add-frame-btn')) {
+                    const anim = target.dataset.anim;
+                    const direction = target.dataset.direction || null;
+                    this.addFrame(anim, direction);
+                }
+
+                if (target.classList.contains('remove-frame-btn')) {
+                    const anim = target.dataset.anim;
+                    const index = parseInt(target.dataset.index);
+                    this.removeFrame(anim, index);
+                }
+
+                if (target.classList.contains('remove-anim-btn')) {
+                    const anim = target.dataset.anim;
+                    this.removeAnimation(anim);
+                }
+            });
+            editor.dataset.delegated = 'true';
+        }
+
         // Tous les inputs -> mise à jour
-        document.querySelectorAll('#enemyEditor input, #enemyEditor select').forEach(input => {
+        editor.querySelectorAll('input, select').forEach(input => {
+            if (input.dataset.bound) return;
+
             if (input.id === 'enemyDirMode') {
                 input.addEventListener('change', (e) => {
                     const newMode = e.target.value;
@@ -574,42 +604,20 @@ class EnemiesModule {
                 input.addEventListener('change', () => this.updateEnemyFromForm());
                 input.addEventListener('input', () => this.updateEnemyFromForm());
             }
+
+            input.dataset.bound = 'true';
         });
 
-        // Ajouter frame
-        document.querySelectorAll('.add-frame-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const anim = e.target.dataset.anim;
-                const direction = e.target.dataset.direction || null;
-                this.addFrame(anim, direction);
-            });
+        // Boutons fixes
+        ['addAnimationBtn', 'saveEnemyBtn', 'deleteEnemyBtn'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn && !btn.dataset.bound) {
+                if (id === 'addAnimationBtn') btn.addEventListener('click', () => this.addNewAnimation());
+                if (id === 'saveEnemyBtn') btn.addEventListener('click', () => this.saveEnemy());
+                if (id === 'deleteEnemyBtn') btn.addEventListener('click', () => this.deleteEnemy());
+                btn.dataset.bound = 'true';
+            }
         });
-
-        // Supprimer frame
-        document.querySelectorAll('.remove-frame-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const anim = e.target.dataset.anim;
-                const index = parseInt(e.target.dataset.index);
-                this.removeFrame(anim, index);
-            });
-        });
-
-        // Supprimer animation
-        document.querySelectorAll('.remove-anim-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const anim = e.target.dataset.anim;
-                this.removeAnimation(anim);
-            });
-        });
-
-        // Ajouter animation
-        document.getElementById('addAnimationBtn')?.addEventListener('click', () => this.addNewAnimation());
-
-        // Sauvegarder
-        document.getElementById('saveEnemyBtn')?.addEventListener('click', () => this.saveEnemy());
-
-        // Supprimer
-        document.getElementById('deleteEnemyBtn')?.addEventListener('click', () => this.deleteEnemy());
 
         // Charger les previews des frames
         this.loadFramePreviews();
@@ -644,7 +652,7 @@ class EnemiesModule {
         if (!e.visuals) e.visuals = {};
         e.visuals.type = document.getElementById('enemyVisualType')?.value || 'sprite';
         e.visuals.width = parseInt(document.getElementById('enemyWidth')?.value) || 48;
-        
+
         const height = document.getElementById('enemyHeight')?.value;
         if (height) e.visuals.height = parseInt(height);
         else delete e.visuals.height;
@@ -656,20 +664,20 @@ class EnemiesModule {
 
         // Animations
         if (!e.visuals.animations) e.visuals.animations = {};
-        
+
         const dirMode = e.visuals.directionMode;
         const is4Way = dirMode === '4_way';
-        
+
         const newAnimations = {};
-        
+
         document.querySelectorAll('.animation-editor').forEach(editor => {
             const animName = editor.dataset.anim;
             const mode = editor.dataset.mode;
-            
+
             if (mode === '4way' || is4Way) {
                 const directions = ['up', 'down', 'left', 'right'];
                 const animObj = {};
-                
+
                 directions.forEach(dir => {
                     const dirSection = editor.querySelector(`.direction-section[data-direction="${dir}"]`);
                     if (dirSection) {
@@ -677,14 +685,14 @@ class EnemiesModule {
                         dirSection.querySelectorAll('.frame-select').forEach(select => {
                             if (select.value) frames.push(select.value);
                         });
-                        
+
                         const frameRate = parseInt(dirSection.querySelector('.anim-framerate')?.value) || 10;
                         const loop = dirSection.querySelector('.anim-loop')?.checked ?? true;
-                        
+
                         animObj[dir] = { frames, frameRate, loop };
                     }
                 });
-                
+
                 if (Object.keys(animObj).length > 0) {
                     newAnimations[animName] = animObj;
                 }
@@ -713,25 +721,25 @@ class EnemiesModule {
     addNewAnimation() {
         const select = document.getElementById('newAnimSelect');
         let animName = select?.value;
-        
+
         if (!animName) return;
-        
+
         if (animName === '_custom') {
             animName = prompt('Nom de l\'animation (ex: charge, explode):');
             if (!animName) return;
             animName = animName.trim().toLowerCase().replace(/\s+/g, '_');
         }
-        
+
         if (this.currentEnemy.visuals?.animations?.[animName]) {
             this.app.showNotification(`L'animation "${animName}" existe déjà`, 'warning');
             return;
         }
-        
+
         if (!this.currentEnemy.visuals) this.currentEnemy.visuals = {};
         if (!this.currentEnemy.visuals.animations) this.currentEnemy.visuals.animations = {};
-        
+
         const dirMode = this.currentEnemy.visuals?.directionMode;
-        
+
         if (dirMode === '4_way') {
             this.currentEnemy.visuals.animations[animName] = {
                 up: { frames: [], frameRate: 10, loop: true },
@@ -746,7 +754,7 @@ class EnemiesModule {
                 loop: true
             };
         }
-        
+
         this.renderEditor();
         this.updateJsonPreview();
     }
@@ -756,11 +764,11 @@ class EnemiesModule {
      */
     removeAnimation(animName) {
         if (!confirm(`Supprimer l'animation "${animName}" ?`)) return;
-        
+
         if (this.currentEnemy.visuals?.animations?.[animName]) {
             delete this.currentEnemy.visuals.animations[animName];
         }
-        
+
         this.renderEditor();
         this.updateJsonPreview();
     }
@@ -773,7 +781,7 @@ class EnemiesModule {
         if (direction) {
             frameListId = `frames-${animName}_${direction}`;
         }
-        
+
         const framesList = document.getElementById(frameListId);
         if (!framesList) return;
 
@@ -806,7 +814,7 @@ class EnemiesModule {
             const anim = select.dataset.anim;
             const index = select.dataset.index;
             const path = select.value;
-            
+
             const previewEl = document.getElementById(`frame-preview-${anim}-${index}`);
             if (!previewEl) continue;
 
@@ -856,23 +864,23 @@ class EnemiesModule {
      */
     getAnimationParams(animName) {
         if (!this.currentEnemy?.visuals?.animations) return null;
-        
+
         const visuals = this.currentEnemy.visuals;
         const animations = visuals.animations;
         const dirMode = visuals.directionMode;
         const direction = document.getElementById('previewDirection')?.value || 'down';
-        
+
         let animData = animations[animName];
         if (!animData) return null;
-        
+
         // Mode 4_way : on cherche la sous-direction
         if (dirMode === '4_way' && animData[direction]) {
             animData = animData[direction];
         }
-        
+
         const frames = animData.frames || [];
         const frameRate = animData.frameRate || 10;
-        
+
         // Calcul de la transformation CSS
         let transform = '';
         if (dirMode === 'flip' && direction === 'left') {
@@ -882,7 +890,7 @@ class EnemiesModule {
             const angle = (angles[direction] || 0) + (visuals.angleOffset || 0);
             transform = `rotate(${angle}deg)`;
         }
-        
+
         return { frames, frameRate, transform };
     }
 
@@ -894,7 +902,7 @@ class EnemiesModule {
         if (!canvas || !this.currentEnemy) return;
 
         const visuals = this.currentEnemy.visuals;
-        
+
         // Si pas de visuels ou type shape, afficher la couleur
         if (!visuals || visuals.type === 'shape') {
             const color = this.currentEnemy.color || '#fff';
@@ -908,7 +916,7 @@ class EnemiesModule {
         // Utiliser getAnimationParams pour récupérer les données avec la bonne direction
         const walkParams = this.getAnimationParams('walk');
         const idleParams = this.getAnimationParams('idle');
-        
+
         const params = (walkParams?.frames?.length > 0) ? walkParams : idleParams;
 
         if (params?.frames?.length > 0) {
@@ -917,7 +925,7 @@ class EnemiesModule {
                 const width = visuals.width || 48;
                 const height = visuals.height || width;
                 canvas.innerHTML = `<img src="${url}" alt="preview" style="width: ${width}px; height: ${height}px; image-rendering: pixelated; transform: ${params.transform}">`;
-                
+
                 // Activer les contrôles d'animation
                 document.getElementById('playIdleBtn').disabled = !idleParams || idleParams.frames.length === 0;
                 document.getElementById('playWalkBtn').disabled = !walkParams || walkParams.frames.length === 0;
@@ -1063,7 +1071,7 @@ class EnemiesModule {
      */
     addNewEnemy() {
         const newId = `new_enemy_${Date.now()}`;
-        
+
         const newEnemy = {
             name: 'Nouvel Ennemi',
             hp: 20,
@@ -1084,11 +1092,11 @@ class EnemiesModule {
 
         // Ajouter aux données (temporaire, pas encore sauvegardé)
         this.app.gameData.enemies[newId] = newEnemy;
-        
+
         // Sélectionner le nouvel ennemi
         this.loadEnemiesList();
         this.selectEnemy(newId);
-        
+
         this.app.showNotification('Nouvel ennemi créé. N\'oubliez pas de le sauvegarder!', 'info');
     }
 
