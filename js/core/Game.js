@@ -4,6 +4,7 @@ import { Projectile } from '../entities/Projectile.js';
 import { Enemy } from '../entities/Enemy.js';
 import { Boss } from '../entities/Boss.js';
 import { Loot } from '../entities/Loot.js';
+import { Animator } from '../entities/Animator.js';
 import { UpgradeSystem } from '../systems/UpgradeSystem.js';
 import { SaveSystem } from '../systems/SaveSystem.js';
 import { DataManager } from './DataManager.js';

@@ -19,7 +19,7 @@
                 "animations": {
                     "idle": {
                         "frames": [
-                            "assets/boss/ovule_boss.png"
+                            "assets/boss/conception/ovule_boss.png"
                         ],
                         "frameRate": 10,
                         "loop": true
@@ -43,6 +43,58 @@
                 "path": "assets/projectiles/capotes.png",
                 "angleOffset": 180,
                 "height": 16
+            },
+            "weapon_id": ""
+        },
+        "new_boss_1769257709616": {
+            "name": "Playmobil flash",
+            "hp": 2000,
+            "speed": 150,
+            "damage": 40,
+            "fireRate": 1500,
+            "attackPattern": "flower",
+            "movePattern": "rush",
+            "radius": 80,
+            "color": "#ff3333",
+            "visuals": {
+                "type": "sprite",
+                "width": 200,
+                "directionMode": "flip",
+                "hitFlash": false,
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/boss/playmobile/chien-boss-i.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    },
+                    "walk": {
+                        "frames": [
+                            "assets/boss/playmobile/chien-boss-w-1.png",
+                            "assets/boss/playmobile/chien-boss-i.png",
+                            "assets/boss/playmobile/chien-boss-w-2.png"
+                        ],
+                        "frameRate": 15,
+                        "loop": true
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": true
+            },
+            "projectileVisuals": {
+                "type": "sprite",
+                "width": 16,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "path": "",
+                "angleOffset": 0
             },
             "weapon_id": ""
         }

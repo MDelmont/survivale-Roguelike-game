@@ -51,7 +51,7 @@ export class Boss extends Enemy {
             const dy = player.y - this.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
             const targetDir = dist > 0 ? { dx: dx / dist, dy: dy / dist } : { dx: 1, dy: 0 };
-            
+
             this.weapon.update(deltaTime, this, {
                 targetDir: targetDir,
                 onShoot: (x, y, dx, dy, stats) => onShoot(x, y, dx, dy, stats),
@@ -77,7 +77,13 @@ export class Boss extends Enemy {
         switch (this.movePattern) {
             case 'fixed':
                 // Ne bouge pas une fois arrivé à l'écran (y=100)
-                if (this.y < 100) this.y += this.speed * dt;
+                if (this.y < 100) {
+                    this.velocity.y = this.speed;
+                    this.y += this.velocity.y * dt;
+                } else {
+                    this.velocity.y = 0;
+                }
+                this.velocity.x = 0;
                 break;
 
             case 'constant':
@@ -87,8 +93,13 @@ export class Boss extends Enemy {
                     const dy = player.y - this.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist > 5) {
-                        this.x += (dx / dist) * this.speed * dt;
-                        this.y += (dy / dist) * this.speed * dt;
+                        this.velocity.x = (dx / dist) * this.speed;
+                        this.velocity.y = (dy / dist) * this.speed;
+                        this.x += this.velocity.x * dt;
+                        this.y += this.velocity.y * dt;
+                    } else {
+                        this.velocity.x = 0;
+                        this.velocity.y = 0;
                     }
                 }
                 break;
@@ -110,14 +121,20 @@ export class Boss extends Enemy {
                         const rushSpeed = this.speed * 4;
 
                         if (dist > 10) {
-                            this.x += (dx / dist) * rushSpeed * dt;
-                            this.y += (dy / dist) * rushSpeed * dt;
+                            this.velocity.x = (dx / dist) * rushSpeed;
+                            this.velocity.y = (dy / dist) * rushSpeed;
+                            this.x += this.velocity.x * dt;
+                            this.y += this.velocity.y * dt;
                         } else {
                             this.isRushing = false;
                             this.rushTimer = 0; // Pause après la charge
+                            this.velocity.x = 0;
+                            this.velocity.y = 0;
                         }
                     } else {
                         // Flotte légèrement en attendant la prochaine charge
+                        this.velocity.x = 0;
+                        this.velocity.y = Math.cos(this.time / 500) * 10; // Petite velocity verticale pour l'anim
                         this.y += Math.sin(this.time / 500) * 0.5;
                     }
                 }

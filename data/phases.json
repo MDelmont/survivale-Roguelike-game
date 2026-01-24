@@ -3,21 +3,18 @@
         {
             "id": 2,
             "name": "playmobile-dog",
-            "duration_before_boss": 60,
-            "enemy_types": [
-                "basic_cell",
-                "fast_cell",
-                "tank_cell",
-                "new_enemy_1767798373589"
-            ],
+            "duration_before_boss": 10,
+            "enemy_types": [],
             "player_id": "playmobile_ony",
             "spawn_rate": 1000,
             "default_weapon": "lance_bille",
             "weapon_drop_rate": 0.25,
             "available_weapons": [
-                "basic_shot"
+                "lance_bille",
+                "new_weapon_mks7hfrs",
+                "new_weapon_mks870pe"
             ],
-            "boss_id": "",
+            "boss_id": "new_boss_1769257709616",
             "background_image": "assets/fond/playmobile/fond-playmobile-storm.png",
             "xp_visual": "assets/experiences/lego-exp.png",
             "xp_size": 20,
@@ -48,12 +45,11 @@
             ],
             "player_id": "ony_sperm",
             "spawn_rate": 1500,
-            "default_weapon": "basic_shot",
+            "default_weapon": "lance_bille",
             "available_weapons": [
-                "basic_shot",
-                "poison_shot",
-                "smartphone_wave",
-                "smartphone_poison"
+                "lance_bille",
+                "new_weapon_mks7hfrs",
+                "new_weapon_mks870pe"
             ],
             "boss_id": "ovule_geant",
             "story_intro": [],

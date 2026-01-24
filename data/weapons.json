@@ -377,21 +377,22 @@
             "name": "Lance Bille",
             "type": "attack",
             "stats": {
-                "damage": 20,
+                "damage": 15,
                 "fireRate": 500,
                 "projectileSpeed": 800,
                 "projectileCount": 1,
                 "piercingCount": 0,
                 "color": null,
                 "isPoisonous": false,
-                "isSlowing": false,
+                "isSlowing": true,
                 "slowMultiplier": 0.4,
                 "poisonDamage": 10,
                 "poisonDuration": 2000,
                 "poisonTickRate": 500,
                 "isExplosive": false,
                 "explosionRadius": 80,
-                "explosionDamageMultiplier": 0.5
+                "explosionDamageMultiplier": 0.5,
+                "range": 100
             },
             "upgrades": [],
             "visuals": {
@@ -413,6 +414,111 @@
             },
             "description": "Munition illimitée grâce au troc avec Calos.",
             "category": "projectile",
+            "preview": ""
+        },
+        {
+            "id": "new_weapon_mks7hfrs",
+            "name": "Froid mental",
+            "type": "aoe",
+            "stats": {
+                "damage": 7,
+                "fireRate": 500,
+                "projectileSpeed": 400,
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": true,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": false,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5
+            },
+            "upgrades": [],
+            "visuals": {
+                "path": "assets/projectiles/lego-zone-glace.png",
+                "width": 20,
+                "rotateWithVelocity": false,
+                "angleOffset": 0,
+                "directionMode": "none",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/lego-zone-glace.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "auraRotationSpeed": 0,
+                "auraPulseAlpha": false,
+                "auraPulseSize": false,
+                "auraAlphaSpeed": 200,
+                "auraAlphaMin": 0.2,
+                "auraAlphaMax": 1
+            },
+            "description": "Tu garde ton sang froid maintenant !",
+            "category": "aura",
+            "preview": ""
+        },
+        {
+            "id": "new_weapon_mks870pe",
+            "name": "os explosif",
+            "type": "attack",
+            "stats": {
+                "damage": 10,
+                "fireRate": 500,
+                "projectileSpeed": 400,
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": true,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5,
+                "explosionVisuals": {
+                    "path": "assets/explosion/lego-explosion.png",
+                    "width": 80,
+                    "height": 80,
+                    "directionMode": "none",
+                    "animations": {
+                        "idle": {
+                            "frames": [
+                                "assets/explosion/lego-explosion.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                }
+            },
+            "upgrades": [],
+            "visuals": {
+                "path": "assets/projectiles/os-explosif.png",
+                "width": 30,
+                "rotateWithVelocity": true,
+                "angleOffset": 0,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/os-explosif.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "Explose moi ce cabot",
+            "category": "",
             "preview": ""
         }
     ]
