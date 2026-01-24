@@ -207,7 +207,8 @@ export class AreaWeapon extends Weapon {
     }
 
     update(deltaTime, owner, context) {
-        const range = (this.stats.range || 100) * (owner.stats.rangeMultiplier || 1.0);
+        const baseRange = (this.stats.range !== undefined) ? this.stats.range : 100;
+        const range = baseRange * (owner.stats.rangeMultiplier || 1.0);
         const dt = deltaTime / 1000;
 
         const targets = [...(context.enemies || [])];
@@ -260,7 +261,7 @@ export class AreaWeapon extends Weapon {
     }
 
     draw(ctx, owner) {
-        let range = (this.stats.range || 100) * (owner.stats.rangeMultiplier || 1.0);
+        let range = (this.stats.range !== undefined ? this.stats.range : 100) * (owner.stats.rangeMultiplier || 1.0);
 
         // Effet de pulsation de taille (visuel uniquement)
         if (this.visuals && this.visuals.auraPulseSize) {

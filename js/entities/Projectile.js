@@ -83,7 +83,7 @@ export class Projectile {
             CombatSystem.handleAOE({
                 x: this.x,
                 y: this.y,
-                radius: this.stats.explosionRadius || 80,
+                radius: (this.stats.explosionRadius !== undefined) ? this.stats.explosionRadius : 80,
                 damage: this.damage * (this.stats.explosionDamageMultiplier || 0.5),
                 enemies: combatContext.enemies,
                 boss: combatContext.boss,

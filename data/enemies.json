@@ -192,6 +192,7 @@
             "color": "#ff5555",
             "visuals": {
                 "type": "sprite",
+                "width": 90,
                 "height": 125,
                 "directionMode": "2_way",
                 "hitFlash": true,

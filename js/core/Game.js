@@ -474,7 +474,9 @@ class Game {
             e.update(deltaTime, this.player, {
                 onEnemyShoot: (x, y, dx, dy, stats) => this.spawnEnemyProjectile(x, y, dx, dy, stats)
             });
-            if (this.player && CombatSystem.checkCollision(this.player, e)) { this.player.takeDamage(e.damage); e.toRemove = true; }
+            if (this.player && CombatSystem.checkCollision(this.player, e)) {
+                this.player.takeDamage(e.damage * (deltaTime / 1000));
+            }
             if (e.toRemove) {
                 if (e.hp <= 0) {
                     this.killCount++;
