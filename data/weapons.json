@@ -394,7 +394,29 @@
                 "explosionDamageMultiplier": 0.5,
                 "range": 100
             },
-            "upgrades": [],
+            "upgrades": [
+                {
+                    "name": "Bille d'acier",
+                    "preview": "Traverse +1 ennemi",
+                    "stats": {
+                        "piercingCount": 1
+                    }
+                },
+                {
+                    "name": "Barillet Huilé",
+                    "preview": "Cadence +20%",
+                    "stats": {
+                        "fireRate": -100
+                    }
+                },
+                {
+                    "name": "Rafale de Verre",
+                    "preview": "+1 Projectile",
+                    "stats": {
+                        "projectileCount": 1
+                    }
+                }
+            ],
             "visuals": {
                 "path": "assets/projectiles/bille.png",
                 "width": 20,
@@ -437,7 +459,29 @@
                 "explosionRadius": 80,
                 "explosionDamageMultiplier": 0.5
             },
-            "upgrades": [],
+            "upgrades": [
+                {
+                    "name": "Gel Profond",
+                    "preview": "Rayon +30px",
+                    "stats": {
+                        "range": 30
+                    }
+                },
+                {
+                    "name": "Zéro Absolu",
+                    "preview": "Ralenti +20%",
+                    "stats": {
+                        "slowMultiplier": 0.2
+                    }
+                },
+                {
+                    "name": "Frisson Mortel",
+                    "preview": "Dégâts +5",
+                    "stats": {
+                        "damage": 5
+                    }
+                }
+            ],
             "visuals": {
                 "path": "assets/projectiles/lego-zone-glace.png",
                 "width": 20,
@@ -500,7 +544,29 @@
                     }
                 }
             },
-            "upgrades": [],
+            "upgrades": [
+                {
+                    "name": "Fémur lourd",
+                    "preview": "Rayon +40px",
+                    "stats": {
+                        "explosionRadius": 40
+                    }
+                },
+                {
+                    "name": "Moelle Instable",
+                    "preview": "Dégâts explo +30%",
+                    "stats": {
+                        "explosionDamageMultiplier": 0.3
+                    }
+                },
+                {
+                    "name": "Squelette Infini",
+                    "preview": "+1 Projectile",
+                    "stats": {
+                        "projectileCount": 1
+                    }
+                }
+            ],
             "visuals": {
                 "path": "assets/projectiles/os-explosif.png",
                 "width": 30,

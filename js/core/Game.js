@@ -16,6 +16,7 @@ import { MainMenu } from '../ui/screens/MainMenu.js';
 import { LevelUpScreen } from '../ui/screens/LevelUpScreen.js';
 import { WeaponMenuScreen } from '../ui/screens/WeaponMenuScreen.js';
 import { VictoryScreen } from '../ui/screens/VictoryScreen.js';
+import { PhaseSelectionScreen } from '../ui/screens/PhaseSelectionScreen.js';
 
 /**
  * GameState Enum
@@ -27,6 +28,7 @@ const GameState = {
     WEAPON_MENU: 'WEAPON_MENU',
     STORY: 'STORY',
     VICTORY: 'VICTORY',
+    PHASE_SELECTION: 'PHASE_SELECTION',
     GAMEOVER: 'GAMEOVER'
 };
 
@@ -99,6 +101,7 @@ class Game {
         this.levelUpScreen = new LevelUpScreen(this);
         this.weaponMenuScreen = new WeaponMenuScreen(this);
         this.victoryScreen = new VictoryScreen(this);
+        this.phaseSelectionScreen = new PhaseSelectionScreen(this);
 
         this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
 
@@ -138,12 +141,14 @@ class Game {
         this.loots = [];
         this.explosions = [];
         this.boss = null;
+        this.killCount = 0;
         this.threatBudgets = {}; // Un budget par type d'ennemi pour des jauges parallèles
 
         if (this.currentPhase.transition_intro_id) {
             const transition = this.dataManager.getTransitionData(this.currentPhase.transition_intro_id);
             if (transition) {
                 this.openStory(transition.pages, () => {
+                    this.player = null; // S'assurer que le joueur est reset
                     this.setupInitialPlayer();
                     this.state = GameState.PLAYING;
                 });
@@ -153,10 +158,12 @@ class Game {
 
         if (this.currentPhase.story_intro && this.currentPhase.story_intro.length > 0) {
             this.openStory(this.currentPhase.story_intro, () => {
+                this.player = null;
                 this.setupInitialPlayer();
                 this.state = GameState.PLAYING;
             });
         } else {
+            this.player = null;
             this.setupInitialPlayer();
             this.state = GameState.PLAYING;
         }
@@ -227,6 +234,10 @@ class Game {
                 this.requestFullscreen();
                 this.continueGame();
                 return;
+            } else if (action === 'select_phase') {
+                this.state = GameState.PHASE_SELECTION;
+                if (this.phaseSelectionScreen) this.phaseSelectionScreen.reset();
+                return;
             }
         } else if (this.state === GameState.STORY) {
             this.nextStoryPage();
@@ -249,8 +260,33 @@ class Game {
                 this.player.pendingWeaponUpgrade = false;
                 this.state = GameState.PLAYING;
             }
-        } else if (this.state === GameState.VICTORY || this.state === GameState.GAMEOVER) {
+        } else if (this.state === GameState.VICTORY) {
+            const nextIndex = this.currentPhaseIndex + 1;
+            const phases = this.dataManager.data.phases?.phases || [];
+
+            if (nextIndex < phases.length) {
+                // Passage à la phase suivante (reset complet du joueur)
+                this.player = null;
+                this.startPhase(nextIndex);
+            } else {
+                // Fin du jeu
+                this.state = GameState.MENU;
+            }
+        } else if (this.state === GameState.GAMEOVER) {
+            // Un seul choix : retour au menu
             this.state = GameState.MENU;
+            this.exitFullscreen();
+        } else if (this.state === GameState.PHASE_SELECTION && this.phaseSelectionScreen) {
+            const action = this.phaseSelectionScreen.handleClick(mouseX, mouseY);
+            if (action) {
+                if (action.type === 'phase') {
+                    this.requestFullscreen();
+                    this.player = null;
+                    this.startPhase(action.index);
+                } else if (action.type === 'back') {
+                    this.state = GameState.MENU;
+                }
+            }
         }
     }
 
@@ -283,6 +319,8 @@ class Game {
             this.weaponMenuScreen.update(deltaTime, this.mouseX, this.mouseY);
         } else if (this.state === GameState.VICTORY && this.victoryScreen) {
             this.victoryScreen.update(deltaTime);
+        } else if (this.state === GameState.PHASE_SELECTION && this.phaseSelectionScreen) {
+            this.phaseSelectionScreen.update(deltaTime, this.mouseX, this.mouseY);
         } else if (this.state === GameState.PLAYING) {
             this.update(deltaTime);
         }
@@ -477,6 +515,11 @@ class Game {
     }
 
     handlePhaseWin() {
+        // Sauvegarde de la progression
+        if (this.saveSystem) {
+            this.saveSystem.saveProgress(this.currentPhaseIndex + 1);
+        }
+
         if (this.currentPhase.transition_outro_id) {
             const transition = this.dataManager.getTransitionData(this.currentPhase.transition_outro_id);
             if (transition) {
@@ -737,6 +780,12 @@ class Game {
         if (this.state === GameState.UPGRADE && this.levelUpScreen) this.levelUpScreen.draw(this.ctx);
         if (this.state === GameState.WEAPON_MENU && this.weaponMenuScreen) this.weaponMenuScreen.draw(this.ctx);
         if (this.state === GameState.VICTORY && this.victoryScreen) this.victoryScreen.draw(this.ctx);
+        if (this.state === GameState.PHASE_SELECTION && this.phaseSelectionScreen) {
+            this.phaseSelectionScreen.draw(this.ctx);
+            this.ctx.restore();
+            return;
+        }
+
         if (this.state === GameState.GAMEOVER) {
             // On ne dessine pas le "GAME OVER" si on utilise déjà une image de défaite (normalement déjà passé au MENU)
             // Mais au cas où, on garde l'affichage standard
@@ -1226,18 +1275,41 @@ class Game {
 
     drawEndScreen(text, color) {
         const ctx = this.ctx;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-        ctx.fillRect(0, 0, this.logicalWidth, this.logicalHeight);
+        const w = this.logicalWidth;
+        const h = this.logicalHeight;
+        const centerX = w / 2;
+        const centerY = h / 2;
 
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+        ctx.fillRect(0, 0, w, h);
+
+        // Titre Game Over
         ctx.fillStyle = color;
         ctx.font = 'bold 80px Inter, Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(text, this.logicalWidth / 2, this.logicalHeight / 2 - 50);
+        ctx.fillText(text, centerX, centerY - 120);
 
+        // Stats
         ctx.fillStyle = 'white';
         ctx.font = '24px Inter, Arial';
-        ctx.fillText(`KILLS: ${this.killCount}`, this.logicalWidth / 2, this.logicalHeight / 2 + 20);
-        ctx.fillText('CLIQUE POUR RECOMMENCER', this.logicalWidth / 2, this.logicalHeight / 2 + 100);
+        ctx.fillText(`KILLS: ${this.killCount}`, centerX, centerY - 40);
+
+        // --- Bouton unique : RETOUR AU MENU ---
+        const btnW = 320;
+        const btnH = 60;
+        const btnX = centerX - btnW / 2;
+        const btnY = centerY + 40;
+
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+        this.roundRect(ctx, btnX, btnY, btnW, btnH, 10);
+        ctx.fill();
+        ctx.strokeStyle = '#EF4444';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#EF4444';
+        ctx.font = 'bold 20px Inter, Arial';
+        ctx.fillText('RETOUR AU MENU', centerX, btnY + btnH / 2 + 7);
     }
 
 }

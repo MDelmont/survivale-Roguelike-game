@@ -94,7 +94,12 @@ export class VictoryScreen {
             ctx.fillStyle = Colors.TEXT_PRIMARY;
             ctx.font = `bold 22px ${Typography.FONT_PRIMARY}`;
             ctx.textAlign = 'center';
-            ctx.fillText('CLIQUEZ POUR RECOMMENCER', w / 2, btnY);
+
+            const nextIndex = this.game.currentPhaseIndex + 1;
+            const phases = this.game.dataManager.data.phases?.phases || [];
+            const text = nextIndex < phases.length ? 'CLIQUEZ POUR CONTINUER' : 'CLIQUEZ POUR RECOMMENCER';
+
+            ctx.fillText(text, w / 2, btnY);
         }
 
         ctx.restore();

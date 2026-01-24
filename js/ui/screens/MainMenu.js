@@ -39,14 +39,20 @@ export class MainMenu {
                 id: 'new_game',
                 text: 'NOUVELLE PARTIE',
                 color: Colors.PRIMARY,
-                y: 0.52  // Position relative (% of screen height)
+                y: 0.50
             },
             {
                 id: 'continue',
                 text: 'CONTINUER',
                 color: Colors.ACCENT,
-                y: 0.62,
+                y: 0.60,
                 condition: () => this.game.saveSystem.getProgress() > 0
+            },
+            {
+                id: 'select_phase',
+                text: 'SÉLECTION DE PHASE',
+                color: Colors.WARNING,
+                y: 0.70
             }
         ];
     }
