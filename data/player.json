@@ -160,6 +160,94 @@
                 "angleOffset": 0,
                 "height": 80
             }
+        },
+        "player_1769291289336": {
+            "name": "baby ony",
+            "speed": 180,
+            "hp": 100,
+            "maxHp": 100,
+            "fireRate": 300,
+            "damage": 10,
+            "projectileSpeed": 400,
+            "pickupRadius": 100,
+            "xpNextLevel": 50,
+            "visuals": {
+                "type": "sprite",
+                "directionMode": "4_way",
+                "hitFlash": true,
+                "animations": {
+                    "idle": {
+                        "up": {
+                            "frames": [
+                                "assets/players/peluche-bebe/bebe-ony-dos-i.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/players/peluche-bebe/bebe-ony-face-i.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/players/peluche-bebe/bebe-ony-gauche-i.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/players/peluche-bebe/bebe-ony-droite-i.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": true
+                        }
+                    },
+                    "walk": {
+                        "up": {
+                            "frames": [
+                                "assets/players/peluche-bebe/bebe-ony-dos-w-1.png",
+                                "assets/players/peluche-bebe/bebe-ony-dos-i.png",
+                                "assets/players/peluche-bebe/bebe-ony-dos-w-2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/players/peluche-bebe/bebe-ony-face-w-1.png",
+                                "assets/players/peluche-bebe/bebe-ony-face-i.png",
+                                "assets/players/peluche-bebe/bebe-ony-face-w-2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/players/peluche-bebe/bebe-ony-gauche-w-1.png",
+                                "assets/players/peluche-bebe/bebe-ony-gauche-i.png",
+                                "assets/players/peluche-bebe/bebe-ony-gauche-w-2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/players/peluche-bebe/bebe-ony-droite-w-1.png",
+                                "assets/players/peluche-bebe/bebe-ony-droite-i.png",
+                                "assets/players/peluche-bebe/bebe-ony-droite-w-2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "height": 130
+            }
         }
     }
 }
