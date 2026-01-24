@@ -149,7 +149,7 @@
             "name": "lego-dog",
             "hp": 20,
             "speed": 300,
-            "damage": 5,
+            "damage": 10,
             "xpValue": 10,
             "radius": 12,
             "color": "#ff5555",
@@ -186,13 +186,12 @@
             "name": "parent fige",
             "hp": 150,
             "speed": 100,
-            "damage": 1,
+            "damage": 5,
             "xpValue": 10,
             "radius": 12,
             "color": "#ff5555",
             "visuals": {
                 "type": "sprite",
-                "width": 90,
                 "height": 125,
                 "directionMode": "2_way",
                 "hitFlash": true,
@@ -234,7 +233,7 @@
                 "pixelPerfect": false
             },
             "threatLevel": 60,
-            "weapon_id": ""
+            "weapon_id": "new_weapon_mks7hfrs"
         }
     }
 }
