@@ -321,6 +321,7 @@ class EnemiesModule {
                                 <option value="none" ${e.visuals?.directionMode === 'none' ? 'selected' : ''}>None (fixe)</option>
                                 <option value="flip" ${e.visuals?.directionMode === 'flip' ? 'selected' : ''}>Flip (miroir)</option>
                                 <option value="rotate" ${e.visuals?.directionMode === 'rotate' ? 'selected' : ''}>Rotate (orientation)</option>
+                                <option value="2_way" ${e.visuals?.directionMode === '2_way' ? 'selected' : ''}>2 Way (Left/Right)</option>
                                 <option value="4_way" ${e.visuals?.directionMode === '4_way' ? 'selected' : ''}>4 Way</option>
                             </select>
                         </div>
@@ -406,11 +407,11 @@ class EnemiesModule {
      * Rendu d'un éditeur d'animation
      */
     renderAnimationEditor(animName, animData, assets, dirMode = 'rotate') {
-        // Détecter si c'est une animation 4_way
-        const is4Way = dirMode === '4_way' || (animData && (animData.up || animData.down || animData.left || animData.right));
+        // Détecter si c'est une animation multi-directionnelle (Basé UNIQUEMENT sur le mode actuel)
+        const isMultiDir = dirMode === '4_way' || dirMode === '2_way';
 
-        if (is4Way) {
-            return this.render4WayAnimationEditor(animName, animData, assets);
+        if (isMultiDir) {
+            return this.renderMultiDirAnimationEditor(animName, animData, assets, dirMode);
         }
 
         // Mode simple
@@ -445,20 +446,26 @@ class EnemiesModule {
     }
 
     /**
-     * Rendu d'un éditeur d'animation 4_way (4 directions)
+     * Rendu d'un éditeur d'animation Multi-Directionnelle (2-Way ou 4-Way)
      */
-    render4WayAnimationEditor(animName, animData, assets) {
-        const directions = ['up', 'down', 'left', 'right'];
+    renderMultiDirAnimationEditor(animName, animData, assets, dirMode) {
+        let directions = ['up', 'down', 'left', 'right'];
+        let badge = '4-Way';
+
+        if (dirMode === '2_way') {
+            directions = ['left', 'right'];
+            badge = '2-Way';
+        }
 
         return `
-            <div class="animation-editor animation-editor-4way" data-anim="${animName}" data-mode="4way">
+            <div class="animation-editor animation-editor-multidir" data-anim="${animName}" data-mode="${dirMode}">
                 <div class="animation-header">
-                    <h4>${animName.charAt(0).toUpperCase() + animName.slice(1)} <span class="badge badge-primary">4-Way</span></h4>
+                    <h4>${animName.charAt(0).toUpperCase() + animName.slice(1)} <span class="badge badge-primary">${badge}</span></h4>
                     <div class="animation-header-actions">
                         <button class="btn btn-sm btn-danger remove-anim-btn" data-anim="${animName}" title="Supprimer animation">×</button>
                     </div>
                 </div>
-                <div class="directions-grid">
+                <div class="directions-grid" style="grid-template-columns: repeat(${directions.length > 2 ? 2 : directions.length}, 1fr);">
                     ${directions.map(dir => this.render4WayDirection(animName, dir, animData?.[dir], assets)).join('')}
                 </div>
             </div>
@@ -525,25 +532,54 @@ class EnemiesModule {
         if (!this.currentEnemy?.visuals?.animations) return;
 
         const animations = this.currentEnemy.visuals.animations;
-        const isNew4Way = newMode === '4_way';
+        const isNewMultiDir = newMode === '4_way' || newMode === '2_way';
 
         for (const animName in animations) {
             const data = animations[animName];
-            const isCurrently4Way = !!(data.up || data.down || data.left || data.right);
+            // Détecter si c'est déjà un format objet (multi-dir)
+            const isCurrentlyMulti = !!(data.up || data.down || data.left || data.right);
 
-            if (isNew4Way && !isCurrently4Way) {
-                // Convert simple to 4_way
-                animations[animName] = {
-                    up: JSON.parse(JSON.stringify(data)),
-                    down: JSON.parse(JSON.stringify(data)),
-                    left: JSON.parse(JSON.stringify(data)),
-                    right: JSON.parse(JSON.stringify(data))
-                };
-            } else if (!isNew4Way && isCurrently4Way) {
-                // Convert 4_way to simple
-                animations[animName] = data.down || data.up || data.left || data.right;
-                if (!animations[animName]) animations[animName] = { frames: [], frameRate: 10, loop: true };
+            if (isNewMultiDir && !isCurrentlyMulti) {
+                // Convert Simple -> Multi (2-way ou 4-way)
+                // On duplique les frames existantes pour ne pas perdre le travail
+                const base = JSON.parse(JSON.stringify(data));
+                if (newMode === '4_way') {
+                    animations[animName] = {
+                        up: JSON.parse(JSON.stringify(base)),
+                        down: JSON.parse(JSON.stringify(base)),
+                        left: JSON.parse(JSON.stringify(base)),
+                        right: JSON.parse(JSON.stringify(base))
+                    };
+                } else {
+                    animations[animName] = {
+                        left: JSON.parse(JSON.stringify(base)),
+                        right: JSON.parse(JSON.stringify(base))
+                    };
+                }
+            } else if (!isNewMultiDir && isCurrentlyMulti) {
+                // Convert Multi -> Simple
+                // Priorité : down > left > right > up
+                const selected = data.down || data.left || data.right || data.up;
+                animations[animName] = JSON.parse(JSON.stringify(selected));
                 if (!animations[animName].frames) animations[animName].frames = [];
+            } else if (isNewMultiDir && isCurrentlyMulti) {
+                // Convert entre 2-way et 4-way
+                if (newMode === '2_way') {
+                    // 4-way -> 2-way : On garde left/right
+                    animations[animName] = {
+                        left: data.left || data.down || data.up, // Fallback si pas de left
+                        right: data.right || data.down || data.up // Fallback si pas de right
+                    };
+                } else if (newMode === '4_way') {
+                    // 2-way -> 4-way : On étend
+                    // Si on vient de 2-way pur (left/right only)
+                    animations[animName] = {
+                        left: data.left || data.up || data.down,
+                        right: data.right || data.up || data.down,
+                        up: data.up || data.left || data.right, // Fallback
+                        down: data.down || data.left || data.right // Fallback
+                    };
+                }
             }
         }
     }
@@ -677,7 +713,7 @@ class EnemiesModule {
             const animName = editor.dataset.anim;
             const mode = editor.dataset.mode;
 
-            if (mode === '4way' || is4Way) {
+            if (mode === '4way' || mode === '4_way' || mode === '2_way' || is4Way || dirMode === '2_way') {
                 const directions = ['up', 'down', 'left', 'right'];
                 const animObj = {};
 
@@ -747,6 +783,11 @@ class EnemiesModule {
             this.currentEnemy.visuals.animations[animName] = {
                 up: { frames: [], frameRate: 10, loop: true },
                 down: { frames: [], frameRate: 10, loop: true },
+                left: { frames: [], frameRate: 10, loop: true },
+                right: { frames: [], frameRate: 10, loop: true }
+            };
+        } else if (dirMode === '2_way') {
+            this.currentEnemy.visuals.animations[animName] = {
                 left: { frames: [], frameRate: 10, loop: true },
                 right: { frames: [], frameRate: 10, loop: true }
             };
@@ -871,14 +912,23 @@ class EnemiesModule {
         const visuals = this.currentEnemy.visuals;
         const animations = visuals.animations;
         const dirMode = visuals.directionMode;
-        const direction = document.getElementById('previewDirection')?.value || 'down';
+        let direction = document.getElementById('previewDirection')?.value || 'down';
 
         let animData = animations[animName];
         if (!animData) return null;
 
-        // Mode 4_way : on cherche la sous-direction
-        if (dirMode === '4_way' && animData[direction]) {
+        // Support 2_way mapping
+        if (dirMode === '2_way') {
+            if (direction === 'up') direction = 'left'; // Fallback
+            if (direction === 'down') direction = 'right'; // Fallback
+            if (animData[direction]) {
+                animData = animData[direction];
+            }
+        } else if (dirMode === '4_way' && animData[direction]) {
             animData = animData[direction];
+        } else if (dirMode === '4_way' && !animData[direction]) {
+            // Fallback
+            animData = animData['down'] || animData['right'] || animData['left'] || animData['up'];
         }
 
         const frames = animData.frames || [];

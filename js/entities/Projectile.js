@@ -94,7 +94,9 @@ export class Projectile {
         }
 
         // Gestion de la disparition / perçage
-        if (this.piercingCount > 0) {
+        // Gestion de la disparition / perçage
+        // Si c'est explosif, le projectile est détruit par l'explosion (pas de perçage)
+        if (!this.isExplosive && this.piercingCount > 0) {
             this.piercingCount--;
         } else {
             this.toRemove = true;

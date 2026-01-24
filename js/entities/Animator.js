@@ -8,15 +8,18 @@ export class Animator {
         this.assetManager = assetManager;
 
         this.currentState = 'idle';
-        this.currentDirection = 'down'; // Pour les modes 4_way/8_way
+        this.directionMode = visuals.directionMode || 'none';
+
+        // Initialisation de la direction par défaut selon le mode
+        this.currentDirection = (this.directionMode === 'flip' || this.directionMode === '2_way') ? 'right' : 'down';
+
         this.currentFrameIndex = 0;
         this.timer = 0;
 
         this.width = visuals.width;
         this.height = visuals.height;
         this.displayOffset = visuals.displayOffset || { x: 0, y: 0 };
-        this.angleOffset = (visuals.angleOffset || 0) * (Math.PI / 180); // Conversion en radians
-        this.directionMode = visuals.directionMode || 'none'; // none, flip, rotate, 4_way, 8_way
+        this.angleOffset = (visuals.angleOffset || 0) * (Math.PI / 180);
 
         this.isHurt = false;
         this.hurtTimer = 0;
@@ -87,13 +90,22 @@ export class Animator {
     }
 
     updateDirection(velocity) {
-        if (Math.abs(velocity.x) < 0.1 && Math.abs(velocity.y) < 0.1) return;
+        const absX = Math.abs(velocity.x);
+        const absY = Math.abs(velocity.y);
 
-        if (this.directionMode === 'flip') {
-            if (velocity.x < 0) this.currentDirection = 'left';
-            else if (velocity.x > 0) this.currentDirection = 'right';
+        // Seuil d'activité global pour éviter les calculs sur place
+        if (absX < 0.1 && absY < 0.1) return;
+
+        if (this.directionMode === 'flip' || this.directionMode === '2_way') {
+            // Pour les modes latéraux, on ne change l'orientation QUE si le mouvement horizontal 
+            // est prédominant par rapport au mouvement vertical.
+            // Cela stabilise l'image quand on avance vers le haut/bas avec une légère dérive X.
+            if (absX > absY && absX > 0.5) {
+                this.currentDirection = velocity.x > 0 ? 'right' : 'left';
+            }
         } else if (this.directionMode === '4_way' || this.directionMode === 'rotate') {
-            if (Math.abs(velocity.x) > Math.abs(velocity.y)) {
+            // Mode 4 directions : on choisit l'axe le plus fort
+            if (absX > absY) {
                 this.currentDirection = velocity.x > 0 ? 'right' : 'left';
             } else {
                 this.currentDirection = velocity.y > 0 ? 'down' : 'up';
@@ -108,11 +120,24 @@ export class Animator {
         let anim = this.visuals.animations[state];
         if (!anim) return null;
 
-        // Si l'animation contient des clés de direction (up, down, etc.)
-        if (anim[this.currentDirection]) {
+        // Cas spécifique du 2-Way : on veut soit left, soit right
+        if (this.directionMode === '2_way') {
+            let dir = this.currentDirection;
+            // Sécurité : si on est bloqué en up/down, on fallback sur une direction latérale
+            if (dir !== 'left' && dir !== 'right') dir = 'right';
+
+            if (anim[dir]) return anim[dir];
+            // Si l'animation n'est pas structurée en 2-way (ex: cas de transition), fallback
+            return anim['right'] || anim['left'] || anim;
+        }
+
+        // Cas du 4-Way / 8-Way
+        const isMultiDir = ['4_way', '8_way'].includes(this.directionMode);
+        if (isMultiDir && anim[this.currentDirection]) {
             return anim[this.currentDirection];
         }
 
+        // Mode Flip, Rotate ou None : on retourne l'objet racine (format simple {frames:[]})
         return anim;
     }
 
@@ -157,8 +182,8 @@ export class Animator {
         // Rotation : 
         // 1. En mode 'rotate', on suit l'angle de mouvement + offset
         // 2. En mode 'none', on peut forcer un angle (ex: projectiles, auras)
-        // 3. En mode '4_way' / 'flip', on n'applique QUE l'offset statique (pas l'angle de mouvement)
-        const isDirectionalMode = ['4_way', '8_way', 'flip'].includes(this.directionMode);
+        // 3. En mode '4_way' / 'flip' / '2_way', on n'applique QUE l'offset statique (pas l'angle de mouvement)
+        const isDirectionalMode = ['4_way', '8_way', 'flip', '2_way'].includes(this.directionMode);
 
         if (this.directionMode === 'rotate' || (!isDirectionalMode && angle !== 0)) {
             ctx.rotate(angle + this.angleOffset);

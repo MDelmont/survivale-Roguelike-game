@@ -48,11 +48,11 @@
         },
         "new_boss_1769257709616": {
             "name": "Playmobil flash",
-            "hp": 2000,
+            "hp": 8545,
             "speed": 150,
             "damage": 40,
             "fireRate": 1500,
-            "attackPattern": "flower",
+            "attackPattern": "melee",
             "movePattern": "rush",
             "radius": 80,
             "color": "#ff3333",

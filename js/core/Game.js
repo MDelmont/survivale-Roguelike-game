@@ -80,6 +80,7 @@ class Game {
         this.logicalWidth = this.baseWidth;
         this.logicalHeight = 900;
         this.scale = 1;
+        this.debugMode = false;
 
         this.init();
     }
@@ -114,6 +115,11 @@ class Game {
         }, { passive: false });
 
         window.addEventListener('keydown', (e) => {
+            if (e.key === 'F3') {
+                e.preventDefault();
+                this.debugMode = !this.debugMode;
+                console.log('Debug Mode:', this.debugMode);
+            }
             if (e.ctrlKey && (e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0')) {
                 e.preventDefault();
             }
@@ -741,6 +747,56 @@ class Game {
 
         // Le joystick utilise les coordonnées écran brutes, donc on le dessine hors du scale
         this.input.draw(this.ctx);
+
+        if (this.debugMode) {
+            this.drawDebug();
+        }
+    }
+
+    drawDebug() {
+        this.ctx.save();
+        this.ctx.scale(this.scale, this.scale);
+        this.ctx.lineWidth = 1;
+
+        // Draw Player Hitbox
+        if (this.player) {
+            this.ctx.strokeStyle = '#0f0'; // Green for player
+            this.ctx.beginPath();
+            this.ctx.arc(this.player.x, this.player.y, this.player.radius, 0, Math.PI * 2);
+            this.ctx.stroke();
+        }
+
+        // Draw Enemy Hitboxes
+        this.enemies.forEach(e => {
+            this.ctx.strokeStyle = '#f00'; // Red for enemies
+            this.ctx.beginPath();
+            this.ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+            this.ctx.stroke();
+        });
+
+        // Draw Boss Hitbox
+        if (this.boss) {
+            this.ctx.strokeStyle = '#f0f'; // Magenta for boss
+            this.ctx.beginPath();
+            this.ctx.arc(this.boss.x, this.boss.y, this.boss.radius, 0, Math.PI * 2);
+            this.ctx.stroke();
+        }
+
+        // Draw Projectile Hitboxes
+        this.ctx.strokeStyle = '#ff0'; // Yellow for projectiles
+        this.projectiles.forEach(p => {
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            this.ctx.stroke();
+        });
+
+        this.enemyProjectiles.forEach(p => {
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            this.ctx.stroke();
+        });
+
+        this.ctx.restore();
     }
 
     drawStory() {

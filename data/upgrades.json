@@ -63,6 +63,22 @@
             "type": "stat",
             "stat": "piercingBonus",
             "add": 1
+        },
+        {
+            "id": "new_upgrade_1769271808868",
+            "name": "Remonter à block",
+            "description": "Tu seras plus endurant",
+            "type": "stat",
+            "stat": "maxHp",
+            "add": 25
+        },
+        {
+            "id": "new_upgrade_1769272000700",
+            "name": "Explosion de chagrin",
+            "description": "Tes explosion sont plus grande",
+            "type": "stat",
+            "stat": "speed",
+            "multiplier": 1.15
         }
     ]
 }

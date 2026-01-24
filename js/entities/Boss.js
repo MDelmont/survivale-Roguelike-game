@@ -133,8 +133,11 @@ export class Boss extends Enemy {
                         }
                     } else {
                         // Flotte légèrement en attendant la prochaine charge
+                        // On met la vélocité à 0 pour que l'animateur joue l'animation 'idle'
                         this.velocity.x = 0;
-                        this.velocity.y = Math.cos(this.time / 500) * 10; // Petite velocity verticale pour l'anim
+                        this.velocity.y = 0;
+
+                        // Petit mouvement de flottement purement positionnel (ignoré par l'animateur)
                         this.y += Math.sin(this.time / 500) * 0.5;
                     }
                 }
@@ -145,6 +148,10 @@ export class Boss extends Enemy {
     executePattern(onShoot, player) {
         const stats = this.getProjectileStats();
         switch (this.pattern) {
+            case 'melee':
+            case 'none':
+                // Pas de tir, c'est le corps à corps qui compte
+                break;
             case 'circle': this.shootCircle(onShoot, stats); break;
             case 'spiral': this.shootSpiral(onShoot, stats); break;
             case 'double_spiral': this.shootDoubleSpiral(onShoot, stats); break;

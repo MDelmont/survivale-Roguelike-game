@@ -39,7 +39,7 @@
         },
         "playmobile_ony": {
             "name": "playmobil ony",
-            "speed": 250,
+            "speed": 300,
             "hp": 100,
             "maxHp": 100,
             "fireRate": 300,

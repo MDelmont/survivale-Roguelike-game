@@ -3,8 +3,11 @@
         {
             "id": 2,
             "name": "playmobile-dog",
-            "duration_before_boss": 10,
-            "enemy_types": [],
+            "duration_before_boss": 60,
+            "enemy_types": [
+                "new_enemy_1769265604682",
+                "new_enemy_1769266367603"
+            ],
             "player_id": "playmobile_ony",
             "spawn_rate": 1000,
             "default_weapon": "lance_bille",
@@ -28,9 +31,7 @@
             "threat_growth_rate": 50,
             "transition_intro_id": "transition_1769206056996",
             "transition_outro_id": "transition_1769206097596",
-            "available_upgrades": [
-                "sperm_hp"
-            ],
+            "available_upgrades": [],
             "transition_defeat_id": "transition_1769206080497"
         },
         {

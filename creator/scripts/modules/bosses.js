@@ -26,6 +26,7 @@ class BossesModule {
 
         // Patterns disponibles selon la documentation
         this.attackPatterns = [
+            'melee', 'none', // Corps à corps (pas de projectiles)
             'circle', 'spiral', 'double_spiral', 'spray', 'wave_spray',
             'cross', 'vortex', 'flower', 'barrage', 'star',
             'oscillator', 'wall', 'web'
@@ -357,6 +358,7 @@ class BossesModule {
                                 <option value="none" ${b.visuals?.directionMode === 'none' ? 'selected' : ''}>None (fixe)</option>
                                 <option value="flip" ${b.visuals?.directionMode === 'flip' ? 'selected' : ''}>Flip (miroir)</option>
                                 <option value="rotate" ${b.visuals?.directionMode === 'rotate' ? 'selected' : ''}>Rotate</option>
+                                <option value="2_way" ${b.visuals?.directionMode === '2_way' ? 'selected' : ''}>2 Way (Left/Right)</option>
                                 <option value="4_way" ${b.visuals?.directionMode === '4_way' ? 'selected' : ''}>4 Way</option>
                             </select>
                         </div>
@@ -450,6 +452,56 @@ class BossesModule {
     }
 
     /**
+     * Convertit la structure des animations selon le mode choisi
+     */
+    convertAnimationsToMode(newMode) {
+        if (!this.currentBoss?.visuals?.animations) return;
+
+        const animations = this.currentBoss.visuals.animations;
+        const isNewMultiDir = newMode === '4_way' || newMode === '2_way';
+
+        for (const animName in animations) {
+            const data = animations[animName];
+            const isCurrentlyMulti = !!(data.up || data.down || data.left || data.right);
+
+            if (isNewMultiDir && !isCurrentlyMulti) {
+                const base = JSON.parse(JSON.stringify(data));
+                if (newMode === '4_way') {
+                    animations[animName] = {
+                        up: JSON.parse(JSON.stringify(base)),
+                        down: JSON.parse(JSON.stringify(base)),
+                        left: JSON.parse(JSON.stringify(base)),
+                        right: JSON.parse(JSON.stringify(base))
+                    };
+                } else {
+                    animations[animName] = {
+                        left: JSON.parse(JSON.stringify(base)),
+                        right: JSON.parse(JSON.stringify(base))
+                    };
+                }
+            } else if (!isNewMultiDir && isCurrentlyMulti) {
+                const selected = data.down || data.left || data.right || data.up;
+                animations[animName] = JSON.parse(JSON.stringify(selected));
+                if (!animations[animName].frames) animations[animName].frames = [];
+            } else if (isNewMultiDir && isCurrentlyMulti) {
+                if (newMode === '2_way') {
+                    animations[animName] = {
+                        left: data.left || data.down || data.up,
+                        right: data.right || data.down || data.up
+                    };
+                } else if (newMode === '4_way') {
+                    animations[animName] = {
+                        left: data.left || data.up || data.down,
+                        right: data.right || data.up || data.down,
+                        up: data.up || data.left || data.right,
+                        down: data.down || data.left || data.right
+                    };
+                }
+            }
+        }
+    }
+
+    /**
      * Liste des animations standards
      */
     getStandardAnimations() {
@@ -489,10 +541,11 @@ class BossesModule {
      * Rendu d'un éditeur d'animation
      */
     renderAnimationEditor(animName, animData, assets, dirMode, prefix) {
-        const is4Way = dirMode === '4_way' || (animData && (animData.up || animData.down));
+        // Détecter si c'est une animation multi-directionnelle (Basé UNIQUEMENT sur le mode actuel)
+        const isMultiDir = dirMode === '4_way' || dirMode === '2_way';
 
-        if (is4Way) {
-            return this.render4WayAnimationEditor(animName, animData, assets, prefix);
+        if (isMultiDir) {
+            return this.renderMultiDirAnimationEditor(animName, animData, assets, prefix, dirMode);
         }
 
         const frames = animData?.frames || [];
@@ -526,20 +579,26 @@ class BossesModule {
     }
 
     /**
-     * Rendu animation 4-way
+     * Rendu animation Multi-Directionnelle (2-Way ou 4-Way)
      */
-    render4WayAnimationEditor(animName, animData, assets, prefix) {
-        const directions = ['up', 'down', 'left', 'right'];
+    renderMultiDirAnimationEditor(animName, animData, assets, prefix, dirMode) {
+        let directions = ['up', 'down', 'left', 'right'];
+        let badge = '4-Way';
+
+        if (dirMode === '2_way') {
+            directions = ['left', 'right'];
+            badge = '2-Way';
+        }
 
         return `
-            <div class="animation-editor animation-editor-4way" data-anim="${animName}" data-prefix="${prefix}" data-mode="4way">
+            <div class="animation-editor animation-editor-multidir" data-anim="${animName}" data-prefix="${prefix}" data-mode="${dirMode}">
                 <div class="animation-header">
-                    <h4>${animName.charAt(0).toUpperCase() + animName.slice(1)} <span class="badge badge-primary">4-Way</span></h4>
+                    <h4>${animName.charAt(0).toUpperCase() + animName.slice(1)} <span class="badge badge-primary">${badge}</span></h4>
                     <div class="animation-header-actions">
                         <button class="btn btn-sm btn-danger remove-anim-btn" data-anim="${animName}" data-prefix="${prefix}">×</button>
                     </div>
                 </div>
-                <div class="directions-grid">
+                <div class="directions-grid" style="grid-template-columns: repeat(${directions.length > 2 ? 2 : directions.length}, 1fr);">
                     ${directions.map(dir => this.render4WayDirection(animName, dir, animData?.[dir], assets, prefix)).join('')}
                 </div>
             </div>
@@ -693,10 +752,23 @@ class BossesModule {
             if (input.dataset.bound) return;
 
             if (input.id === 'bossDirMode') {
+                input.addEventListener('change', (e) => {
+                    const newMode = e.target.value;
+                    if (this.currentBoss.visuals) {
+                        this.currentBoss.visuals.directionMode = newMode;
+                    }
+                    this.convertAnimationsToMode(newMode);
+                    this.renderEditor();
+                    this.loadPreview();
+                    this.updateJsonPreview();
+                });
+            } else if (input.id === 'projDirMode') {
                 input.addEventListener('change', () => {
+                    // TODO: Add conversion logic for projectile direction mode if needed
                     this.updateBossFromForm();
                     this.renderEditor();
                     this.loadPreview();
+                    this.updateJsonPreview();
                 });
             } else if (input.id === 'bossColorPicker') {
                 input.addEventListener('input', (e) => {
@@ -813,13 +885,13 @@ class BossesModule {
     collectAnimations(prefix) {
         const animations = {};
         const dirMode = prefix === 'boss' ? this.currentBoss?.visuals?.directionMode : 'none';
-        const is4Way = dirMode === '4_way';
+        const isMultiDir = dirMode === '4_way' || dirMode === '2_way';
 
         document.querySelectorAll(`.animation-editor[data-prefix="${prefix}"]`).forEach(editor => {
             const animName = editor.dataset.anim;
             const mode = editor.dataset.mode;
 
-            if (mode === '4way' || is4Way) {
+            if (mode === '4way' || mode === '4_way' || mode === '2_way' || isMultiDir) {
                 const directions = ['up', 'down', 'left', 'right'];
                 const animObj = {};
 
@@ -883,6 +955,11 @@ class BossesModule {
             targetVisuals.animations[animName] = {
                 up: { frames: [], frameRate: 10, loop: true },
                 down: { frames: [], frameRate: 10, loop: true },
+                left: { frames: [], frameRate: 10, loop: true },
+                right: { frames: [], frameRate: 10, loop: true }
+            };
+        } else if (dirMode === '2_way') {
+            targetVisuals.animations[animName] = {
                 left: { frames: [], frameRate: 10, loop: true },
                 right: { frames: [], frameRate: 10, loop: true }
             };
@@ -973,17 +1050,27 @@ class BossesModule {
         const visuals = this.currentBoss.visuals;
         const animations = visuals.animations;
         const dirMode = visuals.directionMode;
-        const direction = document.getElementById('previewDirection')?.value || 'down';
+        let direction = document.getElementById('previewDirection')?.value || 'down';
 
         let animData = animations[animName];
         if (!animData) return null;
 
-        if (dirMode === '4_way' && animData[direction]) {
+        // Support 2_way mapping
+        if (dirMode === '2_way') {
+            if (direction === 'up') direction = 'left'; // Fallback
+            if (direction === 'down') direction = 'right'; // Fallback
+            if (animData[direction]) {
+                animData = animData[direction];
+            }
+        } else if (dirMode === '4_way' && animData[direction]) {
             animData = animData[direction];
+        } else if (dirMode === '4_way' && !animData[direction]) {
+            // Fallback si la direction demandée n'existe pas
+            animData = animData['down'] || animData['right'] || animData['left'] || animData['up'];
         }
 
-        const frames = animData.frames || [];
-        const frameRate = animData.frameRate || 10;
+        const frames = animData?.frames || [];
+        const frameRate = animData?.frameRate || 10;
 
         let transform = '';
         if (dirMode === 'flip' && direction === 'left') {
