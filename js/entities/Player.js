@@ -24,6 +24,7 @@ export class Player {
             damageMultiplier: 1.0,
             projectileBonus: 0,
             rangeMultiplier: 1.0,
+            explosionRadiusMultiplier: 1.0,
             piercingBonus: 0,
             appliedUpgrades: []
         };

@@ -213,6 +213,7 @@ class UpgradesModule {
                                     <option value="pickupRadius" ${this.currentUpgrade.stat === 'pickupRadius' ? 'selected' : ''}>Portée collecte</option>
                                     <option value="projectileBonus" ${this.currentUpgrade.stat === 'projectileBonus' ? 'selected' : ''}>Projectiles bonus</option>
                                     <option value="rangeMultiplier" ${this.currentUpgrade.stat === 'rangeMultiplier' ? 'selected' : ''}>Portée / Taille</option>
+                                    <option value="explosionRadiusMultiplier" ${this.currentUpgrade.stat === 'explosionRadiusMultiplier' ? 'selected' : ''}>Taille Explosion</option>
                                     <option value="piercingBonus" ${this.currentUpgrade.stat === 'piercingBonus' ? 'selected' : ''}>Transpercement</option>
                                 </select>
                             </div>

@@ -347,6 +347,7 @@ export class LevelUpScreen {
             if (data.type === 'attack') {
                 if (stats.damage !== undefined) statEntries.push({ label: 'DMG', value: stats.damage });
                 if (stats.fireRate) statEntries.push({ label: 'CD', value: stats.fireRate + 'ms' });
+                if (stats.explosionRadius) statEntries.push({ label: 'EXPLO', value: stats.explosionRadius });
             } else if (data.type === 'defense') {
                 if (stats.damage !== undefined) statEntries.push({ label: 'DMG', value: stats.damage });
                 if (stats.radius) statEntries.push({ label: 'RAD', value: stats.radius });
@@ -408,6 +409,7 @@ export class LevelUpScreen {
             pickupRadius: 'COLLECTE',
             projectileBonus: 'PROJECTILE',
             rangeMultiplier: 'PORTÉE',
+            explosionRadiusMultiplier: 'TAILLE EXPLO',
             piercingBonus: 'PERÇANT'
         };
         return names[stat] || '';
@@ -422,6 +424,7 @@ export class LevelUpScreen {
             pickupRadius: 'Collecte & XP',
             projectileBonus: 'Multi-Projectiles',
             rangeMultiplier: 'Zone d\'Effet',
+            explosionRadiusMultiplier: 'Rayon d\'Explosion',
             piercingBonus: 'Pénétration'
         };
         return hints[opt.stat] || 'Amélioration';
@@ -440,6 +443,7 @@ export class LevelUpScreen {
                 return Colors.ACCENT;
             case 'pickupRadius':
             case 'rangeMultiplier':
+            case 'explosionRadiusMultiplier':
                 return Colors.SECONDARY;
             default:
                 return Colors.WARNING;

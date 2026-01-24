@@ -1,6 +1,53 @@
 {
     "phases": [
         {
+            "id": 1,
+            "name": "La Conception",
+            "duration_before_boss": 60,
+            "enemy_types": [
+                "basic_cell",
+                "fast_cell",
+                "tank_cell",
+                "new_enemy_1767798373589"
+            ],
+            "player_id": "ony_sperm",
+            "spawn_rate": 1500,
+            "default_weapon": "basic_shot",
+            "available_weapons": [
+                "basic_shot",
+                "poison_shot",
+                "shield_orbit",
+                "smartphone_wave",
+                "smartphone_poison"
+            ],
+            "boss_id": "ovule_geant",
+            "story_intro": [],
+            "story_outro": [],
+            "background_image": "assets/fond/conception/fond-ovule-dark.png",
+            "transition_intro_id": "transition_1767784600979",
+            "transition_outro_id": "transition_1767806453330",
+            "xp_visual": "assets/experiences/exp-sperm.png",
+            "weapon_visual": "assets/armes/lance-capote.png",
+            "xp_size": 15,
+            "weapon_size": 45,
+            "difficulty_multiplier": 1,
+            "initial_threat_budget": 20,
+            "max_threat_budget": 200,
+            "threat_growth_rate": 15,
+            "weapon_drop_rate": 0.04,
+            "available_upgrades": [
+                "sperm_hp",
+                "sperm_cadence",
+                "sperm_speed-monving",
+                "sperm_domage",
+                "sperm_collect",
+                "sperm_projectiles",
+                "sperm_range",
+                "sperm-perforation"
+            ],
+            "transition_defeat_id": "transition_1768064926813"
+        },
+        {
             "id": 2,
             "name": "playmobile-dog",
             "duration_before_boss": 60,
@@ -31,53 +78,14 @@
             "threat_growth_rate": 50,
             "transition_intro_id": "transition_1769206056996",
             "transition_outro_id": "transition_1769206097596",
-            "available_upgrades": [],
-            "transition_defeat_id": "transition_1769206080497"
-        },
-        {
-            "id": 1,
-            "name": "La Conception",
-            "duration_before_boss": 60,
-            "enemy_types": [
-                "basic_cell",
-                "fast_cell",
-                "tank_cell",
-                "new_enemy_1767798373589"
-            ],
-            "player_id": "ony_sperm",
-            "spawn_rate": 1500,
-            "default_weapon": "lance_bille",
-            "available_weapons": [
-                "lance_bille",
-                "new_weapon_mks7hfrs",
-                "new_weapon_mks870pe"
-            ],
-            "boss_id": "ovule_geant",
-            "story_intro": [],
-            "story_outro": [],
-            "background_image": "assets/fond/conception/fond-ovule-dark.png",
-            "transition_intro_id": "transition_1767784600979",
-            "transition_outro_id": "transition_1767806453330",
-            "xp_visual": "assets/experiences/exp-sperm.png",
-            "weapon_visual": "assets/armes/lance-capote.png",
-            "xp_size": 15,
-            "weapon_size": 45,
-            "difficulty_multiplier": 1,
-            "initial_threat_budget": 20,
-            "max_threat_budget": 200,
-            "threat_growth_rate": 15,
-            "weapon_drop_rate": 0.04,
             "available_upgrades": [
-                "sperm_hp",
-                "sperm_cadence",
-                "sperm_speed-monving",
-                "sperm_domage",
-                "sperm_collect",
-                "sperm_projectiles",
-                "sperm_range",
-                "sperm-perforation"
+                "new_upgrade_1769271808868",
+                "new_upgrade_1769272000700",
+                "new_upgrade_1769272317751",
+                "new_upgrade_1769272508711",
+                "new_upgrade_1769272556776"
             ],
-            "transition_defeat_id": "transition_1768064926813"
+            "transition_defeat_id": "transition_1769206080497"
         }
     ],
     "menu_background": "assets/fond/conception/fond-ovule-dark.png",

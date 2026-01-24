@@ -61,6 +61,7 @@ export class ProjectileWeapon extends Weapon {
                     ...this.stats,
                     visuals: this.visuals, // Transmet les visuels au projectile
                     damage: (this.stats.damage || 10) * (owner.stats.damageMultiplier || 1.0),
+                    explosionRadius: (this.stats.explosionRadius || 80) * (owner.stats.explosionRadiusMultiplier || 1.0),
                     piercingCount: (this.stats.piercingCount || 0) + (owner.stats.piercingBonus || 0)
                 };
                 const spread = 20;
