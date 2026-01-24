@@ -107,6 +107,17 @@ class Game {
             this.mouseY = (e.clientY - rect.top) / this.scale;
         });
 
+        // Empêcher le zoom manuel (Ctrl + Scroll ou Ctrl + +/-) qui casse les hitboxes
+        window.addEventListener('wheel', (e) => {
+            if (e.ctrlKey) e.preventDefault();
+        }, { passive: false });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && (e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0')) {
+                e.preventDefault();
+            }
+        });
+
         requestAnimationFrame((time) => this.loop(time));
     }
 
@@ -189,6 +200,11 @@ class Game {
     }
 
     handleCanvasClick(e) {
+        // Force le plein écran sur n'importe quel clic pour garantir un affichage à 100%
+        if (!document.fullscreenElement) {
+            this.requestFullscreen();
+        }
+
         const rect = this.canvas.getBoundingClientRect();
         // Conversion des coordonnées écran -> coordonnées logiques
         const mouseX = (e.clientX - rect.left) / this.scale;
