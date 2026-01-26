@@ -9,7 +9,10 @@
             "spawn_rate": 1000,
             "default_weapon": "Lance_tetine",
             "weapon_drop_rate": 0.25,
-            "available_weapons": [],
+            "available_weapons": [
+                "Lance_tetine",
+                "Lance_couche-pleine"
+            ],
             "boss_id": "",
             "background_image": "assets/fond/peluche-bebe/fond-maison-bebe.png",
             "xp_visual": "",
