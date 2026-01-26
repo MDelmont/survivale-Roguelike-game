@@ -21,6 +21,12 @@ export class Boss extends Enemy {
         this.isRushing = false;
         this.rushTarget = null;
 
+        // Variables pour le mouvement Stalker
+        this.stalkerTimer = 0;
+        this.stalkerState = 'moving'; // 'moving' ou 'paused'
+        this.stalkerMoveDuration = 3000; // 3 secondes de mouvement
+        this.stalkerPauseDuration = 1500; // 1.5 secondes de pause
+
         // Phase de comportement (optionnel pour MVP)
         this.behaviorPhase = 0;
     }
@@ -104,6 +110,43 @@ export class Boss extends Enemy {
                 }
                 break;
 
+            case 'stalker':
+                if (player) {
+                    this.stalkerTimer += deltaTime;
+
+                    if (this.stalkerState === 'moving') {
+                        if (this.stalkerTimer >= this.stalkerMoveDuration) {
+                            this.stalkerState = 'paused';
+                            this.stalkerTimer = 0;
+                            this.velocity.x = 0;
+                            this.velocity.y = 0;
+                        } else {
+                            const dx = player.x - this.x;
+                            const dy = player.y - this.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            if (dist > 5) {
+                                this.velocity.x = (dx / dist) * this.speed;
+                                this.velocity.y = (dy / dist) * this.speed;
+                                this.x += this.velocity.x * dt;
+                                this.y += this.velocity.y * dt;
+                            } else {
+                                this.velocity.x = 0;
+                                this.velocity.y = 0;
+                            }
+                        }
+                    } else if (this.stalkerState === 'paused') {
+                        if (this.stalkerTimer >= this.stalkerPauseDuration) {
+                            this.stalkerState = 'moving';
+                            this.stalkerTimer = 0;
+                        }
+                        // Flottement léger pendant la pause
+                        this.y += Math.sin(this.time / 500) * 0.5;
+                        this.velocity.x = 0;
+                        this.velocity.y = 0;
+                    }
+                }
+                break;
+
             case 'rush':
                 if (player) {
                     this.rushTimer += deltaTime;
@@ -173,6 +216,7 @@ export class Boss extends Enemy {
         const stats = {
             damage: this.damage,
             projectileSpeed: 200,
+            radius: this.stats.projectileRadius, // Support pour le rayon personnalisé
             color: this.color || '#f00',
             ...extraStats
         };

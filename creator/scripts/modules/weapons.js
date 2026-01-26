@@ -365,6 +365,10 @@ class WeaponsModule {
                     <input type="number" class="form-input stat-input" data-stat="piercingCount" value="${s.piercingCount || 0}">
                 </div>
                 <div class="form-group">
+                    <label class="form-label">Rayon Hitbox</label>
+                    <input type="number" class="form-input stat-input" data-stat="radius" value="${s.radius || 5}">
+                </div>
+                <div class="form-group">
                     <label class="form-label">Couleur (fallback)</label>
                     <input type="text" class="form-input stat-input" data-stat="color" value="${s.color || '#fff'}">
                 </div>

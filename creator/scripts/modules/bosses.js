@@ -35,7 +35,8 @@ class BossesModule {
         this.movePatterns = [
             { value: 'constant', label: 'Constant - Suit le joueur' },
             { value: 'fixed', label: 'Fixed - Reste à une position fixe' },
-            { value: 'rush', label: 'Rush - Charge vers le joueur' }
+            { value: 'rush', label: 'Rush - Charge vers le joueur' },
+            { value: 'stalker', label: 'Stalker - Suit avec des pauses' }
         ];
     }
 
@@ -431,6 +432,11 @@ class BossesModule {
                         <div class="form-group">
                             <label class="form-label">Angle Offset (°)</label>
                             <input type="number" class="form-input" id="projAngleOffset" value="${b.projectileVisuals?.angleOffset || 0}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Rayon Hitbox (px)</label>
+                            <input type="number" class="form-input" id="projRadius" value="${b.projectileRadius || b.projectileVisuals?.width ? b.projectileVisuals.width / 2 : 5}">
+                            <small style="color: var(--text-muted); font-size: 0.75rem;">Radius de collision (défaut: largeur/2)</small>
                         </div>
                     </div>
                     
@@ -860,6 +866,10 @@ class BossesModule {
         else delete b.projectileVisuals.height;
         b.projectileVisuals.directionMode = document.getElementById('projDirMode')?.value || 'rotate';
         b.projectileVisuals.angleOffset = parseInt(document.getElementById('projAngleOffset')?.value) || 0;
+        
+        const pRadius = document.getElementById('projRadius')?.value;
+        if (pRadius) b.projectileRadius = parseInt(pRadius);
+        else delete b.projectileRadius;
 
         const projAnimations = this.collectAnimations('proj');
 

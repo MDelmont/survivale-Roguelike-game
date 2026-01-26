@@ -101,11 +101,11 @@
         "new_boss_1769440570918": {
             "name": "Peluche_bleu",
             "hp": 2000,
-            "speed": 120,
+            "speed": 180,
             "damage": 20,
             "fireRate": 1500,
             "attackPattern": "melee",
-            "movePattern": "constant",
+            "movePattern": "stalker",
             "radius": 80,
             "color": "#ff3333",
             "visuals": {
@@ -200,7 +200,7 @@
                 "path": "",
                 "angleOffset": 0
             },
-            "weapon_id": ""
+            "weapon_id": "new_weapon_mkvc48ff"
         }
     }
 }

@@ -85,7 +85,7 @@ Hérite des champs **Ennemis**, avec des spécificités de combat.
 | Champ | Type | Valeurs / Description |
 | :--- | :--- | :--- |
 | `attackPattern` | String | Pattern de tir (ex: `spiral`, `circle`, `vortex`, `cross`, etc.). |
-| `movePattern` | String | Type de mouvement (`constant`, `fixed`, `rush`). |
+| `movePattern` | String | Type de mouvement (`constant`, `fixed`, `rush`, `stalker`). |
 | `fireRate` | Number | Temps entre chaque salve de tir (en ms). |
 | `visuals` | Object | Bloc visuel du boss. |
 | `projectileVisuals`| Object | Bloc visuel des tirs du boss. |
@@ -113,6 +113,7 @@ Configurations des attaques et bonus.
 | `stats.isSlowing` | Boolean | Ralentit l'ennemi. |
 | `stats.radius` | Number | Rayon (pour orbital). |
 | `stats.range` | Number | Portée (pour aura). |
+| `stats.radius` | Number | Rayon de collision (projectile). |
 | `visuals` | Object | Bloc visuel de l'arme/projectile. |
 | `upgrades[].name` | String | Nom de l'amélioration. |
 | `upgrades[].preview`| String | **Texte affiché sur le badge d'upgrade** (ex: `Dégâts +20%`). |

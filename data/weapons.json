@@ -589,6 +589,48 @@
             "description": "Explose moi ce cabot",
             "category": "",
             "preview": ""
+        },
+        {
+            "id": "new_weapon_mkvc48ff",
+            "name": "lance-rembourage",
+            "type": "attack",
+            "stats": {
+                "damage": 10,
+                "fireRate": 800,
+                "projectileSpeed": 150,
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": false,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5
+            },
+            "upgrades": [],
+            "visuals": {
+                "path": "assets/projectiles/rembourage.png",
+                "width": 40,
+                "rotateWithVelocity": true,
+                "angleOffset": 0,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/rembourage.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "",
+            "category": "",
+            "preview": ""
         }
     ]
 }
