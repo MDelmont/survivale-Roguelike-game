@@ -97,6 +97,110 @@
                 "angleOffset": 0
             },
             "weapon_id": ""
+        },
+        "new_boss_1769440570918": {
+            "name": "Peluche_bleu",
+            "hp": 2000,
+            "speed": 120,
+            "damage": 20,
+            "fireRate": 1500,
+            "attackPattern": "melee",
+            "movePattern": "constant",
+            "radius": 80,
+            "color": "#ff3333",
+            "visuals": {
+                "type": "sprite",
+                "directionMode": "4_way",
+                "hitFlash": true,
+                "animations": {
+                    "idle": {
+                        "up": {
+                            "frames": [
+                                "assets/boss/bebe-peluche/peluche-bleu-dos-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/boss/bebe-peluche/peluche-bleu-face-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/boss/bebe-peluche/peluche-bleu-gauche-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/boss/bebe-peluche/peluche-bleu-doite-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    },
+                    "walk": {
+                        "up": {
+                            "frames": [
+                                "assets/boss/bebe-peluche/peluche-bleu-dos-w1.png",
+                                "assets/boss/bebe-peluche/peluche-bleu-dos-i.png",
+                                "assets/boss/bebe-peluche/peluche-bleu-dos-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/boss/bebe-peluche/peluche-bleu-face-w1.png",
+                                "assets/boss/bebe-peluche/peluche-bleu-face-i.png",
+                                "assets/boss/bebe-peluche/peluche-bleu-face-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/boss/bebe-peluche/peluche-bleu-gauche-w1.png",
+                                "assets/boss/bebe-peluche/peluche-bleu-gauche-i.png",
+                                "assets/boss/bebe-peluche/peluche-bleu-gauche-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/boss/bebe-peluche/peluche-bleu-doite-w1.png",
+                                "assets/boss/bebe-peluche/peluche-bleu-doite-i.png",
+                                "assets/boss/bebe-peluche/peluche-bleu-doite-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": false,
+                "height": 300
+            },
+            "projectileVisuals": {
+                "type": "sprite",
+                "width": 16,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "path": "",
+                "angleOffset": 0
+            },
+            "weapon_id": ""
         }
     }
 }
