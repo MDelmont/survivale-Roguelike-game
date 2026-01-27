@@ -7,15 +7,27 @@ export const CombatSystem = {
      * Vérifie la collision entre deux entités circulaires.
      */
     checkCollision(a, b) {
+        // Broad phase : On utilise un rayon plus large si l'entité est en pixel-perfect
+        // car le 'radius' de base est souvent celui du corps/centre alors que le sprite est bien plus grand.
+        let radiusA = a.radius;
+        if (a.visuals?.pixelPerfect && a.animator) {
+            radiusA = Math.max(a.animator.width || 0, a.animator.height || 0, a.radius);
+        }
+
+        let radiusB = b.radius;
+        if (b.visuals?.pixelPerfect && b.animator) {
+            radiusB = Math.max(b.animator.width || 0, b.animator.height || 0, b.radius);
+        }
+
         const dx = a.x - b.x;
         const dy = a.y - b.y;
         const distSq = dx * dx + dy * dy;
-        const radiusSum = a.radius + b.radius;
+        const radiusSum = radiusA + radiusB;
 
-        // Test circulaire rapide
+        // Test circulaire rapide (Broad Phase)
         if (distSq >= radiusSum * radiusSum) return false;
 
-        // Test Pixel-Perfect si configuré
+        // Narrow Phase : Test Pixel-Perfect si configuré
         if (a.visuals?.pixelPerfect && a.animator) {
             return a.animator.isPixelOpaque(b.x, b.y, a.x, a.y, a.angle);
         }

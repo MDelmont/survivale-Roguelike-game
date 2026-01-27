@@ -829,18 +829,40 @@ class Game {
 
         // Draw Enemy Hitboxes
         this.enemies.forEach(e => {
-            this.ctx.strokeStyle = '#f00'; // Red for enemies
+            // Cercle de physique (radius)
+            this.ctx.strokeStyle = '#f00';
             this.ctx.beginPath();
             this.ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
             this.ctx.stroke();
+
+            // Cercle de détection (bounding radius pour pixel-perfect)
+            if (e.visuals?.pixelPerfect && e.animator) {
+                const broadRadius = Math.max(e.animator.width || 0, e.animator.height || 0, e.radius);
+                this.ctx.strokeStyle = 'rgba(255, 0, 0, 0.3)';
+                this.ctx.setLineDash([5, 5]);
+                this.ctx.beginPath();
+                this.ctx.arc(e.x, e.y, broadRadius, 0, Math.PI * 2);
+                this.ctx.stroke();
+                this.ctx.setLineDash([]);
+            }
         });
 
         // Draw Boss Hitbox
         if (this.boss) {
-            this.ctx.strokeStyle = '#f0f'; // Magenta for boss
+            this.ctx.strokeStyle = '#f0f';
             this.ctx.beginPath();
             this.ctx.arc(this.boss.x, this.boss.y, this.boss.radius, 0, Math.PI * 2);
             this.ctx.stroke();
+
+            if (this.boss.visuals?.pixelPerfect && this.boss.animator) {
+                const broadRadius = Math.max(this.boss.animator.width || 0, this.boss.animator.height || 0, this.boss.radius);
+                this.ctx.strokeStyle = 'rgba(255, 0, 255, 0.3)';
+                this.ctx.setLineDash([5, 5]);
+                this.ctx.beginPath();
+                this.ctx.arc(this.boss.x, this.boss.y, broadRadius, 0, Math.PI * 2);
+                this.ctx.stroke();
+                this.ctx.setLineDash([]);
+            }
         }
 
         // Draw Projectile Hitboxes

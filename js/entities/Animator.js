@@ -246,13 +246,23 @@ export class Animator {
             localX = -localX;
         }
 
-        // 4. Mapping aux dimensions de l'image source
+        // 4. Mapping aux dimensions de l'image source (doit correspondre exactement à draw())
         let drawW = this.width;
         let drawH = this.height;
 
-        if (drawW && !drawH) drawH = (img.height / img.width) * drawW;
-        else if (!drawW && drawH) drawW = (img.width / img.height) * drawH;
-        else if (!drawH && !drawW) {
+        if (drawW && drawH) {
+            const imgRatio = img.width / img.height;
+            const targetRatio = drawW / drawH;
+            if (imgRatio > targetRatio) {
+                drawH = drawW / imgRatio;
+            } else {
+                drawW = drawH * imgRatio;
+            }
+        } else if (drawW && !drawH) {
+            drawH = (img.height / img.width) * drawW;
+        } else if (!drawW && drawH) {
+            drawW = (img.width / img.height) * drawH;
+        } else {
             drawW = img.width;
             drawH = img.height;
         }
