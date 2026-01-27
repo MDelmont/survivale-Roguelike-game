@@ -631,6 +631,49 @@
             "description": "",
             "category": "",
             "preview": ""
+        },
+        {
+            "id": "new_weapon_mkx3nah9",
+            "name": "Pot au feu",
+            "type": "attack",
+            "stats": {
+                "damage": 5,
+                "fireRate": 3000,
+                "projectileSpeed": 400,
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "radius": 5,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": false,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5
+            },
+            "upgrades": [],
+            "visuals": {
+                "path": "assets/projectiles/pot-au-feu.png",
+                "width": 40,
+                "rotateWithVelocity": false,
+                "angleOffset": 0,
+                "directionMode": "none",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/pot-au-feu.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "",
+            "category": "",
+            "preview": ""
         }
     ]
 }

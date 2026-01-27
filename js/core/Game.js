@@ -144,6 +144,14 @@ class Game {
         this.killCount = 0;
         this.threatBudgets = {}; // Un budget par type d'ennemi pour des jauges parallèles
 
+        // Initialisation du budget de menace de départ
+        if (this.currentPhase.initial_threat_budget && this.currentPhase.enemy_types) {
+            const initialBonus = this.currentPhase.initial_threat_budget / this.currentPhase.enemy_types.length;
+            this.currentPhase.enemy_types.forEach(type => {
+                this.threatBudgets[type] = initialBonus;
+            });
+        }
+
         if (this.currentPhase.transition_intro_id) {
             const transition = this.dataManager.getTransitionData(this.currentPhase.transition_intro_id);
             if (transition) {
@@ -403,13 +411,13 @@ class Game {
             const growthPerType = (totalGrowthPerSec * (deltaTime / 1000)) / types.length;
 
             types.forEach(type => {
-                if (!this.threatBudgets[type]) this.threatBudgets[type] = 0;
+                if (this.threatBudgets[type] === undefined) this.threatBudgets[type] = 0;
                 this.threatBudgets[type] += growthPerType;
 
                 // Cap de sécurité pour éviter l'accumulation infinie si on ne spawn pas
                 const enemyData = this.dataManager.getEnemyData(type);
                 const cost = enemyData?.threatLevel || 10;
-                if (this.threatBudgets[type] > cost * 3) this.threatBudgets[type] = cost * 3;
+                if (this.threatBudgets[type] > cost * 5) this.threatBudgets[type] = cost * 5;
             });
 
             this.trySpawnEnemy();
@@ -472,7 +480,9 @@ class Game {
         for (let i = this.enemies.length - 1; i >= 0; i--) {
             const e = this.enemies[i];
             e.update(deltaTime, this.player, {
-                onEnemyShoot: (x, y, dx, dy, stats) => this.spawnEnemyProjectile(x, y, dx, dy, stats)
+                onEnemyShoot: (x, y, dx, dy, stats) => this.spawnEnemyProjectile(x, y, dx, dy, stats),
+                logicalWidth: this.logicalWidth,
+                logicalHeight: this.logicalHeight
             });
             if (this.player && CombatSystem.checkCollision(this.player, e)) {
                 this.player.takeDamage(e.damage * (deltaTime / 1000));
@@ -845,6 +855,49 @@ class Game {
             this.ctx.beginPath();
             this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
             this.ctx.stroke();
+        });
+
+        // Debug Panel (Top Left)
+        const panelX = 10;
+        const panelY = 150;
+        const panelW = 350;
+        const typesCount = Object.keys(this.threatBudgets).length;
+        const panelH = 60 + (typesCount * 25);
+
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.fillRect(panelX, panelY, panelW, panelH);
+        this.ctx.strokeStyle = '#0f0';
+        this.ctx.strokeRect(panelX, panelY, panelW, panelH);
+
+        this.ctx.fillStyle = '#0f0';
+        this.ctx.font = 'bold 16px monospace';
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText(`DEBUG - ENNEMIS: ${this.enemies.length}`, panelX + 10, panelY + 25);
+        this.ctx.font = '12px monospace';
+        this.ctx.fillText(`CROIDDANCE TOTALE: +${this.lastThreatGrowth || 0}/s`, panelX + 10, panelY + 45);
+
+        Object.entries(this.threatBudgets).forEach(([type, budget], i) => {
+            const enemyData = this.dataManager.getEnemyData(type);
+            const cost = enemyData?.threatLevel || 10;
+            const progress = Math.min(1, budget / cost);
+            const name = enemyData?.name || type;
+            const y = panelY + 70 + (i * 25);
+
+            // Label
+            this.ctx.fillStyle = '#fff';
+            this.ctx.fillText(`${name.substring(0, 15)}:`, panelX + 10, y);
+
+            // Gauge bg
+            this.ctx.fillStyle = '#333';
+            this.ctx.fillRect(panelX + 140, y - 10, 150, 12);
+
+            // Gauge fill
+            this.ctx.fillStyle = progress >= 1 ? '#0f0' : '#0af';
+            this.ctx.fillRect(panelX + 140, y - 10, 150 * progress, 12);
+
+            // Values
+            this.ctx.fillStyle = '#fff';
+            this.ctx.fillText(`${Math.floor(budget)}/${cost}`, panelX + 300, y);
         });
 
         this.ctx.restore();

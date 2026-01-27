@@ -20,7 +20,7 @@ export class Enemy {
 
         this.activeEffects = []; // Pour le poison, etc.
         this.originalColor = this.color;
-        
+
         // Système d'animation data-driven
         this.visuals = stats.visuals;
         this.animator = this.visuals ? new Animator(this.visuals, assetManager) : null;
@@ -63,18 +63,70 @@ export class Enemy {
             }
         }
 
-        // Comportement simple : foncer vers le joueur
+        // Calcul de la distance au joueur
         const dx = playerPos.x - this.x;
         const dy = playerPos.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist > 0) {
-            this.velocity.x = (dx / dist) * (this.speed * speedMultiplier);
-            this.velocity.y = (dy / dist) * (this.speed * speedMultiplier);
+        // Comportement de mouvement
+        const behavior = this.stats.behavior || { type: 'chase' };
+        let moveX = 0;
+        let moveY = 0;
+
+        if (behavior.type === 'ranged') {
+            const minDistance = behavior.minDistance || 200;
+            const maxDistance = behavior.maxDistance || 300;
+
+            if (dist < minDistance) {
+                // Trop proche : on recule
+                moveX = -dx;
+                moveY = -dy;
+            } else if (dist > maxDistance) {
+                // Trop loin : on s'approche
+                moveX = dx;
+                moveY = dy;
+            } else {
+                // Bonne distance : on ne bouge pas (ou on peut ajouter du strafe ici plus tard)
+                moveX = 0;
+                moveY = 0;
+            }
+        } else {
+            // Par défaut 'chase' : foncer vers le joueur
+            moveX = dx;
+            moveY = dy;
+        }
+
+        if (moveX !== 0 || moveY !== 0) {
+            const moveDist = Math.sqrt(moveX * moveX + moveY * moveY);
+            this.velocity.x = (moveX / moveDist) * (this.speed * speedMultiplier);
+            this.velocity.y = (moveY / moveDist) * (this.speed * speedMultiplier);
+
+            // L'angle reste toujours orienté vers le mouvement pour l'animation
+            // Sauf si on recule, peut-être qu'on veut toujours regarder le joueur ?
+            // L'animateur utilise la vélocité par défaut.
             this.angle = Math.atan2(this.velocity.y, this.velocity.x);
-            
+
+            const oldX = this.x;
+            const oldY = this.y;
             this.x += this.velocity.x * dt;
             this.y += this.velocity.y * dt;
+
+            // Contrainte : rester dans l'écran visible si on y était déjà
+            if (context.logicalWidth && context.logicalHeight) {
+                const margin = this.radius;
+                const wasOnScreen = oldX >= -margin && oldX <= context.logicalWidth + margin &&
+                    oldY >= -margin && oldY <= context.logicalHeight + margin;
+
+                if (wasOnScreen) {
+                    this.x = Math.max(margin, Math.min(context.logicalWidth - margin, this.x));
+                    this.y = Math.max(margin, Math.min(context.logicalHeight - margin, this.y));
+                }
+            }
+        } else {
+            this.velocity.x = 0;
+            this.velocity.y = 0;
+            // Si on ne bouge pas, on s'oriente quand même vers le joueur pour tirer
+            this.angle = Math.atan2(dy, dx);
         }
 
         // Mise à jour de l'arme
@@ -165,10 +217,10 @@ export class Enemy {
     takeDamage(amount) {
         this.hp -= amount;
         this.isHurt = true;
-        
+
         if (!this.animator) {
             // Feedback visuel de dégâts (fallback)
-            this.color = '#fff'; 
+            this.color = '#fff';
             setTimeout(() => {
                 this.color = this.originalColor;
             }, 50);

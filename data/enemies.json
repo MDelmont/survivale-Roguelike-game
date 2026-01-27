@@ -234,6 +234,125 @@
             },
             "threatLevel": 60,
             "weapon_id": "new_weapon_mks7hfrs"
+        },
+        "new_enemy_1769548498337": {
+            "name": "girafe bebe",
+            "hp": 180,
+            "speed": 30,
+            "damage": 20,
+            "xpValue": 25,
+            "radius": 12,
+            "color": "#ff5555",
+            "visuals": {
+                "type": "sprite",
+                "height": 180,
+                "directionMode": "2_way",
+                "hitFlash": true,
+                "animations": {
+                    "walk": {
+                        "left": {
+                            "frames": [
+                                "assets/monster/baby-peluche/girafe-gauche-w1.png",
+                                "assets/monster/baby-peluche/girafe-gauche-i.png",
+                                "assets/monster/baby-peluche/girafe-gauche-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/baby-peluche/girafe-droite-w1.png",
+                                "assets/monster/baby-peluche/girafe-droite-i.png",
+                                "assets/monster/baby-peluche/girafe-droite-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    },
+                    "idle": {
+                        "left": {
+                            "frames": [
+                                "assets/monster/baby-peluche/girafe-gauche-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/baby-peluche/girafe-droite-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": false
+            },
+            "threatLevel": 7,
+            "weapon_id": ""
+        },
+        "new_enemy_1769548647524": {
+            "name": "chef legume bebe",
+            "hp": 35,
+            "speed": 100,
+            "damage": 5,
+            "xpValue": 15,
+            "radius": 12,
+            "color": "#ff5555",
+            "visuals": {
+                "type": "sprite",
+                "height": 120,
+                "directionMode": "2_way",
+                "hitFlash": true,
+                "animations": {
+                    "walk": {
+                        "left": {
+                            "frames": [
+                                "assets/monster/baby-peluche/chef-gauche-w1.png",
+                                "assets/monster/baby-peluche/chef-gauche-i.png",
+                                "assets/monster/baby-peluche/chef-gauche-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/baby-peluche/chef-droite-w1.png",
+                                "assets/monster/baby-peluche/chef-droite-i.png",
+                                "assets/monster/baby-peluche/chef-droite-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    },
+                    "idle": {
+                        "left": {
+                            "frames": [
+                                "assets/monster/baby-peluche/chef-gauche-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/baby-peluche/chef-droite-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": false
+            },
+            "threatLevel": 15,
+            "weapon_id": "new_weapon_mkx3nah9",
+            "behavior": {
+                "type": "ranged",
+                "minDistance": 400,
+                "maxDistance": 450
+            }
         }
     }
 }

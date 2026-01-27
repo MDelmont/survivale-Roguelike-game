@@ -257,6 +257,23 @@ class EnemiesModule {
                                 ${this.app.gameData.weapons.map(w => `<option value="${w.id}" ${e.weapon_id === w.id ? 'selected' : ''}>${w.name || w.id}</option>`).join('')}
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Comportement</label>
+                            <select class="form-select" id="enemyBehaviorType">
+                                <option value="chase" ${e.behavior?.type === 'chase' || !e.behavior ? 'selected' : ''}>Chase (Fonce sur le joueur)</option>
+                                <option value="ranged" ${e.behavior?.type === 'ranged' ? 'selected' : ''}>Ranged (Reste à distance)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row" id="rangedBehaviorParams" style="display: ${e.behavior?.type === 'ranged' ? 'flex' : 'none'}">
+                        <div class="form-group">
+                            <label class="form-label">Distance Min (Fuit si <)</label>
+                            <input type="number" class="form-input" id="enemyMinDist" value="${e.behavior?.minDistance || 200}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Distance Max (Approche si >)</label>
+                            <input type="number" class="form-input" id="enemyMaxDist" value="${e.behavior?.maxDistance || 300}">
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -631,6 +648,15 @@ class EnemiesModule {
                     this.loadPreview();
                     this.updateJsonPreview();
                 });
+            } else if (input.id === 'enemyBehaviorType') {
+                input.addEventListener('change', (e) => {
+                    const type = e.target.value;
+                    const params = document.getElementById('rangedBehaviorParams');
+                    if (params) {
+                        params.style.display = type === 'ranged' ? 'flex' : 'none';
+                    }
+                    this.updateEnemyFromForm();
+                });
             } else if (input.id === 'enemyColorPicker') {
                 input.addEventListener('input', (e) => {
                     document.getElementById('enemyColor').value = e.target.value;
@@ -683,6 +709,18 @@ class EnemiesModule {
         e.radius = parseInt(document.getElementById('enemyRadius')?.value) || 12;
         e.color = document.getElementById('enemyColor')?.value || '#fff';
         e.weapon_id = document.getElementById('enemyWeapon')?.value || '';
+
+        // Comportement
+        const behaviorType = document.getElementById('enemyBehaviorType')?.value || 'chase';
+        if (behaviorType === 'chase') {
+            delete e.behavior;
+        } else {
+            e.behavior = {
+                type: behaviorType,
+                minDistance: parseInt(document.getElementById('enemyMinDist')?.value) || 200,
+                maxDistance: parseInt(document.getElementById('enemyMaxDist')?.value) || 300
+            };
+        }
 
         // Visuels
         if (!e.visuals) e.visuals = {};
