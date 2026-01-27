@@ -11,7 +11,7 @@
             "player_id": "player_1769291289336",
             "spawn_rate": 1000,
             "default_weapon": "Lance_tetine",
-            "weapon_drop_rate": 0.25,
+            "weapon_drop_rate": 0.4,
             "available_weapons": [
                 "Lance_tetine",
                 "Lance_couche-pleine"
@@ -31,7 +31,10 @@
             "transition_intro_id": "transition_1769549010270",
             "transition_outro_id": "transition_1769549077736",
             "available_upgrades": [
-                "new_upgrade_1769272317751"
+                "new_upgrade_1769272317751",
+                "baby_projectiles",
+                "baby_speed",
+                "baby_piercing"
             ],
             "transition_defeat_id": "transition_1769549046085"
         },

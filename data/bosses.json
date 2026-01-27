@@ -100,7 +100,7 @@
         },
         "new_boss_1769440570918": {
             "name": "Peluche_bleu",
-            "hp": 2000,
+            "hp": 6500,
             "speed": 180,
             "damage": 20,
             "fireRate": 1500,
@@ -200,7 +200,8 @@
                 "path": "",
                 "angleOffset": 0
             },
-            "weapon_id": "new_weapon_mkvc48ff"
+            "weapon_id": "new_weapon_mkvc48ff",
+            "projectileRadius": 8
         }
     }
 }

@@ -287,7 +287,22 @@
                 "explosionRadius": 80,
                 "explosionDamageMultiplier": 0.5
             },
-            "upgrades": [],
+            "upgrades": [
+                {
+                    "name": "Tetine en rafale",
+                    "preview": "+1 Projectile",
+                    "stats": {
+                        "projectileCount": 1
+                    }
+                },
+                {
+                    "name": "Tetine en titane",
+                    "preview": "Dégâts +10",
+                    "stats": {
+                        "damage": 10
+                    }
+                }
+            ],
             "visuals": {
                 "path": "assets/projectiles/tetine.png",
                 "width": 40,
@@ -352,6 +367,13 @@
                     "preview": "Rayon +40px",
                     "stats": {
                         "explosionRadius": 40
+                    }
+                },
+                {
+                    "name": "Diarrhée foudroyante",
+                    "preview": "Poison +20",
+                    "stats": {
+                        "poisonDamage": 20
                     }
                 }
             ],

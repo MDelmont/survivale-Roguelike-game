@@ -103,6 +103,30 @@
             "type": "stat",
             "stat": "projectileBonus",
             "add": 1
+        },
+        {
+            "id": "baby_projectiles",
+            "name": "Double dose de lait",
+            "description": "Le biberon était bien rempli, ça tire en rafale !",
+            "type": "stat",
+            "stat": "projectileBonus",
+            "add": 1
+        },
+        {
+            "id": "baby_speed",
+            "name": "Trotteur turbo",
+            "description": "Pieds au plancher dans le salon, personne ne t'arrête.",
+            "type": "stat",
+            "stat": "speed",
+            "multiplier": 1.2
+        },
+        {
+            "id": "baby_piercing",
+            "name": "Tétine perforante",
+            "description": "On dirait que les dents de lait commencent à pousser. Ça traverse tout !",
+            "type": "stat",
+            "stat": "piercingBonus",
+            "add": 1
         }
     ]
 }
