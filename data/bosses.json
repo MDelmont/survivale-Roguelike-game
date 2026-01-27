@@ -183,7 +183,7 @@
                     }
                 },
                 "angleOffset": 0,
-                "pixelPerfect": false,
+                "pixelPerfect": true,
                 "height": 300
             },
             "projectileVisuals": {
