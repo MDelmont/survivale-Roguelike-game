@@ -1,6 +1,33 @@
 {
     "phases": [
         {
+            "id": 4,
+            "name": "Test",
+            "duration_before_boss": 60,
+            "enemy_types": [],
+            "player_id": "player_1769682205542",
+            "spawn_rate": 1000,
+            "default_weapon": "basic_shot",
+            "weapon_drop_rate": 0.25,
+            "available_weapons": [],
+            "boss_id": "",
+            "background_image": "",
+            "xp_visual": "",
+            "xp_size": 20,
+            "weapon_visual": "",
+            "weapon_size": 30,
+            "story_intro": [],
+            "story_outro": [],
+            "difficulty_multiplier": 1,
+            "initial_threat_budget": 20,
+            "max_threat_budget": 200,
+            "threat_growth_rate": 0.5,
+            "transition_intro_id": "",
+            "transition_outro_id": "",
+            "available_upgrades": [],
+            "transition_defeat_id": ""
+        },
+        {
             "id": 1,
             "name": "La Conception",
             "duration_before_boss": 60,
