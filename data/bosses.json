@@ -227,7 +227,7 @@
                         "loop": true
                     }
                 },
-                "angleOffset": 180,
+                "angleOffset": 0,
                 "pixelPerfect": false
             },
             "projectileVisuals": {
@@ -246,8 +246,7 @@
                 "angleOffset": 90,
                 "height": 45
             },
-            "weapon_id": "",
-            "projectileRadius": 5
+            "weapon_id": ""
         }
     }
 }
