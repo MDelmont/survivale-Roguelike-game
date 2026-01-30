@@ -202,6 +202,52 @@
             },
             "weapon_id": "new_weapon_mkvc48ff",
             "projectileRadius": 8
+        },
+        "new_boss_1769709370272": {
+            "name": "Police",
+            "hp": 5851,
+            "speed": 50,
+            "damage": 20,
+            "fireRate": 3000,
+            "attackPattern": "wave_spray",
+            "movePattern": "fixed",
+            "radius": 80,
+            "color": "#ff3333",
+            "visuals": {
+                "type": "sprite",
+                "width": 128,
+                "directionMode": "none",
+                "hitFlash": true,
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/boss/velo-ony/police-car.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "angleOffset": 180,
+                "pixelPerfect": false
+            },
+            "projectileVisuals": {
+                "type": "sprite",
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/gosh-cat.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "path": "assets/projectiles/gosh-cat.png",
+                "angleOffset": 90,
+                "height": 45
+            },
+            "weapon_id": "",
+            "projectileRadius": 5
         }
     }
 }

@@ -353,6 +353,171 @@
                 "minDistance": 400,
                 "maxDistance": 450
             }
+        },
+        "new_enemy_1769709850298": {
+            "name": "ony-trotte",
+            "hp": 5,
+            "speed": 420,
+            "damage": 5,
+            "xpValue": 10,
+            "radius": 12,
+            "color": "#ff5555",
+            "visuals": {
+                "type": "sprite",
+                "height": 65,
+                "directionMode": "2_way",
+                "hitFlash": true,
+                "animations": {
+                    "idle": {
+                        "left": {
+                            "frames": [
+                                "assets/monster/velo-ony/trotinette-ony-gauche-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/velo-ony/trotinette-ony-droite-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    },
+                    "walk": {
+                        "left": {
+                            "frames": [
+                                "assets/monster/velo-ony/trotinette-ony-gauche-w1.png",
+                                "assets/monster/velo-ony/trotinette-ony-gauche-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/velo-ony/trotinette-ony-droite-w1.png",
+                                "assets/monster/velo-ony/trotinette-ony-droite-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": false
+            },
+            "threatLevel": 5,
+            "weapon_id": ""
+        },
+        "new_enemy_1769710042216": {
+            "name": "ony-horse",
+            "hp": 85,
+            "speed": 150,
+            "damage": 5,
+            "xpValue": 10,
+            "radius": 12,
+            "color": "#ff5555",
+            "visuals": {
+                "type": "sprite",
+                "height": 100,
+                "directionMode": "2_way",
+                "hitFlash": true,
+                "animations": {
+                    "idle": {
+                        "left": {
+                            "frames": [
+                                "assets/monster/velo-ony/horse-ony-gauche-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/velo-ony/horse-ony-droite-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    },
+                    "walk": {
+                        "left": {
+                            "frames": [
+                                "assets/monster/velo-ony/horse-ony-gauche-w2.png",
+                                "assets/monster/velo-ony/horse-ony-gauche-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/velo-ony/horse-ony-droite-w1.png",
+                                "assets/monster/velo-ony/horse-ony-droite-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": false
+            },
+            "threatLevel": 10,
+            "weapon_id": ""
+        },
+        "new_enemy_1769710241488": {
+            "name": "berline Michigan",
+            "hp": 150,
+            "speed": 80,
+            "damage": 5,
+            "xpValue": 10,
+            "radius": 12,
+            "color": "#ff5555",
+            "visuals": {
+                "type": "sprite",
+                "directionMode": "2_way",
+                "hitFlash": true,
+                "animations": {
+                    "idle": {
+                        "left": {
+                            "frames": [
+                                "assets/monster/velo-ony/michigan-gauche-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/velo-ony/michigan-droite-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    },
+                    "walk": {
+                        "left": {
+                            "frames": [
+                                "assets/monster/velo-ony/michigan-gauche-w1.png",
+                                "assets/monster/velo-ony/michigan-gauche-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/velo-ony/michigan-droite-w2.png",
+                                "assets/monster/velo-ony/michigan-droite-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": false,
+                "width": 250
+            },
+            "threatLevel": 25,
+            "weapon_id": ""
         }
     }
 }
