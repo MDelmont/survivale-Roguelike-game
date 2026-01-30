@@ -359,7 +359,7 @@
             "hp": 5,
             "speed": 420,
             "damage": 5,
-            "xpValue": 10,
+            "xpValue": 2,
             "radius": 12,
             "color": "#ff5555",
             "visuals": {
@@ -406,7 +406,7 @@
                 "angleOffset": 0,
                 "pixelPerfect": false
             },
-            "threatLevel": 5,
+            "threatLevel": 2,
             "weapon_id": ""
         },
         "new_enemy_1769710042216": {
@@ -461,8 +461,13 @@
                 "angleOffset": 0,
                 "pixelPerfect": false
             },
-            "threatLevel": 10,
-            "weapon_id": ""
+            "threatLevel": 25,
+            "weapon_id": "new_weapon_ml1633w7",
+            "behavior": {
+                "type": "ranged",
+                "minDistance": 200,
+                "maxDistance": 300
+            }
         },
         "new_enemy_1769710241488": {
             "name": "berline Michigan",
@@ -516,7 +521,7 @@
                 "pixelPerfect": false,
                 "width": 250
             },
-            "threatLevel": 25,
+            "threatLevel": 32,
             "weapon_id": ""
         }
     }

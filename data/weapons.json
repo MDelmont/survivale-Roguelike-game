@@ -674,6 +674,289 @@
             "description": "",
             "category": "",
             "preview": ""
+        },
+        {
+            "id": "new_weapon_ml1633w7",
+            "name": "horse ball",
+            "type": "attack",
+            "stats": {
+                "damage": 15,
+                "fireRate": 2500,
+                "projectileSpeed": 400,
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "radius": 5,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": false,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5
+            },
+            "upgrades": [],
+            "visuals": {
+                "path": "assets/projectiles/horseball-projectile.png",
+                "width": 50,
+                "rotateWithVelocity": true,
+                "angleOffset": 0,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/horseball-projectile.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "",
+            "category": "",
+            "preview": ""
+        },
+        {
+            "id": "new_weapon_ml164bn8",
+            "name": "Titi en furie",
+            "type": "aoe",
+            "stats": {
+                "damage": 20,
+                "fireRate": 500,
+                "projectileSpeed": 400,
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "radius": 5,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": false,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5,
+                "range": 100
+            },
+            "upgrades": [
+                {
+                    "name": "Griffes de Lumière",
+                    "preview": "Dégâts +10",
+                    "stats": {
+                        "damage": 10
+                    }
+                },
+                {
+                    "name": "Miaulement Strident",
+                    "preview": "Rayon +40px",
+                    "stats": {
+                        "range": 40
+                    }
+                },
+                {
+                    "name": "Coup de Patte",
+                    "preview": "Ralentit les ennemis",
+                    "stats": {
+                        "isSlowing": true,
+                        "slowMultiplier": 0.4
+                    }
+                },
+                {
+                    "name": "Instinct de Tueur",
+                    "preview": "Dégâts +15",
+                    "stats": {
+                        "damage": 15
+                    }
+                }
+            ],
+            "visuals": {
+                "path": "assets/projectiles/zone-chat.png",
+                "width": 120,
+                "rotateWithVelocity": true,
+                "angleOffset": 0,
+                "directionMode": "rotate",
+                "auraRotationSpeed": 0,
+                "auraPulseAlpha": false,
+                "auraPulseSize": false,
+                "auraAlphaSpeed": 200,
+                "auraAlphaMin": 0.2,
+                "auraAlphaMax": 1,
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/zone-chat.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "Zone de protection créer par la vitesse de ton chat",
+            "category": "Aura",
+            "preview": ""
+        },
+        {
+            "id": "new_weapon_ml164c35",
+            "name": "Sonnette de Billy",
+            "type": "attack",
+            "stats": {
+                "damage": 20,
+                "fireRate": 250,
+                "projectileSpeed": 400,
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "radius": 5,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": false,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5
+            },
+            "upgrades": [
+                {
+                    "name": "Ultrasons",
+                    "preview": "Dégâts +15",
+                    "stats": {
+                        "damage": 15
+                    }
+                },
+                {
+                    "name": "Fréquence Élevée",
+                    "preview": "Cadence +20%",
+                    "stats": {
+                        "fireRate": -50
+                    }
+                },
+                {
+                    "name": "Résonance Multiple",
+                    "preview": "+1 Projectile",
+                    "stats": {
+                        "projectileCount": 1
+                    }
+                },
+                {
+                    "name": "Onde de Choc",
+                    "preview": "Traverse +2 ennemis",
+                    "stats": {
+                        "piercingCount": 2
+                    }
+                }
+            ],
+            "visuals": {
+                "path": "assets/projectiles/sonor-projectile.png",
+                "width": 55,
+                "rotateWithVelocity": true,
+                "angleOffset": 0,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/sonor-projectile.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "Projette une onde sonore qui repousse les ennemis et inflige des dégâts.",
+            "category": "Projectile",
+            "preview": ""
+        },
+        {
+            "id": "new_weapon_ml164ceg",
+            "name": "Boules de Mammouth",
+            "type": "attack",
+            "stats": {
+                "damage": 10,
+                "fireRate": 500,
+                "projectileSpeed": 400,
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "radius": 5,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": true,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5,
+                "explosionVisuals": {
+                    "path": "assets/explosion/explosion-mamouh.png",
+                    "width": 80,
+                    "height": 80,
+                    "directionMode": "none",
+                    "animations": {
+                        "idle": {
+                            "frames": [
+                                "assets/explosion/explosion-mamouh.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                }
+            },
+            "upgrades": [
+                {
+                    "name": "Mammouth XXL",
+                    "preview": "Explosion +40px",
+                    "stats": {
+                        "explosionRadius": 40
+                    }
+                },
+                {
+                    "name": "Sucre Cuit",
+                    "preview": "Dégâts Explo +30%",
+                    "stats": {
+                        "explosionDamageMultiplier": 0.3
+                    }
+                },
+                {
+                    "name": "Sac de Bonbons",
+                    "preview": "+1 Projectile",
+                    "stats": {
+                        "projectileCount": 1
+                    }
+                },
+                {
+                    "name": "Effet Collant",
+                    "preview": "Ralentit les ennemis",
+                    "stats": {
+                        "isSlowing": true,
+                        "slowMultiplier": 0.4
+                    }
+                }
+            ],
+            "visuals": {
+                "path": "assets/projectiles/mamouth-projectile.png",
+                "width": 40,
+                "rotateWithVelocity": true,
+                "angleOffset": 0,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/mamouth-projectile.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "Vente de bonbon explosif",
+            "category": "Projectile explosif",
+            "preview": ""
         }
     ]
 }

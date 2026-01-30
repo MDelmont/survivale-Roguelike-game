@@ -127,6 +127,62 @@
             "type": "stat",
             "stat": "piercingBonus",
             "add": 1
+        },
+        {
+            "id": "velo_roulettes",
+            "name": "Libération des Roulettes",
+            "description": "Ton équilibre est précaire mais ta vitesse est décuplée. Tu voles sur l'asphalte d'Ychoux.",
+            "type": "stat",
+            "stat": "speed",
+            "multiplier": 1.25
+        },
+        {
+            "id": "velo_billy",
+            "name": "Motivation de Billy",
+            "description": "Les encouragements de tonton te donnent une force incroyable. Fais-leur voir !",
+            "type": "stat",
+            "stat": "damage",
+            "multiplier": 1.2
+        },
+        {
+            "id": "velo_nad",
+            "name": "Bienveillance de Nad",
+            "description": "Tatie Nad surveille tes arrières, tu te sens plus robuste et prêt à tomber (ou pas).",
+            "type": "stat",
+            "stat": "maxHp",
+            "add": 30
+        },
+        {
+            "id": "velo_michigan",
+            "name": "Publicité Michigan",
+            "description": "Inspiré par les panneaux Michigan, tu as une cadence digne d'une berline de luxe.",
+            "type": "stat",
+            "stat": "fireRate",
+            "multiplier": 1.15
+        },
+        {
+            "id": "velo_asphalte",
+            "name": "Maîtrise de l'Asphalte",
+            "description": "Tu connais chaque aiguille de pin sur la route. Tes projectiles glissent à travers les ennemis.",
+            "type": "stat",
+            "stat": "piercingBonus",
+            "add": 1
+        },
+        {
+            "id": "velo_pignon",
+            "name": "Grand Pignon",
+            "description": "Avec le grand pignon, tu vas plus loin. La portée de tes attaques est augmentée.",
+            "type": "stat",
+            "stat": "rangeMultiplier",
+            "multiplier": 1.25
+        },
+        {
+            "id": "velo_selle",
+            "name": "Selle biplace",
+            "description": "Y'a de la place pour tout le monde ! Tu tires plus de projectiles d'un coup.",
+            "type": "stat",
+            "stat": "projectileBonus",
+            "add": 1
         }
     ]
 }

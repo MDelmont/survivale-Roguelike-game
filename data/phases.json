@@ -2,8 +2,8 @@
     "phases": [
         {
             "id": 4,
-            "name": "Velo ony",
-            "duration_before_boss": 10,
+            "name": "Véhicule en Folie",
+            "duration_before_boss": 60,
             "enemy_types": [
                 "new_enemy_1769709850298",
                 "new_enemy_1769710042216",
@@ -11,25 +11,37 @@
             ],
             "player_id": "player_1769682205542",
             "spawn_rate": 1000,
-            "default_weapon": "basic_shot",
-            "weapon_drop_rate": 0.25,
-            "available_weapons": [],
+            "default_weapon": "new_weapon_ml164c35",
+            "weapon_drop_rate": 0.15,
+            "available_weapons": [
+                "new_weapon_ml164bn8",
+                "new_weapon_ml164c35",
+                "new_weapon_ml164ceg"
+            ],
             "boss_id": "new_boss_1769709370272",
             "background_image": "assets/fond/velo-ony/fond-velo.png",
-            "xp_visual": "",
+            "xp_visual": "assets/experiences/apprenti-exp.png",
             "xp_size": 20,
-            "weapon_visual": "",
-            "weapon_size": 30,
+            "weapon_visual": "assets/armes/sifflet.png",
+            "weapon_size": 40,
             "story_intro": [],
             "story_outro": [],
             "difficulty_multiplier": 1,
             "initial_threat_budget": 20,
             "max_threat_budget": 200,
-            "threat_growth_rate": 10,
-            "transition_intro_id": "",
-            "transition_outro_id": "",
-            "available_upgrades": [],
-            "transition_defeat_id": ""
+            "threat_growth_rate": 20,
+            "transition_intro_id": "transition_1769798567773",
+            "transition_outro_id": "transition_1769798612138",
+            "available_upgrades": [
+                "velo_roulettes",
+                "velo_billy",
+                "velo_nad",
+                "velo_michigan",
+                "velo_asphalte",
+                "velo_pignon",
+                "velo_selle"
+            ],
+            "transition_defeat_id": "transition_1769798598004"
         },
         {
             "id": 1,
