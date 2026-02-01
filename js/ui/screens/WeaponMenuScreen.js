@@ -127,7 +127,12 @@ export class WeaponMenuScreen {
 
         // Déterminer le texte du titre
         const hasUpgrade = this.game.upgradeOptions.some(opt => opt.type === 'upgrade');
-        const titleText = hasUpgrade ? 'AMÉLIORATION' : 'NOUVELLE ARME';
+        const hasNewWeapon = this.game.upgradeOptions.some(opt => opt.type !== 'upgrade');
+
+        let titleText = 'SÉLECTION';
+        if (hasUpgrade && hasNewWeapon) titleText = "ÉVOLUTION DE L'ARSENAL";
+        else if (hasUpgrade) titleText = 'AMÉLIORATION';
+        else if (hasNewWeapon) titleText = 'NOUVELLE ARME';
 
         ctx.globalAlpha = titleAlpha;
 

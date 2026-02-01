@@ -470,8 +470,17 @@ class Game {
             if (!l.isFollowing && this.player && CombatSystem.checkCollision(l, { x: this.player.x, y: this.player.y, radius: this.player.stats.pickupRadius })) l.isFollowing = true;
             l.update(deltaTime, this.player);
             if (l.toRemove) {
-                if (l.type === 'xp') this.player.addXP(l.value);
-                else this.player.pendingWeaponUpgrade = true;
+                if (l.type === 'xp') {
+                    this.player.addXP(l.value);
+                } else {
+                    // Pour les bonus d'armes, on ne lance l'interface que s'il y a quelque chose à gagner
+                    if (this.canGetWeaponReward()) {
+                        this.player.pendingWeaponUpgrade = true;
+                    } else {
+                        // Fallback silencieux : un peu d'XP bonus si tout est déjà maxé
+                        this.player.addXP(50);
+                    }
+                }
                 this.loots.splice(i, 1);
             }
         }
@@ -600,31 +609,39 @@ class Game {
     openWeaponMenu() {
         this.upgradeOptions = [];
 
-        // 1. Proposer de nouvelles armes que le joueur n'a pas encore
-        const availablePool = (this.currentPhase.available_weapons || [])
+        // 1. Collecter toutes les options possibles (Nouvelles armes + Améliorations d'armes existantes)
+        const possibleOptions = [];
+
+        // Nouvelles armes non possédées
+        const newWeaponsPool = (this.currentPhase.available_weapons || [])
             .filter(id => !this.player.weapons.find(w => w.id === id))
             .map(id => this.dataManager.getWeaponData(id))
             .filter(w => w);
 
-        // Prendre max 2 nouvelles armes aléatoires
-        const newWeapons = availablePool.sort(() => 0.5 - Math.random()).slice(0, 2);
-        this.upgradeOptions.push(...newWeapons);
+        newWeaponsPool.forEach(w => possibleOptions.push({ ...w, isNewWeapon: true }));
 
-        // 2. Proposer une amélioration pour une arme déjà possédée (si elle a encore des niveaux)
+        // Améliorations possibles pour chaque arme déjà possédée
         const upgradeableWeapons = this.player.weapons.filter(w => w.level <= (w.upgrades?.length || 0));
-        if (upgradeableWeapons.length > 0) {
-            const weaponToUpgrade = upgradeableWeapons[Math.floor(Math.random() * upgradeableWeapons.length)];
-            this.upgradeOptions.push({
+        upgradeableWeapons.forEach(weapon => {
+            possibleOptions.push({
                 type: 'upgrade',
-                weaponId: weaponToUpgrade.id,
-                name: `Améliorer ${weaponToUpgrade.name}`,
-                description: `Passe au niveau ${weaponToUpgrade.level + 1}`
+                weaponId: weapon.id,
+                name: `Améliorer ${weapon.name}`,
+                description: `Passe au niveau ${weapon.level + 1}`,
+                originalWeapon: weapon // Optionnel, utile pour l'affichage si besoin
             });
-        }
+        });
 
-        // S'assurer qu'on a au moins 2 options (cas rare où toutes les armes sont maxées)
-        if (this.upgradeOptions.length < 2 && availablePool.length === 0) {
-            this.upgradeOptions.push({ name: 'Bonus XP', description: 'Toutes les armes sont au maximum !', id: 'bonus_xp' });
+        // 2. Mélanger et prendre jusqu'à 3 options
+        this.upgradeOptions = possibleOptions
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 3);
+
+        // Si aucune option n'est disponible (cas où tout est maxé)
+        if (this.upgradeOptions.length === 0) {
+            this.player.pendingWeaponUpgrade = false;
+            this.state = GameState.PLAYING;
+            return;
         }
 
         this.state = GameState.WEAPON_MENU;
