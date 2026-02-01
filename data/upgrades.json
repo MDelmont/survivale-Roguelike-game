@@ -183,6 +183,46 @@
             "type": "stat",
             "stat": "projectileBonus",
             "add": 1
+        },
+        {
+            "id": "upgrade_cine",
+            "name": "Ticket de Ciné",
+            "description": "L'endroit parfait pour une rencontre. Augmente la portée de vos capacités.",
+            "type": "stat",
+            "stat": "rangeMultiplier",
+            "multiplier": 1.3
+        },
+        {
+            "id": "upgrade_bague_celib",
+            "name": "Bague de Fiançaille",
+            "description": "Un symbole d'engagement qui vous protège des distractions.",
+            "type": "stat",
+            "stat": "speed",
+            "multiplier": 1.2
+        },
+        {
+            "id": "upgrade_gamer_stats",
+            "name": "Passion Jeux Vidéo",
+            "description": "Tes réflexes de gamer te permettent de tirer plus vite.",
+            "type": "stat",
+            "stat": "fireRate",
+            "multiplier": 1.5
+        },
+        {
+            "id": "new_upgrade_1769985103319",
+            "name": "Un petit BK",
+            "description": "Te redonne de la force",
+            "type": "stat",
+            "stat": "maxHp",
+            "add": 45
+        },
+        {
+            "id": "new_upgrade_1769985156241",
+            "name": "Vision perçante",
+            "description": "Tu vois les points faible des ennemies ",
+            "type": "stat",
+            "stat": "piercingBonus",
+            "add": 1
         }
     ]
 }

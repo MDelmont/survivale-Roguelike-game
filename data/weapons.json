@@ -957,6 +957,261 @@
             "description": "Vente de bonbon explosif",
             "category": "Projectile explosif",
             "preview": ""
+        },
+        {
+            "id": "weapon_zone_rose",
+            "name": "Spray Confort rose",
+            "type": "aoe",
+            "description": "Zone de protection qui maintient les admiratrices à distance.",
+            "category": "aura",
+            "stats": {
+                "damage": 20,
+                "range": 100,
+                "isSlowing": true,
+                "slowMultiplier": 0.5,
+                "fireRate": 500,
+                "isPoisonous": false,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": false,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5
+            },
+            "upgrades": [
+                {
+                    "name": "Parfum Intense",
+                    "preview": "Rayon +40px",
+                    "stats": {
+                        "range": 40
+                    }
+                },
+                {
+                    "name": "Effluves Étourdissantes",
+                    "preview": "Ralenti +20%",
+                    "stats": {
+                        "slowMultiplier": 0.3
+                    }
+                },
+                {
+                    "name": "Effluves agressive",
+                    "preview": "Poison",
+                    "stats": {
+                        "isPoisonous": true,
+                        "poisonDamage": 25,
+                        "poisonTickRate": 150,
+                        "poisonDuration": 1000
+                    }
+                }
+            ],
+            "visuals": {
+                "path": "assets/projectiles/zone-rose.png",
+                "width": 120,
+                "directionMode": "none",
+                "auraRotationSpeed": 0.05,
+                "auraPulseAlpha": true,
+                "auraPulseSize": true,
+                "auraAlphaSpeed": 150,
+                "auraAlphaMin": 0.3,
+                "auraAlphaMax": 0.7,
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/zone-rose.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "rotateWithVelocity": false,
+                "angleOffset": 0
+            },
+            "preview": ""
+        },
+        {
+            "id": "weapon_coeur_explosif",
+            "name": "coeurs explosif",
+            "type": "attack",
+            "description": "Fait vibré, et explosé des coeurs",
+            "category": "projectile explosif",
+            "stats": {
+                "damage": 35,
+                "fireRate": 800,
+                "projectileSpeed": 350,
+                "projectileCount": 1,
+                "isExplosive": true,
+                "explosionRadius": 90,
+                "explosionDamageMultiplier": 0.7,
+                "piercingCount": 0,
+                "radius": 5,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "explosionVisuals": {
+                    "path": "assets/explosion/explosion-coeur.png",
+                    "width": 80,
+                    "height": 80,
+                    "directionMode": "none",
+                    "animations": {
+                        "idle": {
+                            "frames": [
+                                "assets/explosion/explosion-coeur.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                }
+            },
+            "upgrades": [
+                {
+                    "name": "adrénaline",
+                    "preview": "Rayon Explo +30px",
+                    "stats": {
+                        "explosionRadius": 30
+                    }
+                },
+                {
+                    "name": "Piment aphrodisiaque",
+                    "preview": "Dégâts +35",
+                    "stats": {
+                        "damage": 35
+                    }
+                },
+                {
+                    "name": "polyamour",
+                    "preview": "Projectile +1",
+                    "stats": {
+                        "projectileCount": 1
+                    }
+                }
+            ],
+            "visuals": {
+                "path": "assets/projectiles/proj-coeur.png",
+                "width": 35,
+                "rotateWithVelocity": true,
+                "angleOffset": 0,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/proj-coeur.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "preview": ""
+        },
+        {
+            "id": "weapon_stick_labello",
+            "name": "Stick Labello répulsif",
+            "type": "attack",
+            "description": "Soigne les lèvres gercées et les PV.",
+            "category": "support",
+            "stats": {
+                "healAmount": 10,
+                "fireRate": 250,
+                "damage": 45,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": false,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5,
+                "projectileSpeed": 400,
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "radius": 5,
+                "color": null
+            },
+            "upgrades": [
+                {
+                    "name": "Hydratation Totale",
+                    "preview": "Poison +10",
+                    "stats": {
+                        "poisonDamage": 25,
+                        "isPoisonous": true,
+                        "poisonDuration": 1010,
+                        "poisonTickRate": 500
+                    }
+                },
+                {
+                    "name": "Polyamour",
+                    "preview": "projectile +3",
+                    "stats": {
+                        "projectileCount": 3
+                    }
+                }
+            ],
+            "visuals": {
+                "path": "assets/projectiles/labelo.png",
+                "width": 10,
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/labelo.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "directionMode": "rotate",
+                "rotateWithVelocity": true,
+                "angleOffset": 90
+            },
+            "preview": ""
+        },
+        {
+            "id": "new_weapon_ml499g2o",
+            "name": "lance couteau",
+            "type": "attack",
+            "stats": {
+                "damage": 10,
+                "fireRate": 1500,
+                "projectileSpeed": 400,
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "radius": 5,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": false,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5
+            },
+            "upgrades": [],
+            "visuals": {
+                "path": "assets/projectiles/proj-couteau.png",
+                "width": 64,
+                "rotateWithVelocity": true,
+                "angleOffset": 0,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/proj-couteau.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "",
+            "category": "",
+            "preview": ""
         }
     ]
 }

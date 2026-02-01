@@ -302,6 +302,90 @@
                 },
                 "angleOffset": 0
             }
+        },
+        "anthony_celib": {
+            "name": "Anthony Adulte",
+            "speed": 280,
+            "hp": 120,
+            "maxHp": 120,
+            "fireRate": 350,
+            "damage": 15,
+            "projectileSpeed": 450,
+            "pickupRadius": 120,
+            "xpNextLevel": 60,
+            "visuals": {
+                "type": "sprite",
+                "directionMode": "4_way",
+                "hitFlash": true,
+                "animations": {
+                    "idle": {
+                        "up": {
+                            "frames": [
+                                "assets/players/drague_ony/drague-dos-i.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/players/drague_ony/drague-face-i.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/players/drague_ony/drague-gauche-i.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/players/drague_ony/drague-droit-i.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": true
+                        }
+                    },
+                    "walk": {
+                        "up": {
+                            "frames": [
+                                "assets/players/drague_ony/drague-dos-w1.png",
+                                "assets/players/drague_ony/drague-dos-w2.png"
+                            ],
+                            "frameRate": 12,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/players/drague_ony/drague-face-w2.png",
+                                "assets/players/drague_ony/drague-face-w1.png"
+                            ],
+                            "frameRate": 12,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/players/drague_ony/drague-gauche-w1.png",
+                                "assets/players/drague_ony/drague-gauche-w2.png"
+                            ],
+                            "frameRate": 12,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/players/drague_ony/drague-droit-w1.png",
+                                "assets/players/drague_ony/drague-droit-w2.png"
+                            ],
+                            "frameRate": 12,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "height": 110
+            }
         }
     }
 }

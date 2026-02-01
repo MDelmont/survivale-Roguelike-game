@@ -523,6 +523,266 @@
             },
             "threatLevel": 32,
             "weapon_id": ""
+        },
+        "enemy_admiratrice": {
+            "name": "Admiratrice Express",
+            "hp": 40,
+            "speed": 350,
+            "damage": 8,
+            "xpValue": 15,
+            "threatLevel": 12,
+            "radius": 15,
+            "color": "#ff69b4",
+            "visuals": {
+                "type": "sprite",
+                "directionMode": "4_way",
+                "hitFlash": true,
+                "animations": {
+                    "walk": {
+                        "up": {
+                            "frames": [
+                                "assets/monster/drague_ony/fan-girl-dos-w1.png",
+                                "assets/monster/drague_ony/fan-girl-dos-w2.png"
+                            ],
+                            "frameRate": 12,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/monster/drague_ony/fan-girl-face-w1.png",
+                                "assets/monster/drague_ony/fan-girl-face-w2.png"
+                            ],
+                            "frameRate": 12,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/monster/drague_ony/fan-girl-gauche-w1.png",
+                                "assets/monster/drague_ony/fan-girl-gauche-w2.png"
+                            ],
+                            "frameRate": 12,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/drague_ony/fan-girl-droite-w1.png",
+                                "assets/monster/drague_ony/fan-girl-droite-w2.png"
+                            ],
+                            "frameRate": 12,
+                            "loop": true
+                        }
+                    },
+                    "idle": {
+                        "up": {
+                            "frames": [
+                                "assets/monster/drague_ony/fan-girl-dos-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/monster/drague_ony/fan-girl-face-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/monster/drague_ony/fan-girl-gauche-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/drague_ony/fan-girl-droite-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": false,
+                "height": 110
+            },
+            "weapon_id": ""
+        },
+        "enemy_dragueur": {
+            "name": "Dragueur Collant",
+            "hp": 120,
+            "speed": 180,
+            "damage": 5,
+            "xpValue": 25,
+            "threatLevel": 20,
+            "radius": 18,
+            "color": "#4b0082",
+            "visuals": {
+                "type": "sprite",
+                "directionMode": "4_way",
+                "hitFlash": true,
+                "animations": {
+                    "walk": {
+                        "up": {
+                            "frames": [
+                                "assets/monster/drague_ony/mec-canon-dos-w1.png",
+                                "assets/monster/drague_ony/mec-canon-dos-w2.png"
+                            ],
+                            "frameRate": 8,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/monster/drague_ony/mec-canon-face-w1.png",
+                                "assets/monster/drague_ony/mec-canon-face-w2.png"
+                            ],
+                            "frameRate": 8,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/monster/drague_ony/mec-canon-gauche-w1.png",
+                                "assets/monster/drague_ony/mec-canon-gauche-w2.png"
+                            ],
+                            "frameRate": 8,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/drague_ony/mec-canon-droite-w1.png",
+                                "assets/monster/drague_ony/mec-canon-droite-w2.png"
+                            ],
+                            "frameRate": 8,
+                            "loop": true
+                        }
+                    },
+                    "idle": {
+                        "up": {
+                            "frames": [
+                                "assets/monster/drague_ony/mec-canon-dos-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/monster/drague_ony/mec-canon-face-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/monster/drague_ony/mec-canon-gauche-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/drague_ony/mec-canon-droite-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": false,
+                "height": 110
+            },
+            "weapon_id": ""
+        },
+        "enemy_ex_relou": {
+            "name": "Ex-Relou",
+            "hp": 200,
+            "speed": 100,
+            "damage": 15,
+            "xpValue": 40,
+            "threatLevel": 35,
+            "radius": 20,
+            "color": "#8b0000",
+            "visuals": {
+                "type": "sprite",
+                "directionMode": "4_way",
+                "hitFlash": true,
+                "animations": {
+                    "walk": {
+                        "up": {
+                            "frames": [
+                                "assets/monster/drague_ony/ex-dos-w1.png",
+                                "assets/monster/drague_ony/ex-dos-w2.png"
+                            ],
+                            "frameRate": 6,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/monster/drague_ony/ex-face-w1.png",
+                                "assets/monster/drague_ony/ex-face-w2.png"
+                            ],
+                            "frameRate": 6,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/monster/drague_ony/ex-gauche-w1.png",
+                                "assets/monster/drague_ony/ex-gauche-w2.png"
+                            ],
+                            "frameRate": 6,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/drague_ony/ex-droit-w1.png",
+                                "assets/monster/drague_ony/ex-droit-w2.png"
+                            ],
+                            "frameRate": 6,
+                            "loop": true
+                        }
+                    },
+                    "idle": {
+                        "up": {
+                            "frames": [
+                                "assets/monster/drague_ony/ex-dos-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/monster/drague_ony/ex-face-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/monster/drague_ony/ex-gauche-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/drague_ony/ex-droit-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": false,
+                "height": 110
+            },
+            "behavior": {
+                "type": "ranged",
+                "minDistance": 300,
+                "maxDistance": 400
+            },
+            "weapon_id": "new_weapon_ml499g2o"
         }
     }
 }

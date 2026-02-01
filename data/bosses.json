@@ -247,6 +247,52 @@
                 "height": 45
             },
             "weapon_id": ""
+        },
+        "boss_sandrine": {
+            "name": "Sandrine",
+            "hp": 12000,
+            "speed": 60,
+            "damage": 30,
+            "fireRate": 2000,
+            "attackPattern": "circle",
+            "movePattern": "fixed",
+            "radius": 85,
+            "color": "#ff00ff",
+            "visuals": {
+                "type": "sprite",
+                "width": 180,
+                "directionMode": "none",
+                "hitFlash": true,
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/boss/celib/sandrine_i.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": true
+            },
+            "projectileVisuals": {
+                "type": "sprite",
+                "width": 40,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/celib/coeur_boss.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "path": "assets/projectiles/celib/coeur_boss.png",
+                "angleOffset": 0,
+                "height": 40
+            },
+            "weapon_id": ""
         }
     }
 }

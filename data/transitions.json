@@ -251,6 +251,69 @@
                     "animation": "fade"
                 }
             ]
+        },
+        {
+            "id": "trans_celib_start",
+            "name": "celib-start",
+            "pages": [
+                {
+                    "title": "L'Épreuve du Célibat",
+                    "titleSize": 32,
+                    "titleColor": "#ff69b4",
+                    "hideTitle": false,
+                    "text": "Anthony est désormais un jeune adulte. Sa Rolls Royce intérieure est prête, mais le carburant de l'amour manque à l'appel. Dans la jungle urbaine du célibat, il doit naviguer entre admiratrices envahissantes et dragueurs collants pour enfin trouver Sandrine.",
+                    "textSize": 18,
+                    "textColor": "#ffffff",
+                    "hideText": false,
+                    "image": "",
+                    "background": "assets/fond/celib/celib_start.png",
+                    "duration": 6000,
+                    "music": "",
+                    "animation": "fade"
+                }
+            ]
+        },
+        {
+            "id": "trans_celib_win",
+            "name": "celib-win",
+            "pages": [
+                {
+                    "title": "La Rencontre",
+                    "titleSize": 32,
+                    "titleColor": "#ff00ff",
+                    "hideTitle": false,
+                    "text": "Ça y est ! L'ombre se dissipe et Sandrine apparaît. Le coup de foudre est immédiat. Inquiets, vos parents peuvent enfin souffler : le fiston a trouvé sa moitié.",
+                    "textSize": 18,
+                    "textColor": "#ffffff",
+                    "hideText": false,
+                    "image": "",
+                    "background": "assets/fond/celib/celib_win.png",
+                    "duration": 6000,
+                    "music": "",
+                    "animation": "fade"
+                }
+            ]
+        },
+        {
+            "id": "trans_celib_loose",
+            "name": "celib-loose",
+            "pages": [
+                {
+                    "title": "Retour au Nid",
+                    "titleSize": 32,
+                    "titleColor": "#ff0000",
+                    "hideTitle": false,
+                    "text": "Trop de malaise, trop de relous... Anthony retourne manger BK le vendredi soir avec ses parents. Retente ta chance, Tanguy !",
+                    "textSize": 18,
+                    "textColor": "#ffffff",
+                    "hideText": false,
+                    "image": "",
+                    "background": "assets/fond/celib/celib_loose.png",
+                    "duration": 6000,
+                    "music": "",
+                    "animation": "fade"
+                }
+            ]
         }
     ]
 }

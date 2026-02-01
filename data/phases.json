@@ -1,6 +1,47 @@
 {
     "phases": [
         {
+            "id": 5,
+            "name": "L'Épreuve du Célibat",
+            "duration_before_boss": 90,
+            "enemy_types": [
+                "enemy_admiratrice",
+                "enemy_dragueur",
+                "enemy_ex_relou"
+            ],
+            "player_id": "anthony_celib",
+            "spawn_rate": 800,
+            "default_weapon": "weapon_zone_rose",
+            "weapon_drop_rate": 0.2,
+            "available_weapons": [
+                "weapon_zone_rose",
+                "weapon_coeur_explosif",
+                "weapon_stick_labello"
+            ],
+            "boss_id": "boss_sandrine",
+            "background_image": "",
+            "xp_visual": "",
+            "xp_size": 20,
+            "weapon_visual": "",
+            "weapon_size": 40,
+            "story_intro": [],
+            "story_outro": [],
+            "difficulty_multiplier": 1.5,
+            "initial_threat_budget": 30,
+            "max_threat_budget": 300,
+            "threat_growth_rate": 25,
+            "transition_intro_id": "trans_celib_start",
+            "transition_outro_id": "trans_celib_win",
+            "transition_defeat_id": "trans_celib_loose",
+            "available_upgrades": [
+                "upgrade_cine",
+                "upgrade_bague_celib",
+                "upgrade_gamer_stats",
+                "new_upgrade_1769985103319",
+                "new_upgrade_1769985156241"
+            ]
+        },
+        {
             "id": 4,
             "name": "Véhicule en Folie",
             "duration_before_boss": 60,
