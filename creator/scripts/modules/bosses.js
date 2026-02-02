@@ -36,7 +36,8 @@ class BossesModule {
             { value: 'constant', label: 'Constant - Suit le joueur' },
             { value: 'fixed', label: 'Fixed - Reste à une position fixe' },
             { value: 'rush', label: 'Rush - Charge vers le joueur' },
-            { value: 'stalker', label: 'Stalker - Suit avec des pauses' }
+            { value: 'stalker', label: 'Stalker - Suit avec des pauses' },
+            { value: 'flee', label: 'Flee - Fuit le joueur' }
         ];
     }
 
@@ -866,7 +867,7 @@ class BossesModule {
         else delete b.projectileVisuals.height;
         b.projectileVisuals.directionMode = document.getElementById('projDirMode')?.value || 'rotate';
         b.projectileVisuals.angleOffset = parseInt(document.getElementById('projAngleOffset')?.value) || 0;
-        
+
         const pRadius = document.getElementById('projRadius')?.value;
         if (pRadius) b.projectileRadius = parseInt(pRadius);
         else delete b.projectileRadius;

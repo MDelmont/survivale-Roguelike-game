@@ -262,10 +262,11 @@ class EnemiesModule {
                             <select class="form-select" id="enemyBehaviorType">
                                 <option value="chase" ${e.behavior?.type === 'chase' || !e.behavior ? 'selected' : ''}>Chase (Fonce sur le joueur)</option>
                                 <option value="ranged" ${e.behavior?.type === 'ranged' ? 'selected' : ''}>Ranged (Reste à distance)</option>
+                                <option value="flee" ${e.behavior?.type === 'flee' ? 'selected' : ''}>Flee (Fuit le joueur)</option>
                             </select>
                         </div>
                     </div>
-                    <div class="form-row" id="rangedBehaviorParams" style="display: ${e.behavior?.type === 'ranged' ? 'flex' : 'none'}">
+                    <div class="form-row" id="rangedBehaviorParams" style="display: ${(e.behavior?.type === 'ranged' || e.behavior?.type === 'flee') ? 'flex' : 'none'}">
                         <div class="form-group">
                             <label class="form-label">Distance Min (Fuit si <)</label>
                             <input type="number" class="form-input" id="enemyMinDist" value="${e.behavior?.minDistance || 200}">
@@ -653,7 +654,7 @@ class EnemiesModule {
                     const type = e.target.value;
                     const params = document.getElementById('rangedBehaviorParams');
                     if (params) {
-                        params.style.display = type === 'ranged' ? 'flex' : 'none';
+                        params.style.display = (type === 'ranged' || type === 'flee') ? 'flex' : 'none';
                     }
                     this.updateEnemyFromForm();
                 });

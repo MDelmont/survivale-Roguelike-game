@@ -3,7 +3,7 @@
         {
             "id": 5,
             "name": "L'Épreuve du Célibat",
-            "duration_before_boss": 90,
+            "duration_before_boss": 60,
             "enemy_types": [
                 "enemy_admiratrice",
                 "enemy_dragueur",

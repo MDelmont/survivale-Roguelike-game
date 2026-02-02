@@ -1212,6 +1212,55 @@
             "description": "",
             "category": "",
             "preview": ""
+        },
+        {
+            "id": "new_weapon_ml5s9gnx",
+            "name": "parle a ma  main",
+            "type": "attack",
+            "stats": {
+                "damage": 20,
+                "fireRate": 850,
+                "projectileSpeed": 400,
+                "projectileCount": 2,
+                "piercingCount": 0,
+                "radius": 5,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": false,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5
+            },
+            "upgrades": [
+                {
+                    "name": "Nouvelle Amélioration",
+                    "preview": "",
+                    "stats": {}
+                }
+            ],
+            "visuals": {
+                "path": "assets/projectiles/proj_main.png",
+                "width": 43,
+                "rotateWithVelocity": true,
+                "angleOffset": -90,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/proj_main.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "",
+            "category": "",
+            "preview": ""
         }
     ]
 }

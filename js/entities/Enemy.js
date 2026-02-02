@@ -90,6 +90,17 @@ export class Enemy {
                 moveX = 0;
                 moveY = 0;
             }
+        } else if (behavior.type === 'flee') {
+            const fleeDistance = behavior.minDistance || 400;
+            if (dist < fleeDistance) {
+                // Trop proche : on fuit
+                moveX = -dx;
+                moveY = -dy;
+            } else {
+                // Loin : on reste sur place
+                moveX = 0;
+                moveY = 0;
+            }
         } else {
             // Par défaut 'chase' : foncer vers le joueur
             moveX = dx;

@@ -31,9 +31,24 @@ export class Boss extends Enemy {
         this.behaviorPhase = 0;
     }
 
-    update(deltaTime, player, onShoot, forceState = null) {
+    update(deltaTime, player, onShoot, context = {}, forceState = null) {
+        const oldX = this.x;
+        const oldY = this.y;
+
         // Logique de mouvement spécifique
         this.handleMovement(deltaTime, player);
+
+        // Contrainte : rester dans l'écran visible si on y était déjà
+        if (context.logicalWidth && context.logicalHeight) {
+            const margin = this.radius;
+            const wasOnScreen = oldX >= -margin && oldX <= context.logicalWidth + margin &&
+                oldY >= -margin && oldY <= context.logicalHeight + margin;
+
+            if (wasOnScreen) {
+                this.x = Math.max(margin, Math.min(context.logicalWidth - margin, this.x));
+                this.y = Math.max(margin, Math.min(context.logicalHeight - margin, this.y));
+            }
+        }
 
         this.time += deltaTime;
 
@@ -182,6 +197,32 @@ export class Boss extends Enemy {
 
                         // Petit mouvement de flottement purement positionnel (ignoré par l'animateur)
                         this.y += Math.sin(this.time / 500) * 0.5;
+                    }
+                }
+                break;
+
+            case 'flee':
+                if (player) {
+                    const dx = player.x - this.x;
+                    const dy = player.y - this.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const fleeDistance = 400; // Distance à laquelle il commence à fuir
+
+                    if (dist < fleeDistance) {
+                        // Trop proche : on fuit à pleine vitesse
+                        this.velocity.x = (-dx / dist) * this.speed;
+                        this.velocity.y = (-dy / dist) * this.speed;
+                        this.x += this.velocity.x * dt;
+                        this.y += this.velocity.y * dt;
+
+                        // On s'oriente dans la direction de la fuite
+                        this.angle = Math.atan2(this.velocity.y, this.velocity.x);
+                    } else {
+                        // Loin : on s'arrête ou on flotte (et on regarde le joueur par défaut)
+                        this.velocity.x = 0;
+                        this.velocity.y = 0;
+                        this.y += Math.sin(this.time / 500) * 0.5;
+                        this.angle = Math.atan2(dy, dx);
                     }
                 }
                 break;
