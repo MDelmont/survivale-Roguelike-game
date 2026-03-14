@@ -405,6 +405,36 @@
                             "frameRate": 10,
                             "loop": true
                         }
+                    },
+                    "idle": {
+                        "up": {
+                            "frames": [
+                                "assets/boss/mariage/Mariage_sandrine-dos-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/boss/mariage/Mariage_sandrine-face-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/boss/mariage/Mariage_sandrine-gauche-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/boss/mariage/Mariage_sandrine-droite-i.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
                     }
                 },
                 "angleOffset": 0,
