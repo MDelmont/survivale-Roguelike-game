@@ -1304,6 +1304,49 @@
             "description": "projectile",
             "category": "",
             "preview": ""
+        },
+        {
+            "id": "new_weapon_mmqiajty",
+            "name": "Sandrine_Joker",
+            "type": "attack",
+            "stats": {
+                "damage": 20,
+                "fireRate": 500,
+                "projectileSpeed": 400,
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "radius": 5,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0.4,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": false,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5
+            },
+            "upgrades": [],
+            "visuals": {
+                "path": "assets/projectiles/projectile-tete-sandrine.png",
+                "width": 60,
+                "rotateWithVelocity": true,
+                "angleOffset": 0,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/projectile-tete-sandrine.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "Sandrine te soutien !",
+            "category": "projectile",
+            "preview": ""
         }
     ]
 }

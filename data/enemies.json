@@ -838,6 +838,64 @@
             },
             "threatLevel": 10,
             "weapon_id": "new_weapon_mmq5u2tn"
+        },
+        "new_enemy_1773507531859": {
+            "name": "bouteille megot",
+            "hp": 250,
+            "speed": 50,
+            "damage": 5,
+            "xpValue": 10,
+            "radius": 12,
+            "color": "#ff5555",
+            "visuals": {
+                "type": "sprite",
+                "directionMode": "flip",
+                "hitFlash": true,
+                "animations": {
+                    "walk": {
+                        "frames": [
+                            "assets/monster/mariage/monstre-megot-bouteille-face-w1.png",
+                            "assets/monster/mariage/monstre-megot-bouteille-face-w2.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": true,
+                "height": 250
+            },
+            "threatLevel": 10,
+            "weapon_id": ""
+        },
+        "new_enemy_1773514210113": {
+            "name": "pote tete",
+            "hp": 20,
+            "speed": 100,
+            "damage": 5,
+            "xpValue": 10,
+            "radius": 12,
+            "color": "#ff5555",
+            "visuals": {
+                "type": "sprite",
+                "width": 180,
+                "directionMode": "flip",
+                "hitFlash": true,
+                "animations": {
+                    "walk": {
+                        "frames": [
+                            "assets/monster/mariage/monster_potes_face_w1.png",
+                            "assets/monster/mariage/monster_potes_face_w2.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": false
+            },
+            "threatLevel": 10,
+            "weapon_id": ""
         }
     }
 }

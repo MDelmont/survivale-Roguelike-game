@@ -3,18 +3,22 @@
         {
             "id": 6,
             "name": "mariage",
-            "duration_before_boss": 10,
+            "duration_before_boss": 60,
             "enemy_types": [
-                "new_enemy_1773482610998"
+                "new_enemy_1773482610998",
+                "new_enemy_1773507531859",
+                "new_enemy_1773514210113"
             ],
             "player_id": "anthony_celib",
             "spawn_rate": 1000,
-            "default_weapon": "basic_shot",
+            "default_weapon": "new_weapon_mmqiajty",
             "weapon_drop_rate": 0.25,
-            "available_weapons": [],
+            "available_weapons": [
+                "new_weapon_mmqiajty"
+            ],
             "boss_id": "new_boss_1773242652380",
             "background_image": "assets/fond/mariage/mariage.png",
-            "xp_visual": "",
+            "xp_visual": "assets/experiences/exp-champagne.png",
             "xp_size": 20,
             "weapon_visual": "",
             "weapon_size": 30,
@@ -23,7 +27,7 @@
             "difficulty_multiplier": 1,
             "initial_threat_budget": 20,
             "max_threat_budget": 200,
-            "threat_growth_rate": 0.5,
+            "threat_growth_rate": 5,
             "transition_intro_id": "transition_1773482905667",
             "transition_outro_id": "transition_1773483050651",
             "available_upgrades": [],
