@@ -351,6 +351,83 @@
             },
             "weapon_id": "new_weapon_ml5s9gnx",
             "projectileRadius": 20
+        },
+        "new_boss_1773242652380": {
+            "name": "Sandrine _mariage",
+            "hp": 2000,
+            "speed": 50,
+            "damage": 20,
+            "fireRate": 1500,
+            "attackPattern": "oscillator",
+            "movePattern": "fixed",
+            "radius": 80,
+            "color": "#ff3333",
+            "visuals": {
+                "type": "sprite",
+                "width": 128,
+                "directionMode": "4_way",
+                "hitFlash": true,
+                "animations": {
+                    "walk": {
+                        "up": {
+                            "frames": [
+                                "assets/boss/mariage/Mariage_sandrine-dos-w1.png",
+                                "assets/boss/mariage/Mariage_sandrine-dos-i.png",
+                                "assets/boss/mariage/Mariage_sandrine-dos-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/boss/mariage/Mariage_sandrine-face-w1.png",
+                                "assets/boss/mariage/Mariage_sandrine-face-i.png",
+                                "assets/boss/mariage/Mariage_sandrine-face-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/boss/mariage/Mariage_sandrine-gauche-w1.png",
+                                "assets/boss/mariage/Mariage_sandrine-gauche-i.png",
+                                "assets/boss/mariage/Mariage_sandrine-gauche-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/boss/mariage/Mariage_sandrine-droite-w1.png",
+                                "assets/boss/mariage/Mariage_sandrine-droite-i.png",
+                                "assets/boss/mariage/Mariage_sandrine-droite-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": false
+            },
+            "projectileVisuals": {
+                "type": "sprite",
+                "width": 40,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/contrat-de-mariage.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                },
+                "path": "assets/projectiles/contrat-de-mariage.png",
+                "angleOffset": 90
+            },
+            "weapon_id": "",
+            "projectileRadius": 20
         }
     }
 }

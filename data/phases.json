@@ -1,6 +1,35 @@
 {
     "phases": [
         {
+            "id": 6,
+            "name": "mariage",
+            "duration_before_boss": 10,
+            "enemy_types": [
+                "new_enemy_1773482610998"
+            ],
+            "player_id": "anthony_celib",
+            "spawn_rate": 1000,
+            "default_weapon": "basic_shot",
+            "weapon_drop_rate": 0.25,
+            "available_weapons": [],
+            "boss_id": "new_boss_1773242652380",
+            "background_image": "assets/fond/mariage/mariage.png",
+            "xp_visual": "",
+            "xp_size": 20,
+            "weapon_visual": "",
+            "weapon_size": 30,
+            "story_intro": [],
+            "story_outro": [],
+            "difficulty_multiplier": 1,
+            "initial_threat_budget": 20,
+            "max_threat_budget": 200,
+            "threat_growth_rate": 0.5,
+            "transition_intro_id": "transition_1773482905667",
+            "transition_outro_id": "transition_1773483050651",
+            "available_upgrades": [],
+            "transition_defeat_id": "transition_1773483028050"
+        },
+        {
             "id": 1,
             "name": "La Conception",
             "duration_before_boss": 60,
@@ -48,43 +77,6 @@
             "transition_defeat_id": "transition_1768064926813"
         },
         {
-            "id": 3,
-            "name": "Baby fat aventure",
-            "duration_before_boss": 60,
-            "enemy_types": [
-                "new_enemy_1769548498337",
-                "new_enemy_1769548647524"
-            ],
-            "player_id": "player_1769291289336",
-            "spawn_rate": 1000,
-            "default_weapon": "Lance_tetine",
-            "weapon_drop_rate": 0.4,
-            "available_weapons": [
-                "Lance_tetine",
-                "Lance_couche-pleine"
-            ],
-            "boss_id": "new_boss_1769440570918",
-            "background_image": "assets/fond/peluche-bebe/fond-maison-bebe.png",
-            "xp_visual": "assets/experiences/milk-exp.png",
-            "xp_size": 20,
-            "weapon_visual": "assets/armes/lance-couche.png",
-            "weapon_size": 30,
-            "story_intro": [],
-            "story_outro": [],
-            "difficulty_multiplier": 1.5,
-            "initial_threat_budget": 50,
-            "max_threat_budget": 200,
-            "threat_growth_rate": 0.5,
-            "transition_intro_id": "transition_1769549010270",
-            "transition_outro_id": "transition_1769549077736",
-            "available_upgrades": [
-                "baby_projectiles",
-                "baby_speed",
-                "baby_piercing"
-            ],
-            "transition_defeat_id": "transition_1769549046085"
-        },
-        {
             "id": 2,
             "name": "playmobile-dog",
             "duration_before_boss": 60,
@@ -123,6 +115,43 @@
                 "new_upgrade_1769272556776"
             ],
             "transition_defeat_id": "transition_1769206080497"
+        },
+        {
+            "id": 3,
+            "name": "Baby fat aventure",
+            "duration_before_boss": 60,
+            "enemy_types": [
+                "new_enemy_1769548498337",
+                "new_enemy_1769548647524"
+            ],
+            "player_id": "player_1769291289336",
+            "spawn_rate": 1000,
+            "default_weapon": "Lance_tetine",
+            "weapon_drop_rate": 0.4,
+            "available_weapons": [
+                "Lance_tetine",
+                "Lance_couche-pleine"
+            ],
+            "boss_id": "new_boss_1769440570918",
+            "background_image": "assets/fond/peluche-bebe/fond-maison-bebe.png",
+            "xp_visual": "assets/experiences/milk-exp.png",
+            "xp_size": 20,
+            "weapon_visual": "assets/armes/lance-couche.png",
+            "weapon_size": 30,
+            "story_intro": [],
+            "story_outro": [],
+            "difficulty_multiplier": 1.5,
+            "initial_threat_budget": 50,
+            "max_threat_budget": 200,
+            "threat_growth_rate": 0.5,
+            "transition_intro_id": "transition_1769549010270",
+            "transition_outro_id": "transition_1769549077736",
+            "available_upgrades": [
+                "baby_projectiles",
+                "baby_speed",
+                "baby_piercing"
+            ],
+            "transition_defeat_id": "transition_1769549046085"
         },
         {
             "id": 4,
@@ -186,7 +215,7 @@
                 "weapon_stick_labello"
             ],
             "boss_id": "boss_sandrine",
-            "background_image": "assets/fond/ony-love/fond-love-ony.png",
+            "background_image": "assets/fond/mariage/mariage.png",
             "xp_visual": "",
             "xp_size": 20,
             "weapon_visual": "",

@@ -314,6 +314,69 @@
                     "animation": "fade"
                 }
             ]
+        },
+        {
+            "id": "transition_1773482905667",
+            "name": "Mariage-start",
+            "pages": [
+                {
+                    "title": "Nouveau Titre",
+                    "titleSize": 24,
+                    "titleColor": "#6366f1",
+                    "hideTitle": true,
+                    "text": "Nouveau texte...",
+                    "textSize": 16,
+                    "textColor": "#ffffff",
+                    "hideText": true,
+                    "image": "",
+                    "background": "assets/fond/mariage/fond-mariage-start.png",
+                    "duration": 5001,
+                    "music": "",
+                    "animation": "fade"
+                }
+            ]
+        },
+        {
+            "id": "transition_1773483028050",
+            "name": "mariage-loose",
+            "pages": [
+                {
+                    "title": "Nouveau Titre",
+                    "titleSize": 24,
+                    "titleColor": "#6366f1",
+                    "hideTitle": true,
+                    "text": "Nouveau texte...",
+                    "textSize": 16,
+                    "textColor": "#ffffff",
+                    "hideText": true,
+                    "image": "",
+                    "background": "assets/fond/mariage/fond-mariage-loose.png",
+                    "duration": 5000,
+                    "music": "",
+                    "animation": "fade"
+                }
+            ]
+        },
+        {
+            "id": "transition_1773483050651",
+            "name": "mariage-win",
+            "pages": [
+                {
+                    "title": "Nouveau Titre",
+                    "titleSize": 24,
+                    "titleColor": "#6366f1",
+                    "hideTitle": true,
+                    "text": "Nouveau texte...",
+                    "textSize": 16,
+                    "textColor": "#ffffff",
+                    "hideText": true,
+                    "image": "",
+                    "background": "assets/fond/mariage/fond-mariage-end.png",
+                    "duration": 5000,
+                    "music": "",
+                    "animation": "fade"
+                }
+            ]
         }
     ]
 }

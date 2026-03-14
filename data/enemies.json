@@ -783,6 +783,61 @@
                 "maxDistance": 400
             },
             "weapon_id": "new_weapon_ml499g2o"
+        },
+        "new_enemy_1773482610998": {
+            "name": "pote_bourée",
+            "hp": 20,
+            "speed": 100,
+            "damage": 5,
+            "xpValue": 10,
+            "radius": 12,
+            "color": "#ff5555",
+            "visuals": {
+                "type": "sprite",
+                "height": 110,
+                "directionMode": "2_way",
+                "hitFlash": true,
+                "animations": {
+                    "idle": {
+                        "left": {
+                            "frames": [
+                                "assets/monster/mariage/Monstre-Mariage-gauche-i.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/mariage/Monstre-Mariage-droite-i.png"
+                            ],
+                            "frameRate": 1,
+                            "loop": true
+                        }
+                    },
+                    "walk": {
+                        "left": {
+                            "frames": [
+                                "assets/monster/mariage/Monstre-Mariage-gauche-i.png",
+                                "assets/monster/mariage/Monstre-Mariage-gauche-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/monster/mariage/Monstre-Mariage-droite-i.png",
+                                "assets/monster/mariage/Monstre-Mariage-droite-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "pixelPerfect": false
+            },
+            "threatLevel": 10,
+            "weapon_id": "new_weapon_mmq5u2tn"
         }
     }
 }
