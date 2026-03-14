@@ -223,6 +223,54 @@
             "type": "stat",
             "stat": "piercingBonus",
             "add": 1
+        },
+        {
+            "id": "mariage_alliance",
+            "name": "L'Alliance forgée",
+            "description": "L'anneau unique qui te lie pour la vie. Ta force est décuplée !",
+            "type": "stat",
+            "stat": "damage",
+            "multiplier": 1.25
+        },
+        {
+            "id": "mariage_piece_montee",
+            "name": "Pièce Montée",
+            "description": "Une montagne de choux et de nougatine pour tenir jusqu'au bout de la nuit.",
+            "type": "stat",
+            "stat": "maxHp",
+            "add": 50
+        },
+        {
+            "id": "mariage_champagne",
+            "name": "Fontaine à Champagne",
+            "description": "Les petites bulles te montent à la tête, tu vas beaucoup plus vite !",
+            "type": "stat",
+            "stat": "speed",
+            "multiplier": 1.2
+        },
+        {
+            "id": "mariage_temoins",
+            "name": "Soutien des Témoins",
+            "description": "Tes gars sûrs sont là pour doubler la puissance de feu !",
+            "type": "stat",
+            "stat": "projectileBonus",
+            "add": 1
+        },
+        {
+            "id": "mariage_dj",
+            "name": "La Chenille du DJ",
+            "description": "Le rythme effréné de la musique s'empare de toi, tu attaques en rafale !",
+            "type": "stat",
+            "stat": "fireRate",
+            "multiplier": 1.2
+        },
+        {
+            "id": "mariage_costume",
+            "name": "Costume Sur-Mesure",
+            "description": "Une élégance à toute épreuve, tes attaques transpercent les invités.",
+            "type": "stat",
+            "stat": "piercingBonus",
+            "add": 1
         }
     ]
 }

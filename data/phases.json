@@ -2,7 +2,7 @@
     "phases": [
         {
             "id": 6,
-            "name": "mariage",
+            "name": "Le mariage",
             "duration_before_boss": 60,
             "enemy_types": [
                 "new_enemy_1773482610998",
@@ -12,7 +12,7 @@
             "player_id": "anthony_celib",
             "spawn_rate": 1000,
             "default_weapon": "new_weapon_mmqiajty",
-            "weapon_drop_rate": 0.25,
+            "weapon_drop_rate": 1,
             "available_weapons": [
                 "new_weapon_mmqiajty"
             ],
@@ -20,8 +20,8 @@
             "background_image": "assets/fond/mariage/mariage.png",
             "xp_visual": "assets/experiences/exp-champagne.png",
             "xp_size": 20,
-            "weapon_visual": "",
-            "weapon_size": 30,
+            "weapon_visual": "assets/armes/arme_mariage.png",
+            "weapon_size": 60,
             "story_intro": [],
             "story_outro": [],
             "difficulty_multiplier": 1,
@@ -30,7 +30,14 @@
             "threat_growth_rate": 5,
             "transition_intro_id": "transition_1773482905667",
             "transition_outro_id": "transition_1773483050651",
-            "available_upgrades": [],
+            "available_upgrades": [
+                "mariage_alliance",
+                "mariage_piece_montee",
+                "mariage_champagne",
+                "mariage_temoins",
+                "mariage_dj",
+                "mariage_costume"
+            ],
             "transition_defeat_id": "transition_1773483028050"
         },
         {
