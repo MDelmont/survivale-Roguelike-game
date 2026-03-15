@@ -342,7 +342,7 @@
                         },
                         "right": {
                             "frames": [
-                                "assets/players/drague_ony/drague-droite-i.png"
+                                "assets/players/drague_ony/drague-droit-i.png"
                             ],
                             "frameRate": 10,
                             "loop": true
