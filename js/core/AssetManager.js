@@ -6,30 +6,37 @@ export class AssetManager {
     constructor(basePath = '') {
         this.basePath = basePath;
         this.images = new Map();
-        this.alphaData = new Map(); // Cache des données alpha (transparence)
+        this.alphaData = new Map();
         this.loadingPromises = [];
+        this.loadedCount = 0;
+        this.totalCount = 0;
+        this.onProgress = null; // callback(loaded, total)
     }
 
     /**
      * Charge une image et la met en cache.
-     * @param {string} path 
-     * @returns {Promise<HTMLImageElement>}
      */
     loadImage(path) {
         if (this.images.has(path)) {
             return Promise.resolve(this.images.get(path));
         }
 
-        const promise = new Promise((resolve, reject) => {
+        this.totalCount++;
+
+        const promise = new Promise((resolve) => {
             const img = new Image();
             img.src = this.basePath + path;
             img.onload = () => {
                 this.images.set(path, img);
+                this.loadedCount++;
+                if (this.onProgress) this.onProgress(this.loadedCount, this.totalCount);
                 resolve(img);
             };
             img.onerror = () => {
                 console.error(`Impossible de charger l'image : ${path}`);
-                reject(new Error(`Failed to load image at ${path}`));
+                this.loadedCount++;
+                if (this.onProgress) this.onProgress(this.loadedCount, this.totalCount);
+                resolve(null); // Don't reject, just skip broken images
             };
         });
 

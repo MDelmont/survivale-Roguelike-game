@@ -92,8 +92,30 @@ class Game {
     async init() {
         this.handleResize();
         window.addEventListener('resize', () => this.handleResize());
+
+        // Connexion de la barre de progression
+        const loadingBar = document.getElementById('loading-bar');
+        const loadingSubtitle = document.getElementById('loading-subtitle');
+        this.dataManager.assetManager.onProgress = (loaded, total) => {
+            if (loadingBar && total > 0) {
+                const pct = Math.round((loaded / total) * 100);
+                loadingBar.style.width = pct + '%';
+                if (loadingSubtitle) loadingSubtitle.textContent = `Chargement... ${loaded}/${total}`;
+            }
+        };
+
         const success = await this.dataManager.loadAll();
         if (!success) return;
+
+        // Cacher l'écran de chargement avec une transition
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            if (loadingBar) loadingBar.style.width = '100%';
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                setTimeout(() => loadingScreen.remove(), 700);
+            }, 300);
+        }
 
         // Initialize Systems with dynamic data
         this.upgradeSystem.init(this.dataManager.data.upgrades?.upgrades);
