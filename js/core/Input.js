@@ -100,35 +100,51 @@ export class Input {
 
     draw(ctx) {
         if (this.joystickActive && this.touchStart) {
-            // Base du joystick
+            const baseX = this.touchStart.x;
+            const baseY = this.touchStart.y;
+            const radius = 60;
+
+            // Base circle (outer ring)
             ctx.beginPath();
-            ctx.arc(this.touchStart.x, this.touchStart.y, 50, 0, Math.PI * 2);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.lineWidth = 2;
+            ctx.arc(baseX, baseY, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(0, 212, 255, 0.2)';
+            ctx.lineWidth = 3;
             ctx.stroke();
 
-            // Stick
-            const stickX = this.touchMove ? this.touchMove.x : this.touchStart.x;
-            const stickY = this.touchMove ? this.touchMove.y : this.touchStart.y;
+            // Base fill
+            ctx.beginPath();
+            ctx.arc(baseX, baseY, radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0, 212, 255, 0.05)';
+            ctx.fill();
 
-            // Limiter le stick à la base
-            const dx = stickX - this.touchStart.x;
-            const dy = stickY - this.touchStart.y;
+            // Stick position
+            const stickX = this.touchMove ? this.touchMove.x : baseX;
+            const stickY = this.touchMove ? this.touchMove.y : baseY;
+
+            const dx = stickX - baseX;
+            const dy = stickY - baseY;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            const limit = 50;
+            const limit = radius;
 
             let finalX = stickX;
             let finalY = stickY;
 
             if (dist > limit) {
-                finalX = this.touchStart.x + (dx / dist) * limit;
-                finalY = this.touchStart.y + (dy / dist) * limit;
+                finalX = baseX + (dx / dist) * limit;
+                finalY = baseY + (dy / dist) * limit;
             }
 
+            // Stick inner dot with glow
+            ctx.shadowColor = 'rgba(0, 212, 255, 0.8)';
+            ctx.shadowBlur = 15;
             ctx.beginPath();
-            ctx.arc(finalX, finalY, 25, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.arc(finalX, finalY, 28, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0, 212, 255, 0.4)';
             ctx.fill();
+            ctx.strokeStyle = 'rgba(0, 212, 255, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
         }
     }
 }

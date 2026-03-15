@@ -108,6 +108,56 @@ class Game {
 
         this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
 
+        // ===== SUPPORT TACTILE MOBILE =====
+        this._touchStartX = 0;
+        this._touchStartY = 0;
+        this._touchScrolling = false;
+
+        this.canvas.addEventListener('touchstart', (e) => {
+            // Prevent default only for UI screens to avoid scrolling conflict
+            const touch = e.touches[0];
+            const rect = this.canvas.getBoundingClientRect();
+            this._touchStartX = (touch.clientX - rect.left) / this.scale;
+            this._touchStartY = (touch.clientY - rect.top) / this.scale;
+            this._touchScrolling = false;
+
+            // Update hover state for UI screens
+            this.mouseX = this._touchStartX;
+            this.mouseY = this._touchStartY;
+        }, { passive: true });
+
+        this.canvas.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            const rect = this.canvas.getBoundingClientRect();
+            const currentY = (touch.clientY - rect.top) / this.scale;
+            const deltaY = this._touchStartY - currentY;
+
+            // Bestiary scroll on swipe
+            if (this.state === GameState.BESTIARY && this.bestiaryScreen) {
+                if (Math.abs(deltaY) > 5) {
+                    this._touchScrolling = true;
+                    this.bestiaryScreen.handleWheel(deltaY * 2);
+                    this._touchStartY = currentY; // reset so it scrolls continuously
+                }
+            }
+
+            // Update mouse pos for hover effects
+            this.mouseX = (touch.clientX - rect.left) / this.scale;
+            this.mouseY = (touch.clientY - rect.top) / this.scale;
+        }, { passive: true });
+
+        this.canvas.addEventListener('touchend', (e) => {
+            // If we were not scrolling, treat it as a click
+            if (!this._touchScrolling) {
+                const fakeEvent = {
+                    clientX: e.changedTouches[0].clientX,
+                    clientY: e.changedTouches[0].clientY
+                };
+                this.handleCanvasClick(fakeEvent);
+            }
+        }, { passive: true });
+        // ===== FIN SUPPORT TACTILE =====
+
         // Mouse tracking for hover effects
         this.canvas.addEventListener('mousemove', (e) => {
             const rect = this.canvas.getBoundingClientRect();
