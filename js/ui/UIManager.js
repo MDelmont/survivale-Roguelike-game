@@ -397,7 +397,7 @@ export function drawTextWithOutline(ctx, text, x, y, options = {}) {
 /**
  * Draw a rounded rectangle path
  */
-function roundRect(ctx, x, y, width, height, radius) {
+export function roundRect(ctx, x, y, width, height, radius) {
     if (typeof radius === 'number') {
         radius = { tl: radius, tr: radius, br: radius, bl: radius };
     }

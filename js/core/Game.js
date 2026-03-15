@@ -236,11 +236,12 @@ class Game {
         if (this.currentPhase.transition_intro_id) {
             const transition = this.dataManager.getTransitionData(this.currentPhase.transition_intro_id);
             if (transition) {
+                this.saveSystem.saveDiscoveredEntity('transitions', transition.id);
                 this.openStory(transition.pages, () => {
                     this.player = null; // S'assurer que le joueur est reset
                     this.setupInitialPlayer();
                     this.state = GameState.PLAYING;
-                });
+                }, transition.id);
                 return;
             }
         }
@@ -345,7 +346,14 @@ class Game {
                 return;
             }
         } else if (this.state === GameState.STORY) {
-            this.nextStoryPage();
+            // Vérifier si le clic est sur le bouton SUIVANT
+            if (this._storyBtnX !== undefined) {
+                const bx = this._storyBtnX, by = this._storyBtnY;
+                const bw = this._storyBtnW, bh = this._storyBtnH;
+                if (mouseX >= bx && mouseX <= bx + bw && mouseY >= by && mouseY <= by + bh) {
+                    this.nextStoryPage();
+                }
+            }
         } else if (this.state === GameState.UPGRADE && this.levelUpScreen) {
             const choice = this.levelUpScreen.handleClick(mouseX, mouseY);
             if (choice) {
@@ -654,10 +662,11 @@ class Game {
         if (this.currentPhase.transition_outro_id) {
             const transition = this.dataManager.getTransitionData(this.currentPhase.transition_outro_id);
             if (transition) {
+                this.saveSystem.saveDiscoveredEntity('transitions', transition.id);
                 this.openStory(transition.pages, () => {
                     this.state = GameState.VICTORY;
                     if (this.victoryScreen) this.victoryScreen.reset();
-                });
+                }, transition.id);
                 return;
             }
         }
@@ -679,10 +688,11 @@ class Game {
         if (this.currentPhase && this.currentPhase.transition_defeat_id) {
             const transition = this.dataManager.getTransitionData(this.currentPhase.transition_defeat_id);
             if (transition) {
+                this.saveSystem.saveDiscoveredEntity('transitions', transition.id);
                 this.openStory(transition.pages, () => {
                     this.exitFullscreen();
                     this.state = GameState.MENU;
-                });
+                }, transition.id);
                 return;
             }
         }
@@ -1085,14 +1095,48 @@ class Game {
             ctx.drawImage(img, w / 2 - imgW / 2, 100, imgW, imgH);
         }
 
-        // Final prompt
-        ctx.fillStyle = 'white';
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 3;
-        ctx.font = 'bold 18px Inter, Arial';
+        // Bouton SUIVANT en bas de l'écran
+        const btnW = 260;
+        const btnH = 60;
+        const btnX = w / 2 - btnW / 2;
+        const btnY = h - 90;
+
+        // Store hitbox for click detection
+        this._storyBtnX = btnX;
+        this._storyBtnY = btnY;
+        this._storyBtnW = btnW;
+        this._storyBtnH = btnH;
+
+        // Draw button background
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 212, 255, 0.6)';
+        ctx.shadowBlur = 20;
+        ctx.fillStyle = 'rgba(0, 212, 255, 0.15)';
+        ctx.beginPath();
+        ctx.roundRect(btnX, btnY, btnW, btnH, 12);
+        ctx.fill();
+        ctx.strokeStyle = '#00d4ff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Button text
+        const btnLabel = 'SUIVANT ▶';
+        ctx.fillStyle = '#00d4ff';
+        ctx.font = 'bold 22px Orbitron, Courier New, monospace';
         ctx.textAlign = 'center';
-        ctx.strokeText('CLIQUE POUR CONTINUER...', w / 2, h - 50);
-        ctx.fillText('CLIQUE POUR CONTINUER...', w / 2, h - 50);
+        ctx.textBaseline = 'middle';
+        ctx.fillText(btnLabel, w / 2, btnY + btnH / 2);
+        ctx.restore();
+
+        // Page counter
+        if (this.storyQueue.length > 1) {
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.font = '14px Inter, Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'alphabetic';
+            ctx.fillText(`${this.storyPageIndex + 1} / ${this.storyQueue.length}`, w / 2, btnY - 15);
+        }
 
         // Story content box
         if (!page.hideTitle || !page.hideText) {
@@ -1176,11 +1220,16 @@ class Game {
         ctx.drawImage(img, sX, sY, sW, sH, 0, 0, targetW, targetH);
     }
 
-    openStory(queue, callback) {
+    openStory(queue, callback, transitionId = null) {
         this.storyQueue = queue;
         this.storyPageIndex = 0;
         this.onStoryComplete = callback;
         this.state = GameState.STORY;
+        this._storyBtnX = undefined; // Reset button hitbox
+        
+        if (transitionId) {
+            this.saveSystem.saveDiscoveredEntity('transitions', transitionId);
+        }
     }
 
     nextStoryPage() {

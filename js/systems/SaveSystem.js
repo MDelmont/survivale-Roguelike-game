@@ -58,4 +58,13 @@ export class SaveSystem {
         const saved = localStorage.getItem(bestiaryKey);
         return saved ? JSON.parse(saved) : [];
     }
+
+    /**
+     * Vérifie si une entité a été découverte
+     */
+    isEntityDiscovered(type, id) {
+        if (!id) return false;
+        const currentData = this.getDiscoveredEntities(type);
+        return currentData.includes(id);
+    }
 }
