@@ -31,6 +31,31 @@ export class SaveSystem {
      */
     resetProgress() {
         localStorage.removeItem(this.SAVE_KEY);
+        // On ne reset pas le bestiaire avec la progression normale
         console.log('Progression réinitialisée.');
+    }
+
+    /**
+     * Sauvegarde une entité découverte pour le bestiaire
+     */
+    saveDiscoveredEntity(type, id) {
+        if (!id) return;
+        const bestiaryKey = 'evg_anthony_bestiary_' + type;
+        const currentData = this.getDiscoveredEntities(type);
+        
+        if (!currentData.includes(id)) {
+            currentData.push(id);
+            localStorage.setItem(bestiaryKey, JSON.stringify(currentData));
+            console.log(`Nouvelle découverte dans le bestiaire (${type}) : ${id}`);
+        }
+    }
+
+    /**
+     * Récupère la liste des id découverts pour une catégorie
+     */
+    getDiscoveredEntities(type) {
+        const bestiaryKey = 'evg_anthony_bestiary_' + type;
+        const saved = localStorage.getItem(bestiaryKey);
+        return saved ? JSON.parse(saved) : [];
     }
 }

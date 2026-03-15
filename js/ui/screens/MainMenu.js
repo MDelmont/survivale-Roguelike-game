@@ -53,6 +53,12 @@ export class MainMenu {
                 text: 'SÉLECTION DE PHASE',
                 color: Colors.WARNING,
                 y: 0.70
+            },
+            {
+                id: 'bestiary',
+                text: 'BESTIAIRE',
+                color: Colors.EPIC || '#A855F7',
+                y: 0.80
             }
         ];
     }

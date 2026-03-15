@@ -17,6 +17,7 @@ import { LevelUpScreen } from '../ui/screens/LevelUpScreen.js';
 import { WeaponMenuScreen } from '../ui/screens/WeaponMenuScreen.js';
 import { VictoryScreen } from '../ui/screens/VictoryScreen.js';
 import { PhaseSelectionScreen } from '../ui/screens/PhaseSelectionScreen.js';
+import { BestiaryScreen } from '../ui/screens/BestiaryScreen.js';
 
 /**
  * GameState Enum
@@ -29,6 +30,7 @@ const GameState = {
     STORY: 'STORY',
     VICTORY: 'VICTORY',
     PHASE_SELECTION: 'PHASE_SELECTION',
+    BESTIARY: 'BESTIARY',
     GAMEOVER: 'GAMEOVER'
 };
 
@@ -102,6 +104,7 @@ class Game {
         this.weaponMenuScreen = new WeaponMenuScreen(this);
         this.victoryScreen = new VictoryScreen(this);
         this.phaseSelectionScreen = new PhaseSelectionScreen(this);
+        this.bestiaryScreen = new BestiaryScreen(this);
 
         this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
 
@@ -112,9 +115,15 @@ class Game {
             this.mouseY = (e.clientY - rect.top) / this.scale;
         });
 
-        // Empêcher le zoom manuel (Ctrl + Scroll ou Ctrl + +/-) qui casse les hitboxes
+        // Gestion de la molette pour le scroll dans certains écrans (ex: Bestiaire)
         window.addEventListener('wheel', (e) => {
-            if (e.ctrlKey) e.preventDefault();
+            if (e.ctrlKey) {
+                e.preventDefault(); // Empêcher le zoom manuel
+            } else {
+                if (this.state === GameState.BESTIARY && this.bestiaryScreen) {
+                    this.bestiaryScreen.handleWheel(e.deltaY);
+                }
+            }
         }, { passive: false });
 
         window.addEventListener('keydown', (e) => {
@@ -175,6 +184,17 @@ class Game {
             this.setupInitialPlayer();
             this.state = GameState.PLAYING;
         }
+
+        // Enregistrement des données de phase dans le bestiaire
+        if (this.currentPhase.player_id) {
+            this.saveSystem.saveDiscoveredEntity('personnages', this.currentPhase.player_id);
+        }
+        if (this.currentPhase.xp_visual) {
+            this.saveSystem.saveDiscoveredEntity('experiences', this.currentPhase.xp_visual);
+        }
+        if (this.currentPhase.weapon_visual) {
+            this.saveSystem.saveDiscoveredEntity('experiences', this.currentPhase.weapon_visual);
+        }
     }
 
     setupInitialPlayer() {
@@ -190,6 +210,7 @@ class Game {
         if (this.currentPhase.default_weapon) {
             const weaponData = this.dataManager.getWeaponData(this.currentPhase.default_weapon);
             this.player.addWeapon(WeaponFactory.create(weaponData, this.dataManager.assetManager));
+            this.saveSystem.saveDiscoveredEntity('armes', weaponData.id);
         }
     }
 
@@ -246,6 +267,10 @@ class Game {
                 this.state = GameState.PHASE_SELECTION;
                 if (this.phaseSelectionScreen) this.phaseSelectionScreen.reset();
                 return;
+            } else if (action === 'bestiary') {
+                this.state = GameState.BESTIARY;
+                if (this.bestiaryScreen) this.bestiaryScreen.reset();
+                return;
             }
         } else if (this.state === GameState.STORY) {
             this.nextStoryPage();
@@ -264,6 +289,7 @@ class Game {
                     if (weapon) weapon.upgrade();
                 } else {
                     this.player.addWeapon(WeaponFactory.create(choice, this.dataManager.assetManager));
+                    this.saveSystem.saveDiscoveredEntity('armes', choice.id);
                 }
                 this.player.pendingWeaponUpgrade = false;
                 this.state = GameState.PLAYING;
@@ -292,6 +318,13 @@ class Game {
                     this.player = null;
                     this.startPhase(action.index);
                 } else if (action.type === 'back') {
+                    this.state = GameState.MENU;
+                }
+            }
+        } else if (this.state === GameState.BESTIARY && this.bestiaryScreen) {
+            const action = this.bestiaryScreen.handleClick(mouseX, mouseY);
+            if (action) {
+                if (action === 'back') {
                     this.state = GameState.MENU;
                 }
             }
@@ -329,6 +362,8 @@ class Game {
             this.victoryScreen.update(deltaTime);
         } else if (this.state === GameState.PHASE_SELECTION && this.phaseSelectionScreen) {
             this.phaseSelectionScreen.update(deltaTime, this.mouseX, this.mouseY);
+        } else if (this.state === GameState.BESTIARY && this.bestiaryScreen) {
+            this.bestiaryScreen.update(deltaTime, this.mouseX, this.mouseY);
         } else if (this.state === GameState.PLAYING) {
             this.update(deltaTime);
         }
@@ -656,6 +691,7 @@ class Game {
         const bossStats = this.dataManager.getBossData(bossId);
         if (bossStats) {
             this.boss = new Boss(this.logicalWidth / 2, -100, bossStats, this.dataManager.assetManager);
+            this.saveSystem.saveDiscoveredEntity('boss', bossId);
 
             // Équiper l'arme si présente sur le boss
             if (bossStats.weapon_id) {
@@ -709,6 +745,7 @@ class Game {
         }
 
         this.enemies.push(enemy);
+        this.saveSystem.saveDiscoveredEntity('monstres', type);
     }
 
     spawnLoot(x, y, v, t) {
@@ -814,6 +851,11 @@ class Game {
         if (this.state === GameState.VICTORY && this.victoryScreen) this.victoryScreen.draw(this.ctx);
         if (this.state === GameState.PHASE_SELECTION && this.phaseSelectionScreen) {
             this.phaseSelectionScreen.draw(this.ctx);
+            this.ctx.restore();
+            return;
+        }
+        if (this.state === GameState.BESTIARY && this.bestiaryScreen) {
+            this.bestiaryScreen.draw(this.ctx);
             this.ctx.restore();
             return;
         }

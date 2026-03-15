@@ -116,6 +116,11 @@ export class DataManager {
                 });
             }
 
+            // Charger aussi les chemins simples
+            if (obj.path) this.assetManager.loadImage(obj.path);
+            if (obj.sprite && typeof obj.sprite === 'string') this.assetManager.loadImage(obj.sprite);
+            if (obj.icon && typeof obj.icon === 'string') this.assetManager.loadImage(obj.icon);
+
             Object.values(obj).forEach(val => findAndLoad(val));
         };
 
