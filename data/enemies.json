@@ -786,7 +786,7 @@
         },
         "new_enemy_1773482610998": {
             "name": "pote_bourée",
-            "hp": 20,
+            "hp": 50,
             "speed": 100,
             "damage": 5,
             "xpValue": 10,
@@ -836,13 +836,13 @@
                 "angleOffset": 0,
                 "pixelPerfect": false
             },
-            "threatLevel": 10,
+            "threatLevel": 20,
             "weapon_id": "new_weapon_mmq5u2tn"
         },
         "new_enemy_1773507531859": {
             "name": "bouteille megot",
-            "hp": 250,
-            "speed": 50,
+            "hp": 35,
+            "speed": 300,
             "damage": 5,
             "xpValue": 10,
             "radius": 12,
@@ -863,14 +863,14 @@
                 },
                 "angleOffset": 0,
                 "pixelPerfect": true,
-                "height": 250
+                "height": 100
             },
-            "threatLevel": 10,
+            "threatLevel": 3,
             "weapon_id": ""
         },
         "new_enemy_1773514210113": {
             "name": "pote tete",
-            "hp": 20,
+            "hp": 320,
             "speed": 100,
             "damage": 5,
             "xpValue": 10,
@@ -878,7 +878,7 @@
             "color": "#ff5555",
             "visuals": {
                 "type": "sprite",
-                "width": 180,
+                "width": 200,
                 "directionMode": "flip",
                 "hitFlash": true,
                 "animations": {
@@ -894,7 +894,7 @@
                 "angleOffset": 0,
                 "pixelPerfect": false
             },
-            "threatLevel": 10,
+            "threatLevel": 40,
             "weapon_id": ""
         }
     }

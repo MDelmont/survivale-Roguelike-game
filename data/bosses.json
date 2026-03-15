@@ -354,7 +354,7 @@
         },
         "new_boss_1773242652380": {
             "name": "Sandrine _mariage",
-            "hp": 2000,
+            "hp": 50000,
             "speed": 50,
             "damage": 20,
             "fireRate": 1500,

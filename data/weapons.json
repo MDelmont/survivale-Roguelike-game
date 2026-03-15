@@ -1268,7 +1268,7 @@
             "type": "attack",
             "stats": {
                 "damage": 10,
-                "fireRate": 500,
+                "fireRate": 1200,
                 "projectileSpeed": 400,
                 "projectileCount": 1,
                 "piercingCount": 0,
@@ -1385,7 +1385,32 @@
                     }
                 }
             },
-            "upgrades": [],
+            "upgrades": [
+                {
+                    "name": "Bouquet Garni",
+                    "preview": "Rayon +40",
+                    "stats": {
+                        "explosionRadius": 40
+                    }
+                },
+                {
+                    "name": "Épines Vénéneuses",
+                    "preview": "Poison au contact",
+                    "stats": {
+                        "isPoisonous": true,
+                        "poisonDamage": 25,
+                        "poisonDuration": 2500,
+                        "poisonTickRate": 500
+                    }
+                },
+                {
+                    "name": "Double Lancer",
+                    "preview": "+1 Projectile",
+                    "stats": {
+                        "projectileCount": 1
+                    }
+                }
+            ],
             "visuals": {
                 "path": "assets/projectiles/proj-bouquet.png",
                 "width": 80,
@@ -1428,7 +1453,29 @@
                 "explosionRadius": 80,
                 "explosionDamageMultiplier": 0.5
             },
-            "upgrades": [],
+            "upgrades": [
+                {
+                    "name": "Dragées Dures",
+                    "preview": "Dégâts +10",
+                    "stats": {
+                        "damage": 10
+                    }
+                },
+                {
+                    "name": "Pluie Torrentielle",
+                    "preview": "+2 Projectiles",
+                    "stats": {
+                        "projectileCount": 2
+                    }
+                },
+                {
+                    "name": "Sucre Rapide",
+                    "preview": "Cadence +30%",
+                    "stats": {
+                        "fireRate": -100
+                    }
+                }
+            ],
             "visuals": {
                 "path": "assets/projectiles/projet_dragees.png",
                 "width": 45,
@@ -1472,7 +1519,29 @@
                 "explosionRadius": 80,
                 "explosionDamageMultiplier": 0.5
             },
-            "upgrades": [],
+            "upgrades": [
+                {
+                    "name": "Amour Éternel",
+                    "preview": "+1 Satellite",
+                    "stats": {
+                        "projectileCount": 1
+                    }
+                },
+                {
+                    "name": "Bénédiction Rapide",
+                    "preview": "Vitesse Rotation +2",
+                    "stats": {
+                        "orbitSpeed": 2
+                    }
+                },
+                {
+                    "name": "Aura Étendue",
+                    "preview": "Rayon +30",
+                    "stats": {
+                        "radius": 30
+                    }
+                }
+            ],
             "visuals": {
                 "path": "assets/projectiles/proj-coeur.png",
                 "width": 30,
