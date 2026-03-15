@@ -142,8 +142,8 @@ class Game {
             // Prevent default only for UI screens to avoid scrolling conflict
             const touch = e.touches[0];
             const rect = this.canvas.getBoundingClientRect();
-            this._touchStartX = (touch.clientX - rect.left) / (this.scale / this.dpr);
-            this._touchStartY = (touch.clientY - rect.top) / (this.scale / this.dpr);
+            this._touchStartX = (touch.clientX - rect.left) * (this.logicalWidth / rect.width);
+            this._touchStartY = (touch.clientY - rect.top) * (this.logicalHeight / rect.height);
             this._touchScrolling = false;
 
             // Update hover state for UI screens
@@ -167,8 +167,8 @@ class Game {
             }
 
             // Update mouse pos for hover effects
-            this.mouseX = (touch.clientX - rect.left) / (this.scale / this.dpr);
-            this.mouseY = (touch.clientY - rect.top) / (this.scale / this.dpr);
+            this.mouseX = (touch.clientX - rect.left) * (this.logicalWidth / rect.width);
+            this.mouseY = (touch.clientY - rect.top) * (this.logicalHeight / rect.height);
         }, { passive: true });
 
         this.canvas.addEventListener('touchend', (e) => {
@@ -186,8 +186,8 @@ class Game {
         // Mouse tracking for hover effects
         this.canvas.addEventListener('mousemove', (e) => {
             const rect = this.canvas.getBoundingClientRect();
-            this.mouseX = (e.clientX - rect.left) / (this.scale / this.dpr);
-            this.mouseY = (e.clientY - rect.top) / (this.scale / this.dpr);
+            this.mouseX = (e.clientX - rect.left) * (this.logicalWidth / rect.width);
+            this.mouseY = (e.clientY - rect.top) * (this.logicalHeight / rect.height);
         });
 
         // Gestion de la molette pour le scroll dans certains écrans (ex: Bestiaire)
@@ -330,9 +330,9 @@ class Game {
         }
 
         const rect = this.canvas.getBoundingClientRect();
-        // Conversion des coordonnées écran -> coordonnées logiques
-        const mouseX = (e.clientX - rect.left) / (this.scale / this.dpr);
-        const mouseY = (e.clientY - rect.top) / (this.scale / this.dpr);
+        // Conversion des coordonnées écran -> coordonnées logiques (Mapping Robuste)
+        const mouseX = (e.clientX - rect.left) * (this.logicalWidth / rect.width);
+        const mouseY = (e.clientY - rect.top) * (this.logicalHeight / rect.height);
 
         if (this.state === GameState.MENU && this.mainMenu) {
             const action = this.mainMenu.handleClick(mouseX, mouseY);
