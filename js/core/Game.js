@@ -41,6 +41,8 @@ class Game {
     constructor() {
         this.canvas = document.getElementById('game-canvas');
         this.ctx = this.canvas.getContext('2d');
+        // Désactivation du lissage pour un rendu "pixel-art" net
+        this.ctx.imageSmoothingEnabled = false;
 
         this.lastTime = 0;
 
@@ -288,15 +290,20 @@ class Game {
     }
 
     handleResize() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
+        // Gestion du Device Pixel Ratio pour éviter le flou sur mobile/écrans Retina
+        const dpr = window.devicePixelRatio || 1;
+        this.canvas.width = window.innerWidth * dpr;
+        this.canvas.height = window.innerHeight * dpr;
+
+        // On s'assure que le lissage reste désactivé après un changement de taille
+        this.ctx.imageSmoothingEnabled = false;
 
         // Calcul du scale basé sur la largeur de référence
-        this.scale = window.innerWidth / this.baseWidth;
+        this.scale = (window.innerWidth / this.baseWidth) * dpr;
 
         // Mise à jour des dimensions logiques (l'espace de jeu interne)
         this.logicalWidth = this.baseWidth;
-        this.logicalHeight = window.innerHeight / this.scale;
+        this.logicalHeight = window.innerHeight / (this.scale / dpr);
     }
 
     requestFullscreen() {
