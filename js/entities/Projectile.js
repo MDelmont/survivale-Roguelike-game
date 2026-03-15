@@ -11,11 +11,9 @@ export class Projectile {
         this.y = y;
         this.dx = dx;
         this.dy = dy;
-        this.speed = stats.projectileSpeed || stats.speed || 400;
-        this.damage = stats.damage || 10;
-        // Calcul du rayon de la hitbox (priorité: stats.radius > visuals.width / 2 > 5)
-        this.radius = stats.radius || (stats.visuals?.width ? stats.visuals.width / 2 : 5);
-        this.color = stats.color || '#ff0';
+        // Calcul du rayon de la hitbox (priorité: stats.radius > visuals.width / 2 > 8)
+        this.radius = stats.radius || (stats.visuals?.width ? stats.visuals.width / 2 : 8);
+        this.color = stats.color || '#fff';
         this.stats = stats; // Stocker les stats pour les effets étendus (slowing, etc.)
         this.toRemove = false;
 
@@ -133,10 +131,14 @@ export class Projectile {
 
             ctx.fill();
 
+            // Toujours dessiner un contour blanc pour la visibilité sur fond sombre
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
             if (this.isExplosive || this.isPoisonous) {
                 ctx.shadowBlur = 10;
                 ctx.shadowColor = ctx.fillStyle;
-                ctx.strokeStyle = '#fff';
                 ctx.stroke();
                 ctx.shadowBlur = 0;
             }

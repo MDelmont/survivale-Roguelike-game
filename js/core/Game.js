@@ -86,6 +86,7 @@ class Game {
         this.logicalWidth = this.baseWidth;
         this.logicalHeight = 900;
         this.scale = 1;
+        this.dpr = window.devicePixelRatio || 1;
         this.debugMode = false;
 
         this.init();
@@ -141,8 +142,8 @@ class Game {
             // Prevent default only for UI screens to avoid scrolling conflict
             const touch = e.touches[0];
             const rect = this.canvas.getBoundingClientRect();
-            this._touchStartX = (touch.clientX - rect.left) / this.scale;
-            this._touchStartY = (touch.clientY - rect.top) / this.scale;
+            this._touchStartX = (touch.clientX - rect.left) / (this.scale / this.dpr);
+            this._touchStartY = (touch.clientY - rect.top) / (this.scale / this.dpr);
             this._touchScrolling = false;
 
             // Update hover state for UI screens
@@ -166,8 +167,8 @@ class Game {
             }
 
             // Update mouse pos for hover effects
-            this.mouseX = (touch.clientX - rect.left) / this.scale;
-            this.mouseY = (touch.clientY - rect.top) / this.scale;
+            this.mouseX = (touch.clientX - rect.left) / (this.scale / this.dpr);
+            this.mouseY = (touch.clientY - rect.top) / (this.scale / this.dpr);
         }, { passive: true });
 
         this.canvas.addEventListener('touchend', (e) => {
@@ -185,8 +186,8 @@ class Game {
         // Mouse tracking for hover effects
         this.canvas.addEventListener('mousemove', (e) => {
             const rect = this.canvas.getBoundingClientRect();
-            this.mouseX = (e.clientX - rect.left) / this.scale;
-            this.mouseY = (e.clientY - rect.top) / this.scale;
+            this.mouseX = (e.clientX - rect.left) / (this.scale / this.dpr);
+            this.mouseY = (e.clientY - rect.top) / (this.scale / this.dpr);
         });
 
         // Gestion de la molette pour le scroll dans certains écrans (ex: Bestiaire)
@@ -291,19 +292,19 @@ class Game {
 
     handleResize() {
         // Gestion du Device Pixel Ratio pour éviter le flou sur mobile/écrans Retina
-        const dpr = window.devicePixelRatio || 1;
-        this.canvas.width = window.innerWidth * dpr;
-        this.canvas.height = window.innerHeight * dpr;
+        this.dpr = window.devicePixelRatio || 1;
+        this.canvas.width = window.innerWidth * this.dpr;
+        this.canvas.height = window.innerHeight * this.dpr;
 
         // On s'assure que le lissage reste désactivé après un changement de taille
         this.ctx.imageSmoothingEnabled = false;
 
         // Calcul du scale basé sur la largeur de référence
-        this.scale = (window.innerWidth / this.baseWidth) * dpr;
+        this.scale = (window.innerWidth / this.baseWidth) * this.dpr;
 
         // Mise à jour des dimensions logiques (l'espace de jeu interne)
         this.logicalWidth = this.baseWidth;
-        this.logicalHeight = window.innerHeight / (this.scale / dpr);
+        this.logicalHeight = window.innerHeight / (this.scale / this.dpr);
     }
 
     requestFullscreen() {
@@ -330,8 +331,8 @@ class Game {
 
         const rect = this.canvas.getBoundingClientRect();
         // Conversion des coordonnées écran -> coordonnées logiques
-        const mouseX = (e.clientX - rect.left) / this.scale;
-        const mouseY = (e.clientY - rect.top) / this.scale;
+        const mouseX = (e.clientX - rect.left) / (this.scale / this.dpr);
+        const mouseY = (e.clientY - rect.top) / (this.scale / this.dpr);
 
         if (this.state === GameState.MENU && this.mainMenu) {
             const action = this.mainMenu.handleClick(mouseX, mouseY);
@@ -957,8 +958,12 @@ class Game {
 
         this.ctx.restore();
 
-        // Le joystick utilise les coordonnées écran brutes, donc on le dessine hors du scale
+        // Le joystick utilise les coordonnées écran brutes, donc on le dessine hors du scale de jeu
+        // On applique une mise à l'échelle dpr pour qu'il garde sa taille physique
+        this.ctx.save();
+        this.ctx.scale(this.dpr, this.dpr);
         this.input.draw(this.ctx);
+        this.ctx.restore();
 
         if (this.debugMode) {
             this.drawDebug();
