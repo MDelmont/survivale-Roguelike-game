@@ -304,7 +304,7 @@
             }
         },
         "anthony_celib": {
-            "name": "Anthony Adulte",
+            "name": "Anthony Ados",
             "speed": 280,
             "hp": 120,
             "maxHp": 120,
@@ -323,28 +323,28 @@
                             "frames": [
                                 "assets/players/drague_ony/drague-dos-i.png"
                             ],
-                            "frameRate": 1,
+                            "frameRate": 10,
                             "loop": true
                         },
                         "down": {
                             "frames": [
                                 "assets/players/drague_ony/drague-face-i.png"
                             ],
-                            "frameRate": 1,
+                            "frameRate": 10,
                             "loop": true
                         },
                         "left": {
                             "frames": [
                                 "assets/players/drague_ony/drague-gauche-i.png"
                             ],
-                            "frameRate": 1,
+                            "frameRate": 10,
                             "loop": true
                         },
                         "right": {
                             "frames": [
-                                "assets/players/drague_ony/drague-droit-i.png"
+                                "assets/players/drague_ony/drague-droite-i.png"
                             ],
-                            "frameRate": 1,
+                            "frameRate": 10,
                             "loop": true
                         }
                     },
@@ -352,39 +352,127 @@
                         "up": {
                             "frames": [
                                 "assets/players/drague_ony/drague-dos-w1.png",
+                                "assets/players/drague_ony/drague-dos-i.png",
                                 "assets/players/drague_ony/drague-dos-w2.png"
                             ],
-                            "frameRate": 12,
+                            "frameRate": 10,
                             "loop": true
                         },
                         "down": {
                             "frames": [
-                                "assets/players/drague_ony/drague-face-w2.png",
-                                "assets/players/drague_ony/drague-face-w1.png"
+                                "assets/players/drague_ony/drague-face-w1.png",
+                                "assets/players/drague_ony/drague-face-i.png",
+                                "assets/players/drague_ony/drague-face-w2.png"
                             ],
-                            "frameRate": 12,
+                            "frameRate": 10,
                             "loop": true
                         },
                         "left": {
                             "frames": [
                                 "assets/players/drague_ony/drague-gauche-w1.png",
+                                "assets/players/drague_ony/drague-gauche-i.png",
                                 "assets/players/drague_ony/drague-gauche-w2.png"
                             ],
-                            "frameRate": 12,
+                            "frameRate": 10,
                             "loop": true
                         },
                         "right": {
                             "frames": [
                                 "assets/players/drague_ony/drague-droit-w1.png",
+                                "assets/players/drague_ony/drague-droit-i.png",
                                 "assets/players/drague_ony/drague-droit-w2.png"
                             ],
-                            "frameRate": 12,
+                            "frameRate": 10,
                             "loop": true
                         }
                     }
                 },
                 "angleOffset": 0,
                 "height": 110
+            }
+        },
+        "player_1773576398668": {
+            "name": "Anthony Adulte",
+            "speed": 250,
+            "hp": 100,
+            "maxHp": 100,
+            "fireRate": 300,
+            "damage": 10,
+            "projectileSpeed": 400,
+            "pickupRadius": 100,
+            "xpNextLevel": 50,
+            "visuals": {
+                "type": "sprite",
+                "directionMode": "4_way",
+                "hitFlash": true,
+                "animations": {
+                    "idle": {
+                        "up": {
+                            "frames": [
+                                "assets/players/mariage/Ony-mariage-dos-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/players/mariage/Ony-mariage-face-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/players/mariage/Ony-mariage-gauche-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/players/mariage/Ony-mariage-droite-w1.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    },
+                    "walk": {
+                        "up": {
+                            "frames": [
+                                "assets/players/mariage/Ony-mariage-dos-w1.png",
+                                "assets/players/mariage/Ony-mariage-dos-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "down": {
+                            "frames": [
+                                "assets/players/mariage/Ony-mariage-face-w1.png",
+                                "assets/players/mariage/Ony-mariage-face-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "left": {
+                            "frames": [
+                                "assets/players/mariage/Ony-mariage-gauche-w1.png",
+                                "assets/players/mariage/Ony-mariage-gauche-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        },
+                        "right": {
+                            "frames": [
+                                "assets/players/mariage/Ony-mariage-droite-w1.png",
+                                "assets/players/mariage/Ony-mariage-droite-w2.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                },
+                "angleOffset": 0,
+                "height": 120
             }
         }
     }
