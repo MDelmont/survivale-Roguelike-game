@@ -1347,6 +1347,151 @@
             "description": "Sandrine te soutien !",
             "category": "projectile",
             "preview": ""
+        },
+        {
+            "id": "mariage_bouquet",
+            "name": "Bouquet Explosif",
+            "type": "attack",
+            "stats": {
+                "damage": 35,
+                "fireRate": 1200,
+                "projectileSpeed": 350,
+                "projectileCount": 1,
+                "piercingCount": 0,
+                "radius": 10,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": true,
+                "explosionRadius": 120,
+                "explosionDamageMultiplier": 0.8,
+                "explosionVisuals": {
+                    "path": "assets/explosion/explosion-bouquet.png",
+                    "width": 80,
+                    "height": 80,
+                    "directionMode": "none",
+                    "animations": {
+                        "idle": {
+                            "frames": [
+                                "assets/explosion/explosion-bouquet.png"
+                            ],
+                            "frameRate": 10,
+                            "loop": true
+                        }
+                    }
+                }
+            },
+            "upgrades": [],
+            "visuals": {
+                "path": "assets/projectiles/proj-bouquet.png",
+                "width": 80,
+                "rotateWithVelocity": false,
+                "angleOffset": 0,
+                "directionMode": "flip",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/proj-bouquet.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "Le fameux lancer de bouquet... ravageur !",
+            "category": "explosif",
+            "preview": ""
+        },
+        {
+            "id": "mariage_dragees",
+            "name": "Pluie de Dragées",
+            "type": "attack",
+            "stats": {
+                "damage": 12,
+                "fireRate": 300,
+                "projectileSpeed": 500,
+                "projectileCount": 3,
+                "piercingCount": 1,
+                "radius": 5,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": false,
+                "slowMultiplier": 0,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": false,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5
+            },
+            "upgrades": [],
+            "visuals": {
+                "path": "assets/projectiles/projet_dragees.png",
+                "width": 45,
+                "rotateWithVelocity": true,
+                "angleOffset": 20,
+                "directionMode": "rotate",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/projet_dragees.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "Une poignée sucrée... et piquante !",
+            "category": "projectile",
+            "preview": ""
+        },
+        {
+            "id": "mariage_voeux",
+            "name": "Vœux Protégés",
+            "type": "defense",
+            "stats": {
+                "damage": 25,
+                "fireRate": 2000,
+                "projectileSpeed": 0,
+                "projectileCount": 2,
+                "piercingCount": 0,
+                "radius": 70,
+                "orbitSpeed": 4,
+                "color": null,
+                "isPoisonous": false,
+                "isSlowing": true,
+                "slowMultiplier": 0.6,
+                "poisonDamage": 10,
+                "poisonDuration": 2000,
+                "poisonTickRate": 500,
+                "isExplosive": false,
+                "explosionRadius": 80,
+                "explosionDamageMultiplier": 0.5
+            },
+            "upgrades": [],
+            "visuals": {
+                "path": "assets/projectiles/proj-coeur.png",
+                "width": 30,
+                "rotateWithVelocity": false,
+                "angleOffset": 0,
+                "directionMode": "none",
+                "animations": {
+                    "idle": {
+                        "frames": [
+                            "assets/projectiles/proj-coeur.png"
+                        ],
+                        "frameRate": 10,
+                        "loop": true
+                    }
+                }
+            },
+            "description": "L'amour tourne autour de toi et repousse les ennemis.",
+            "category": "orbital",
+            "preview": ""
         }
     ]
 }

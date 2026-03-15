@@ -11,10 +11,13 @@
             ],
             "player_id": "anthony_celib",
             "spawn_rate": 1000,
-            "default_weapon": "new_weapon_mmqiajty",
+            "default_weapon": "mariage_bouquet",
             "weapon_drop_rate": 1,
             "available_weapons": [
-                "new_weapon_mmqiajty"
+                "new_weapon_mmqiajty",
+                "mariage_bouquet",
+                "mariage_dragees",
+                "mariage_voeux"
             ],
             "boss_id": "new_boss_1773242652380",
             "background_image": "assets/fond/mariage/mariage.png",
