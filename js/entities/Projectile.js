@@ -11,6 +11,8 @@ export class Projectile {
         this.y = y;
         this.dx = dx;
         this.dy = dy;
+        this.speed = stats.projectileSpeed || stats.speed || 400;
+        this.damage = stats.damage || 10;
         // Calcul du rayon de la hitbox (priorité: stats.radius > visuals.width / 2 > 8)
         this.radius = stats.radius || (stats.visuals?.width ? stats.visuals.width / 2 : 8);
         this.color = stats.color || '#fff';
