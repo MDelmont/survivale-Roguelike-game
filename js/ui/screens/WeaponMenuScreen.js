@@ -94,7 +94,10 @@ export class WeaponMenuScreen {
 
         const totalWidth = numCards * cardWidth + (numCards - 1) * gap;
         const startX = (w - totalWidth) / 2;
-        const cardY = (h - cardHeight) / 2 + 25;
+        // Centrage vertical prenant en compte les badges au-dessus des cartes (~55px)
+        const badgeSpace = 55;
+        const totalBlockHeight = badgeSpace + cardHeight;
+        const cardY = (h - totalBlockHeight) / 2 + badgeSpace;
 
         return { cardWidth, cardHeight, gap, startX, cardY, w, h, numCards };
     }
