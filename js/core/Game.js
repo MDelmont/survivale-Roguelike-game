@@ -137,6 +137,7 @@ class Game {
         this._touchStartX = 0;
         this._touchStartY = 0;
         this._touchScrolling = false;
+        this._touchStartState = null; // État du jeu au moment du touchstart
 
         this.canvas.addEventListener('touchstart', (e) => {
             // Prevent default only for UI screens to avoid scrolling conflict
@@ -145,6 +146,7 @@ class Game {
             this._touchStartX = (touch.clientX - rect.left) * (this.logicalWidth / rect.width);
             this._touchStartY = (touch.clientY - rect.top) * (this.logicalHeight / rect.height);
             this._touchScrolling = false;
+            this._touchStartState = this.state; // Mémoriser l'état au moment du touch
 
             // Update hover state for UI screens
             this.mouseX = this._touchStartX;
@@ -172,14 +174,37 @@ class Game {
         }, { passive: true });
 
         this.canvas.addEventListener('touchend', (e) => {
-            // If we were not scrolling, treat it as a click
-            if (!this._touchScrolling) {
-                const fakeEvent = {
-                    clientX: e.changedTouches[0].clientX,
-                    clientY: e.changedTouches[0].clientY
-                };
-                this.handleCanvasClick(fakeEvent);
+            // Si on scrollait, pas de clic
+            if (this._touchScrolling) return;
+
+            const rect = this.canvas.getBoundingClientRect();
+            const endX = (e.changedTouches[0].clientX - rect.left) * (this.logicalWidth / rect.width);
+            const endY = (e.changedTouches[0].clientY - rect.top) * (this.logicalHeight / rect.height);
+
+            // Pour les écrans de sélection (armes, améliorations, phases),
+            // on exige que le touchstart ait eu lieu dans le MÊME état de jeu
+            // et que le doigt n'ait pas trop bougé (vrai "tap" et pas glissement)
+            const isSelectionScreen = this.state === GameState.UPGRADE ||
+                                       this.state === GameState.WEAPON_MENU ||
+                                       this.state === GameState.PHASE_SELECTION;
+
+            if (isSelectionScreen) {
+                // Ignorer si l'état a changé entre touchstart et touchend
+                // (ex: le menu est apparu pendant qu'on touchait l'écran)
+                if (this._touchStartState !== this.state) return;
+
+                // Vérifier que le doigt n'a pas trop bougé (seuil de 30px logiques)
+                const dx = endX - this._touchStartX;
+                const dy = endY - this._touchStartY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > 30) return;
             }
+
+            const fakeEvent = {
+                clientX: e.changedTouches[0].clientX,
+                clientY: e.changedTouches[0].clientY
+            };
+            this.handleCanvasClick(fakeEvent);
         }, { passive: true });
         // ===== FIN SUPPORT TACTILE =====
 
