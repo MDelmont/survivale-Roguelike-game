@@ -1,6 +1,6 @@
 /**
  * WeaponMenuScreen
- * EVG Anthony - Survivor Edition
+ * Souvenir d’Ony - Survivor Edition
  * 
  * Weapon selection screen with improved readability.
  * Larger fonts and better visual hierarchy.

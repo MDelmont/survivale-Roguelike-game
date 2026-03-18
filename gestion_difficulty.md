@@ -1,6 +1,6 @@
 # Gestion de la Difficulté Dynamique
 
-Ce document détaille la stratégie proposée pour gérer et équilibrer la difficulté de manière progressive et adaptative dans **EVG Anthony Survivor**.
+Ce document détaille la stratégie proposée pour gérer et équilibrer la difficulté de manière progressive et adaptative dans **Souvenir d’Ony Survivor**.
 
 ## 1. Le Système de "Budget de Menace" (Threat Budget)
 
@@ -14,12 +14,12 @@ Au lieu d'utiliser un taux d'apparition (`spawn_rate`) fixe, le serveur de jeu (
 
 Chaque ennemi dans `enemies.json` possède un coût. L'unité de référence est **10 PM** pour l'ennemi le plus faible.
 
-| Type d'Ennemi | Coût Recommandé | Explication |
-| :--- | :--- | :--- |
-| **Faible** | 10 | Unité de base, apparaît par packs. |
-| **Moyen** | 25 | Demande 2-3 tirs pour mourir. |
-| **Fort** | 50 | Nécessite une attention particulière. |
-| **Elite** | 100+ | Unité rare et très dangereuse. |
+| Type d'Ennemi | Coût Recommandé | Explication                           |
+| :------------ | :-------------- | :------------------------------------ |
+| **Faible**    | 10              | Unité de base, apparaît par packs.    |
+| **Moyen**     | 25              | Demande 2-3 tirs pour mourir.         |
+| **Fort**      | 50              | Nécessite une attention particulière. |
+| **Elite**     | 100+            | Unité rare et très dangereuse.        |
 
 ## 3. Formule d'Accumulation Harmonisée (PM/sec)
 
@@ -30,12 +30,14 @@ Le jeu calcule chaque seconde combien de points il ajoute au budget. La formule 
 - **Croissance_Base** (Réglable par phase) : Le socle minimal (ex: 20 PM/sec = 2 ennemis/sec).
 - **Progression_Phase** (Automatique) : Augmente de 0 à `Croissance_Base` en fonction du temps écoulé dans la phase (0% -> 100% de la barre de temps).
 - **Puissance_Joueur** (Automatique) :
-    - +2 PM/sec par Niveau du joueur au-dessus du lvl 1.
-    - +5 PM/sec par Arme supplémentaire possédée (au-delà de la 1ère).
+  - +2 PM/sec par Niveau du joueur au-dessus du lvl 1.
+  - +5 PM/sec par Arme supplémentaire possédée (au-delà de la 1ère).
 - **Multiplicateur_Phase** (Réglable par phase) : Facteur global d'intensité (X1.0 par défaut).
 
 ### Exemple concret :
+
 Une phase de 60s réglée sur **20 PM/sec** avec un multiplicateur de **1.0** :
+
 - **À 0s** : ~20 PM/sec (2 ennemis/sec).
 - **À 30s (lvl 5, 2 armes)** : (20 + 10 + 8 + 5) = ~43 PM/sec.
 - **À 60s (juste avant le boss)** : L'intensité aura environ doublé par rapport au départ.
@@ -77,4 +79,5 @@ Pour permettre de régler tout cela facilement :
 3. **Simulateur** : Ajouter un petit estimateur dans le Creator qui indique si la phase semble "Facile", "Normale" ou "Impossible" en calculant le DPS théorique nécessaire.
 
 ---
-*Ce document sert de base de réflexion avant l'implémentation technique des nouveaux algorithmes de spawn.*
+
+_Ce document sert de base de réflexion avant l'implémentation technique des nouveaux algorithmes de spawn._

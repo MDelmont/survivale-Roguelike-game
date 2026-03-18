@@ -1,6 +1,6 @@
 /**
  * UIManager - Design System & UI Orchestration
- * EVG Anthony - Survivor Edition
+ * Souvenir d’Ony - Survivor Edition
  * 
  * Manages all UI rendering, theming, and component coordination.
  */

@@ -1,4 +1,4 @@
-# 🎮 EVG Anthony - Roadmap Refonte UI/UX
+# 🎮 Souvenir d’Ony - Roadmap Refonte UI/UX
 
 > **Vision** : Transformer l'interface actuelle en une UI "Jeu Vidéo Moderne" — propre, soft mais impactante, avec une excellente ergonomie.
 
@@ -6,19 +6,20 @@
 
 ## 📋 Résumé Exécutif
 
-| Priorité | Module | Complexité | Impact Visuel |
-|----------|--------|------------|---------------|
-| 🔴 P0 | Design System & Composants de base | Moyenne | ⭐⭐⭐⭐⭐ |
-| 🔴 P1 | Menu Principal | Faible | ⭐⭐⭐⭐⭐ |
-| 🟠 P2 | Level Up Screen (3 cartes) | Élevée | ⭐⭐⭐⭐ |
-| 🟡 P3 | Armes & Améliorations | Élevée | ⭐⭐⭐⭐ |
-| 🟢 P4 | HUD In-Game | Moyenne | ⭐⭐⭐ |
+| Priorité | Module                             | Complexité | Impact Visuel |
+| -------- | ---------------------------------- | ---------- | ------------- |
+| 🔴 P0    | Design System & Composants de base | Moyenne    | ⭐⭐⭐⭐⭐    |
+| 🔴 P1    | Menu Principal                     | Faible     | ⭐⭐⭐⭐⭐    |
+| 🟠 P2    | Level Up Screen (3 cartes)         | Élevée     | ⭐⭐⭐⭐      |
+| 🟡 P3    | Armes & Améliorations              | Élevée     | ⭐⭐⭐⭐      |
+| 🟢 P4    | HUD In-Game                        | Moyenne    | ⭐⭐⭐        |
 
 ---
 
 ## 🎨 Phase 0 : Direction Artistique & Design System
 
 ### Objectif
+
 Définir les fondations visuelles qui seront réutilisées sur toutes les interfaces.
 
 ### Palette de Couleurs Proposée
@@ -45,16 +46,17 @@ Définir les fondations visuelles qui seront réutilisées sur toutes les interf
 
 ### Typographie
 
-| Usage | Font | Taille | Poids |
-|-------|------|--------|-------|
-| Titres | Inter / Orbitron | 32-48px | Bold 700 |
-| Sous-titres | Inter | 20-24px | SemiBold 600 |
-| Corps | Inter | 14-16px | Regular 400 |
-| Stats/Valeurs | Mono (JetBrains) | 18-24px | Bold 700 |
+| Usage         | Font             | Taille  | Poids        |
+| ------------- | ---------------- | ------- | ------------ |
+| Titres        | Inter / Orbitron | 32-48px | Bold 700     |
+| Sous-titres   | Inter            | 20-24px | SemiBold 600 |
+| Corps         | Inter            | 14-16px | Regular 400  |
+| Stats/Valeurs | Mono (JetBrains) | 18-24px | Bold 700     |
 
 ### Composants de Base à Créer
 
 #### 1. `UIButton` - Bouton Gaming Stylisé
+
 ```
 ┌──────────────────────────────────────┐
 │  ▸  NOUVELLE PARTIE                  │  ← Icône chevron animé
@@ -64,12 +66,14 @@ Définir les fondations visuelles qui seront réutilisées sur toutes les interf
 ```
 
 **États :**
+
 - `idle` : Fond transparent, bordure glow subtile
 - `hover` : Fond lumineux, scale 1.02, son "hover.wav"
 - `pressed` : Scale 0.98, flash lumineux, son "click.wav"
 - `disabled` : Opacité 50%, curseur not-allowed
 
 #### 2. `UIPanel` - Panneau Glassmorphism
+
 ```
 ┌────────────────────────────────────────────────┐
 │ ╔══════════════════════════════════════════╗   │
@@ -83,6 +87,7 @@ Définir les fondations visuelles qui seront réutilisées sur toutes les interf
 ```
 
 #### 3. `UICard` - Carte d'Option (Level Up / Armes)
+
 ```
 ┌─────────────────────────────┐
 │  [ICÔNE 64x64]              │
@@ -101,6 +106,7 @@ Définir les fondations visuelles qui seront réutilisées sur toutes les interf
 ## 🏠 Phase 1 : Refonte du Menu Principal
 
 ### État Actuel (Analyse)
+
 ```javascript
 // Game.js:778-816
 drawMenu() {
@@ -119,7 +125,7 @@ drawMenu() {
 │                                                                │
 │              ╔═══════════════════════════════╗                 │
 │              ║                               ║                 │
-│              ║      EVG ANTHONY              ║  ← Logo animé   │
+│              ║      Souvenir d’Ony              ║  ← Logo animé   │
 │              ║      SURVIVOR EDITION         ║                 │
 │              ║                               ║                 │
 │              ╚═══════════════════════════════╝                 │
@@ -136,16 +142,17 @@ drawMenu() {
 
 ### Spécifications Techniques
 
-| Fonctionnalité | Implémentation |
-|----------------|----------------|
-| Fond dynamique | `phases.json` → `menu_background` (image ou couleur) |
-| Parallax (optionnel) | Déplacement léger sur `mousemove` |
-| Titre animé | Glow pulsant via `shadowBlur` oscillant |
-| Boutons | Composant `UIButton` avec sons au survol/clic |
-| Version | Texte positionné en bas-gauche |
-| Icônes son | Toggle mute/unmute en bas-droite |
+| Fonctionnalité       | Implémentation                                       |
+| -------------------- | ---------------------------------------------------- |
+| Fond dynamique       | `phases.json` → `menu_background` (image ou couleur) |
+| Parallax (optionnel) | Déplacement léger sur `mousemove`                    |
+| Titre animé          | Glow pulsant via `shadowBlur` oscillant              |
+| Boutons              | Composant `UIButton` avec sons au survol/clic        |
+| Version              | Texte positionné en bas-gauche                       |
+| Icônes son           | Toggle mute/unmute en bas-droite                     |
 
 ### Fichiers Impactés
+
 - `js/core/Game.js` → `drawMenu()` (réécriture complète)
 - `css/style.css` → Variables CSS si migration vers CSS pour certains overlays
 - `data/config.json` (nouveau) → Paramètres du menu (background, version, etc.)
@@ -155,6 +162,7 @@ drawMenu() {
 ## ⬆️ Phase 2 : Interface Level Up (3 Cartes Horizontales)
 
 ### État Actuel (Analyse)
+
 ```javascript
 // Game.js:871-912
 drawChoiceMenu(title, color, optionHeight = 80) {
@@ -222,6 +230,7 @@ drawChoiceMenu(title, color, optionHeight = 80) {
 5. **Impact Hint** (Italic 12px) - Aide contextuelle pour le build
 
 ### Fichiers Impactés
+
 - `js/systems/UpgradeSystem.js` → Enrichir les données des upgrades
 - `js/core/Game.js` → `drawChoiceMenu()` → Nouvelle fonction `drawLevelUpScreen()`
 - `data/upgrades.json` (nouveau) → Externaliser les données d'upgrades
@@ -232,6 +241,7 @@ drawChoiceMenu(title, color, optionHeight = 80) {
 ## ⚔️ Phase 3 : Interface Armes & Améliorations
 
 ### État Actuel (Analyse)
+
 ```javascript
 // Game.js:441-471
 openWeaponMenu() {
@@ -313,14 +323,15 @@ openWeaponMenu() {
 
 ### Composant `UIWeaponCard` - Spécifications
 
-| Zone | Contenu |
-|------|---------|
-| Header | Icône + Nom + Niveau actuel (e.g. "Lvl 2/5") |
-| Stats Panel | Colonnes comparatives (Actuel vs Prochain niveau) |
-| Evolution Tree | Barre de progression visuelle avec milestones |
-| Footer | Boutons d'action (Acquérir / Améliorer / Passer) |
+| Zone           | Contenu                                           |
+| -------------- | ------------------------------------------------- |
+| Header         | Icône + Nom + Niveau actuel (e.g. "Lvl 2/5")      |
+| Stats Panel    | Colonnes comparatives (Actuel vs Prochain niveau) |
+| Evolution Tree | Barre de progression visuelle avec milestones     |
+| Footer         | Boutons d'action (Acquérir / Améliorer / Passer)  |
 
 ### Fichiers Impactés
+
 - `data/weapons/weapons.json` → Enrichir avec `upgrades[]`, `icon`, `category`
 - `js/core/Game.js` → Nouvelle fonction `drawWeaponMenu()`
 - `js/weapons/Weapon.js` → Méthode `getUpgradePreview()`
@@ -354,6 +365,7 @@ openWeaponMenu() {
 ```
 
 ### Améliorations Clés
+
 - **Barre XP** : Gradient animé + indication niveau clair
 - **Timer Boss** : Compte à rebours visible avec icône
 - **Liste Armes** : Affichage compact avec niveaux à droite
@@ -389,10 +401,10 @@ js/
 
 Le jeu utilise actuellement un **rendu 100% Canvas**. Deux approches sont possibles :
 
-| Approche | Avantages | Inconvénients |
-|----------|-----------|---------------|
-| **Canvas pur** (recommandé) | Performance, cohérence, pas de DOM | Plus de code custom |
-| **HTML/CSS overlay** | Flexbox natif, CSS animations | Complexité de sync, z-index |
+| Approche                    | Avantages                          | Inconvénients               |
+| --------------------------- | ---------------------------------- | --------------------------- |
+| **Canvas pur** (recommandé) | Performance, cohérence, pas de DOM | Plus de code custom         |
+| **HTML/CSS overlay**        | Flexbox natif, CSS animations      | Complexité de sync, z-index |
 
 **Recommandation** : Rester en **Canvas pur** avec une couche d'abstraction UI (`UIManager`).
 
@@ -400,14 +412,14 @@ Le jeu utilise actuellement un **rendu 100% Canvas**. Deux approches sont possib
 
 ## 📅 Planning Estimatif
 
-| Phase | Durée | Priorité |
-|-------|-------|----------|
-| Phase 0 - Design System | 2-3h | P0 |
-| Phase 1 - Menu Principal | 2-3h | P1 |
-| Phase 2 - Level Up Screen | 4-5h | P2 |
-| Phase 3 - Armes & Upgrades | 5-6h | P3 |
-| Phase 4 - HUD In-Game | 2-3h | P4 |
-| **TOTAL** | **15-20h** | - |
+| Phase                      | Durée      | Priorité |
+| -------------------------- | ---------- | -------- |
+| Phase 0 - Design System    | 2-3h       | P0       |
+| Phase 1 - Menu Principal   | 2-3h       | P1       |
+| Phase 2 - Level Up Screen  | 4-5h       | P2       |
+| Phase 3 - Armes & Upgrades | 5-6h       | P3       |
+| Phase 4 - HUD In-Game      | 2-3h       | P4       |
+| **TOTAL**                  | **15-20h** | -        |
 
 ---
 
@@ -439,6 +451,6 @@ Le jeu utilise actuellement un **rendu 100% Canvas**. Deux approches sont possib
 
 ---
 
-> 📝 *Document rédigé le 10/01/2026 - Version 1.0*
-> 
-> *Pour toute question ou ajustement, merci de commenter directement ce document.*
+> 📝 _Document rédigé le 10/01/2026 - Version 1.0_
+>
+> _Pour toute question ou ajustement, merci de commenter directement ce document._

@@ -1,6 +1,6 @@
 /**
  * MainMenu Screen
- * EVG Anthony - Survivor Edition
+ * Souvenir d’Ony - Survivor Edition
  * 
  * Modern, gaming-style main menu with dynamic background support.
  */
@@ -219,11 +219,11 @@ export class MainMenu {
         // Contour noir épais
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 8;
-        ctx.strokeText('EVG ANTHONY', centerX, titleY);
+        ctx.strokeText('Souvenir d’Ony', centerX, titleY);
 
         // Remplissage cyan avec glow
         ctx.fillStyle = Colors.PRIMARY;
-        ctx.fillText('EVG ANTHONY', centerX, titleY);
+        ctx.fillText('Souvenir d’Ony', centerX, titleY);
 
         ctx.restore();
 

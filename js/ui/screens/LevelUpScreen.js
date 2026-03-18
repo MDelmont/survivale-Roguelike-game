@@ -1,6 +1,6 @@
 /**
  * LevelUpScreen
- * EVG Anthony - Survivor Edition
+ * Souvenir d’Ony - Survivor Edition
  * 
  * 3-card horizontal layout for upgrade selection.
  * Improved readability with larger fonts and clear hierarchy.

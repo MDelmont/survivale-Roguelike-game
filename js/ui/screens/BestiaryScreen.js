@@ -1,6 +1,6 @@
 /**
  * BestiaryScreen
- * EVG Anthony - Survivor Edition
+ * Souvenir d’Ony - Survivor Edition
  *
  * Affiche les entités rencontrées dans le jeu, classées par phase.
  */
