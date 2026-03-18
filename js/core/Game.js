@@ -10,6 +10,8 @@ import { SaveSystem } from '../systems/SaveSystem.js';
 import { DataManager } from './DataManager.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { WeaponFactory } from '../systems/WeaponFactory.js';
+import { AudioSystem } from '../systems/AudioSystem.js';
+
 
 // UI Screens
 import { MainMenu } from '../ui/screens/MainMenu.js';
@@ -88,6 +90,7 @@ class Game {
         this.scale = 1;
         this.dpr = window.devicePixelRatio || 1;
         this.debugMode = false;
+        this.audioSystem = new AudioSystem();
 
         this.init();
     }
@@ -363,10 +366,12 @@ class Game {
             const action = this.mainMenu.handleClick(mouseX, mouseY);
             if (action === 'new_game') {
                 this.requestFullscreen();
+                this.audioSystem.playMusic('music/Big-up-Anthony.mp3');
                 this.startNewGame();
                 return;
             } else if (action === 'continue') {
                 this.requestFullscreen();
+                this.audioSystem.playMusic('music/Big-up-Anthony.mp3');
                 this.continueGame();
                 return;
             } else if (action === 'select_phase') {
@@ -428,6 +433,7 @@ class Game {
             if (action) {
                 if (action.type === 'phase') {
                     this.requestFullscreen();
+                    this.audioSystem.playMusic('music/Big-up-Anthony.mp3');
                     this.player = null;
                     this.startPhase(action.index);
                 } else if (action.type === 'back') {
