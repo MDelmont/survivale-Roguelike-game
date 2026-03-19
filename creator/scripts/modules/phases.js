@@ -544,13 +544,13 @@ class PhasesModule {
         p.transition_outro_id = document.getElementById('phaseTransitionOutro').value;
 
         // Chips -> Arrays
-        p.enemy_types = Array.from(document.querySelectorAll('.chip[data-type="enemy"].active'))
+        p.enemy_types = Array.from(document.querySelectorAll('#phasesSection .chip[data-type="enemy"].active'))
             .map(c => c.dataset.id);
 
-        p.available_weapons = Array.from(document.querySelectorAll('.chip[data-type="weapon"].active'))
+        p.available_weapons = Array.from(document.querySelectorAll('#phasesSection .chip[data-type="weapon"].active'))
             .map(c => c.dataset.id);
 
-        p.available_upgrades = Array.from(document.querySelectorAll('.chip[data-type="upgrade"].active'))
+        p.available_upgrades = Array.from(document.querySelectorAll('#phasesSection .chip[data-type="upgrade"].active'))
             .map(c => c.dataset.id);
 
         p.transition_intro_id = document.getElementById('phaseTransitionIntro').value;

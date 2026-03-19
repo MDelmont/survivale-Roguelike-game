@@ -262,7 +262,15 @@
         "acceleration_rate": 0,
         "xp_visual": "",
         "available_upgrades": [
-            "sperm_hp"
+            "infinite_hp",
+            "infinite_speed",
+            "infinite_damage",
+            "infinite_fire_rate",
+            "infinite_collect",
+            "infinite_projectiles",
+            "infinite_range",
+            "infinite_piercing",
+            "infinite_explosion"
         ],
         "difficulties": {
             "simple": {

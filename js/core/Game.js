@@ -535,7 +535,8 @@ class Game {
             threat_growth_rate: (infiniteConfig.threat_growth_rate || 5) * difficultyFactor,
             initial_threat_budget: (infiniteConfig.initial_threat_budget || 30) * (activeDiff.initial_threat_multiplier || 1),
             max_threat_budget: (infiniteConfig.max_threat_budget || 200) * (activeDiff.max_threat_multiplier || 1),
-            acceleration_rate: infiniteConfig.acceleration_rate || 0
+            acceleration_rate: infiniteConfig.acceleration_rate || 0,
+            available_upgrades: infiniteConfig.available_upgrades || []
         };
 
         this.accelerationStartTime = null;
@@ -1215,9 +1216,9 @@ class Game {
         // Debug Panel (Top Left)
         const panelX = 10;
         const panelY = 150;
-        const panelW = 350;
+        const panelW = 380;
         const typesCount = Object.keys(this.threatBudgets).length;
-        const panelH = 60 + (typesCount * 25);
+        const panelH = 75 + (typesCount * 25);
 
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
         this.ctx.fillRect(panelX, panelY, panelW, panelH);
@@ -1229,17 +1230,33 @@ class Game {
         this.ctx.textAlign = 'left';
         this.ctx.fillText(`DEBUG - ENNEMIS: ${this.enemies.length}`, panelX + 10, panelY + 25);
         this.ctx.font = '12px monospace';
-        this.ctx.fillText(`CROIDDANCE TOTALE: +${this.lastThreatGrowth || 0}/s`, panelX + 10, panelY + 45);
+        this.ctx.fillText(`CROISSANCE TOTALE: +${this.lastThreatGrowth || 0}/s`, panelX + 10, panelY + 40);
+
+        if (this.currentPhase && this.currentPhase.is_infinite) {
+            const accelStatus = this.accelerationStartTime === null ? "EN ATTENTE" : "ACTIVE";
+            let accelValue = "1.00x";
+            if (this.accelerationStartTime !== null) {
+                const accelTimeMinutes = Math.floor((this.phaseTimer - this.accelerationStartTime) / 60);
+                if (accelTimeMinutes > 0) {
+                    const rate = this.currentPhase.acceleration_rate || 0;
+                    accelValue = (1 + (accelTimeMinutes * (rate / 100))).toFixed(2) + "x";
+                }
+            }
+            this.ctx.fillStyle = this.accelerationStartTime !== null ? '#f0f' : '#aaa';
+            this.ctx.fillText(`ACCÉLÉRATION: ${accelStatus} (${accelValue})`, panelX + 10, panelY + 55);
+        }
 
         Object.entries(this.threatBudgets).forEach(([type, budget], i) => {
             const enemyData = this.dataManager.getEnemyData(type);
             const cost = enemyData?.threatLevel || 10;
-            const progress = Math.min(1, budget / cost);
+            const maxBudget = (this.currentPhase && this.currentPhase.is_infinite) ? (this.currentPhase.max_threat_budget || cost * 5) : (cost * 5);
+            const progress = Math.min(1, budget / maxBudget);
+            const spawnReady = budget >= cost;
             const name = enemyData?.name || type;
-            const y = panelY + 70 + (i * 25);
+            const y = panelY + 80 + (i * 25);
 
             // Label
-            this.ctx.fillStyle = '#fff';
+            this.ctx.fillStyle = progress >= 1 ? '#f0f' : (spawnReady ? '#fff' : '#888');
             this.ctx.fillText(`${name.substring(0, 15)}:`, panelX + 10, y);
 
             // Gauge bg
@@ -1247,12 +1264,12 @@ class Game {
             this.ctx.fillRect(panelX + 140, y - 10, 150, 12);
 
             // Gauge fill
-            this.ctx.fillStyle = progress >= 1 ? '#0f0' : '#0af';
+            this.ctx.fillStyle = progress >= 1 ? '#f0f' : (spawnReady ? '#0f0' : '#0af');
             this.ctx.fillRect(panelX + 140, y - 10, 150 * progress, 12);
 
             // Values
             this.ctx.fillStyle = '#fff';
-            this.ctx.fillText(`${Math.floor(budget)}/${cost}`, panelX + 300, y);
+            this.ctx.fillText(`${Math.floor(budget)}/${Math.floor(maxBudget)}`, panelX + 300, y);
         });
 
         this.ctx.restore();

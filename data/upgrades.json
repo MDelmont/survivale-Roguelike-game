@@ -271,6 +271,78 @@
             "type": "stat",
             "stat": "piercingBonus",
             "add": 1
+        },
+        {
+            "id": "infinite_hp",
+            "name": "Infini PV",
+            "description": "Une vitalité qui semble ne plus avoir de limites. Ton corps se renforce au-delà du possible.",
+            "type": "stat",
+            "stat": "maxHp",
+            "add": 75
+        },
+        {
+            "id": "infinite_speed",
+            "name": "Infini Vitesse",
+            "description": "Tu te déplaces avec une fluidité surnaturelle, comme si le temps ralentissait pour toi.",
+            "type": "stat",
+            "stat": "speed",
+            "multiplier": 1.4
+        },
+        {
+            "id": "infinite_damage",
+            "name": "Infini Dégâts",
+            "description": "Chaque coup porté résonne avec une puissance dévastatrice. Rien ne résiste à ta fureur.",
+            "type": "stat",
+            "stat": "damage",
+            "multiplier": 1.4
+        },
+        {
+            "id": "infinite_fire_rate",
+            "name": "Infini Cadence",
+            "description": "Tes réflexes sont si rapides que tes attaques forment une pluie ininterrompue.",
+            "type": "stat",
+            "stat": "fireRate",
+            "multiplier": 1.4
+        },
+        {
+            "id": "infinite_collect",
+            "name": "Infini Magnétisme",
+            "description": "Tout ce qui t'entoure est attiré vers toi comme par une force gravitationnelle irrésistible.",
+            "type": "stat",
+            "stat": "pickupRadius",
+            "multiplier": 1.5
+        },
+        {
+            "id": "infinite_projectiles",
+            "name": "Infini Projectiles",
+            "description": "Pourquoi tirer un seul projectile quand on peut en tirer une multitude ?",
+            "type": "stat",
+            "stat": "projectileBonus",
+            "add": 2
+        },
+        {
+            "id": "infinite_range",
+            "name": "Infini Portée",
+            "description": "Tes attaques atteignent désormais les confins du champ de bataille.",
+            "type": "stat",
+            "stat": "rangeMultiplier",
+            "multiplier": 1.5
+        },
+        {
+            "id": "infinite_piercing",
+            "name": "Infini Perforation",
+            "description": "Tes projectiles traversent les rangs ennemis comme s'ils n'existaient pas.",
+            "type": "stat",
+            "stat": "piercingBonus",
+            "add": 2
+        },
+        {
+            "id": "infinite_explosion",
+            "name": "Infini Explosion",
+            "description": "Chaque impact déclenche une détonation colossale qui ravage tout sur son passage.",
+            "type": "stat",
+            "stat": "explosionRadiusMultiplier",
+            "multiplier": 1.5
         }
     ]
 }

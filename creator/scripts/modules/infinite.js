@@ -247,7 +247,7 @@ class InfiniteModule {
      * Exécute et construit la config
      */
     getConfigFromForm() {
-        const upgradeIds = Array.from(document.querySelectorAll('.chip[data-type="upgrade"].active'))
+        const upgradeIds = Array.from(document.querySelectorAll('#infiniteSection .chip[data-type="upgrade"].active'))
             .map(c => c.dataset.id);
 
         return {
