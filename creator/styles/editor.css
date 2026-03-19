@@ -10,6 +10,10 @@
     min-height: calc(100vh - var(--header-height) - 120px);
 }
 
+.editor-layout.full-width {
+    grid-template-columns: 1fr;
+}
+
 .editor-sidebar {
     max-height: calc(100vh - var(--header-height) - 80px);
     overflow: hidden;
@@ -668,4 +672,26 @@
     font-size: 0.7rem;
     color: rgba(255, 255, 255, 0.5);
     z-index: 3;
+}
+
+/* ---------- Info Icon & Tooltips ---------- */
+.info-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    font-size: 0.7rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-default);
+    border-radius: 50%;
+    color: var(--accent-primary);
+    cursor: help;
+    margin-left: var(--space-xs);
+    transition: all var(--transition-fast);
+}
+
+.info-icon:hover {
+    border-color: var(--accent-primary);
+    background: rgba(139, 92, 246, 0.1);
 }

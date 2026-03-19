@@ -19,6 +19,7 @@ import { LevelUpScreen } from '../ui/screens/LevelUpScreen.js';
 import { WeaponMenuScreen } from '../ui/screens/WeaponMenuScreen.js';
 import { VictoryScreen } from '../ui/screens/VictoryScreen.js';
 import { PhaseSelectionScreen } from '../ui/screens/PhaseSelectionScreen.js';
+import { InfiniteSetupScreen } from '../ui/screens/InfiniteSetupScreen.js';
 import { BestiaryScreen } from '../ui/screens/BestiaryScreen.js';
 
 /**
@@ -33,6 +34,7 @@ const GameState = {
     VICTORY: 'VICTORY',
     PHASE_SELECTION: 'PHASE_SELECTION',
     BESTIARY: 'BESTIARY',
+    INFINITE_SETUP: 'INFINITE_SETUP',
     GAMEOVER: 'GAMEOVER'
 };
 
@@ -132,7 +134,10 @@ class Game {
         this.weaponMenuScreen = new WeaponMenuScreen(this);
         this.victoryScreen = new VictoryScreen(this);
         this.phaseSelectionScreen = new PhaseSelectionScreen(this);
+        this.infiniteSetupScreen = new InfiniteSetupScreen(this);
         this.bestiaryScreen = new BestiaryScreen(this);
+
+        this.accelerationStartTime = null;
 
         this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
 
@@ -168,6 +173,12 @@ class Game {
                     this._touchScrolling = true;
                     this.bestiaryScreen.handleWheel(deltaY * 2);
                     this._touchStartY = currentY; // reset so it scrolls continuously
+                }
+            } else if (this.state === GameState.INFINITE_SETUP && this.infiniteSetupScreen) {
+                if (Math.abs(deltaY) > 5) {
+                    this._touchScrolling = true;
+                    this.infiniteSetupScreen.handleWheel(deltaY * 2);
+                    this._touchStartY = currentY;
                 }
             }
 
@@ -218,13 +229,15 @@ class Game {
             this.mouseY = (e.clientY - rect.top) * (this.logicalHeight / rect.height);
         });
 
-        // Gestion de la molette pour le scroll dans certains écrans (ex: Bestiaire)
+        // Gestion de la molette pour le scroll dans certains écrans
         window.addEventListener('wheel', (e) => {
             if (e.ctrlKey) {
                 e.preventDefault(); // Empêcher le zoom manuel
             } else {
                 if (this.state === GameState.BESTIARY && this.bestiaryScreen) {
                     this.bestiaryScreen.handleWheel(e.deltaY);
+                } else if (this.state === GameState.INFINITE_SETUP && this.infiniteSetupScreen) {
+                    this.infiniteSetupScreen.handleWheel(e.deltaY);
                 }
             }
         }, { passive: false });
@@ -255,6 +268,7 @@ class Game {
         this.boss = null;
         this.killCount = 0;
         this.threatBudgets = {}; // Un budget par type d'ennemi pour des jauges parallèles
+        this.accelerationStartTime = null;
 
         // Initialisation du budget de menace de départ
         if (this.currentPhase.initial_threat_budget && this.currentPhase.enemy_types) {
@@ -378,6 +392,10 @@ class Game {
                 this.state = GameState.PHASE_SELECTION;
                 if (this.phaseSelectionScreen) this.phaseSelectionScreen.reset();
                 return;
+            } else if (action === 'infinite_mode') {
+                this.state = GameState.INFINITE_SETUP;
+                if (this.infiniteSetupScreen) this.infiniteSetupScreen.reset();
+                return;
             } else if (action === 'bestiary') {
                 this.state = GameState.BESTIARY;
                 if (this.bestiaryScreen) this.bestiaryScreen.reset();
@@ -440,6 +458,17 @@ class Game {
                     this.state = GameState.MENU;
                 }
             }
+        } else if (this.state === GameState.INFINITE_SETUP && this.infiniteSetupScreen) {
+            const result = this.infiniteSetupScreen.handleClick(mouseX, mouseY);
+            if (result) {
+                if (result.action === 'back') {
+                    this.state = GameState.MENU;
+                } else if (result.action === 'start') {
+                    this.requestFullscreen();
+                    this.audioSystem.playMusic('music/Big-up-Anthony.mp3');
+                    this.startInfiniteMode(result.config);
+                }
+            }
         } else if (this.state === GameState.BESTIARY && this.bestiaryScreen) {
             const action = this.bestiaryScreen.handleClick(mouseX, mouseY);
             if (action) {
@@ -466,6 +495,90 @@ class Game {
     startNewGame() { this.player = null; this.startPhase(0); }
     continueGame() { this.player = null; this.startPhase(this.saveSystem.getProgress()); }
 
+    startInfiniteMode(config = {}) {
+        // Build the current phase specifically for infinite mode
+        const infiniteConfig = this.dataManager.data.phases?.infinite_mode || {};
+        const allEnemies = Object.keys(this.dataManager.data.enemies?.enemies || {});
+        let poolEnemies = infiniteConfig.enemy_types && infiniteConfig.enemy_types.length > 0 ? infiniteConfig.enemy_types : allEnemies;
+        
+        let poolWeapons = config.weapons && config.weapons.length > 0 ? config.weapons : (this.dataManager.data.weapons?.weapons || []).map(w => w.id);
+
+        this.currentPhaseIndex = -1; // Specific infinite phase index
+        
+        const phaseInfo = this.dataManager.data.phases?.phases?.find(p => p.player_id === config.playerId) || {};
+
+        // Let's adjust difficulty scaling based on creator's choices
+        const diffConfig = infiniteConfig.difficulties || {
+            simple: { stat_multiplier: 0.8, score_multiplier: 1, initial_threat_multiplier: 0.8, max_threat_multiplier: 0.8 },
+            medium: { stat_multiplier: 1.0, score_multiplier: 2, initial_threat_multiplier: 1.0, max_threat_multiplier: 1.0 },
+            extreme: { stat_multiplier: 1.5, score_multiplier: 3, initial_threat_multiplier: 1.5, max_threat_multiplier: 1.5 }
+        };
+        const activeDiff = diffConfig[config.difficulty || 'medium'];
+
+        this.infiniteMultiplier = activeDiff.score_multiplier || 1;
+        const difficultyFactor = activeDiff.stat_multiplier || 1.0;
+
+        this.currentPhase = {
+            is_infinite: true,
+            name: "Mode Infini",
+            duration_before_boss: Infinity,
+            enemy_pool: poolEnemies,
+            enemy_types: [], // Will be dynamically managed (max 3)
+            player_id: config.playerId || "anthony",
+            default_weapon: phaseInfo.default_weapon || "basic_shot",
+            available_weapons: poolWeapons,
+            weapon_drop_rate: 0.15,
+            background_image: config.background_image || infiniteConfig.background_image || "",
+            xp_visual: phaseInfo.xp_visual || infiniteConfig.xp_visual || "",
+            weapon_visual: phaseInfo.weapon_visual || infiniteConfig.weapon_visual || "",
+            difficulty_multiplier: difficultyFactor,
+            threat_growth_rate: (infiniteConfig.threat_growth_rate || 5) * difficultyFactor,
+            initial_threat_budget: (infiniteConfig.initial_threat_budget || 30) * (activeDiff.initial_threat_multiplier || 1),
+            max_threat_budget: (infiniteConfig.max_threat_budget || 200) * (activeDiff.max_threat_multiplier || 1),
+            acceleration_rate: infiniteConfig.acceleration_rate || 0
+        };
+
+        this.accelerationStartTime = null;
+
+        this.phaseTimer = 0;
+        this.enemies = [];
+        this.projectiles = [];
+        this.enemyProjectiles = [];
+        this.loots = [];
+        this.explosions = [];
+        this.boss = null;
+        this.killCount = 0;
+        this.threatBudgets = {};
+
+        // Initialize 3 active random enemy types for the gauges
+        this.rollInfiniteEnemyTypes();
+
+        this.player = null;
+        this.setupInitialPlayer();
+        
+        // The 5 selected weapons will organically drop as upgrades (availableWeapons is set)
+        
+        this.state = GameState.PLAYING;
+    }
+
+    rollInfiniteEnemyTypes() {
+        if (!this.currentPhase || !this.currentPhase.is_infinite) return;
+        
+        const pool = this.currentPhase.enemy_pool;
+        this.currentPhase.enemy_types = [];
+        
+        // Select up to 3 random enemies
+        const numTypes = Math.min(3, pool.length);
+        const shuffledPool = [...pool].sort(() => 0.5 - Math.random());
+        
+        for (let i = 0; i < numTypes; i++) {
+            this.currentPhase.enemy_types.push(shuffledPool[i]);
+            if (this.threatBudgets[shuffledPool[i]] === undefined) {
+                this.threatBudgets[shuffledPool[i]] = 0;
+            }
+        }
+    }
+
     loop(currentTime) {
         const deltaTime = currentTime - this.lastTime;
         this.lastTime = currentTime;
@@ -481,6 +594,8 @@ class Game {
             this.victoryScreen.update(deltaTime);
         } else if (this.state === GameState.PHASE_SELECTION && this.phaseSelectionScreen) {
             this.phaseSelectionScreen.update(deltaTime, this.mouseX, this.mouseY);
+        } else if (this.state === GameState.INFINITE_SETUP && this.infiniteSetupScreen) {
+            this.infiniteSetupScreen.update(deltaTime, this.mouseX, this.mouseY);
         } else if (this.state === GameState.BESTIARY && this.bestiaryScreen) {
             this.bestiaryScreen.update(deltaTime, this.mouseX, this.mouseY);
         } else if (this.state === GameState.PLAYING) {
@@ -553,7 +668,8 @@ class Game {
             const diffMult = phase.difficulty_multiplier || 1.0;
             const baseGrowth = phase.threat_growth_rate || 5.0;
 
-            const phaseProgress = Math.min(1.0, this.phaseTimer / (phase.duration_before_boss || 60));
+            // In infinite mode, phaseProgress is not limited to 1.0. It keeps growing indefinitely!
+            const phaseProgress = phase.is_infinite ? (this.phaseTimer / 60) : Math.min(1.0, this.phaseTimer / (phase.duration_before_boss || 60));
             const progressionBonus = baseGrowth * phaseProgress;
             const levelBonus = (this.player.stats.level - 1) * 2;
             const weaponBonus = (this.player.weapons.length - 1) * 5;
@@ -568,13 +684,26 @@ class Game {
                 if (this.threatBudgets[type] === undefined) this.threatBudgets[type] = 0;
                 this.threatBudgets[type] += growthPerType;
 
-                // Cap de sécurité pour éviter l'accumulation infinie si on ne spawn pas
+                // Cap de sécurité basé sur le budget max configuré (ou 5x le coût par défaut)
                 const enemyData = this.dataManager.getEnemyData(type);
                 const cost = enemyData?.threatLevel || 10;
-                if (this.threatBudgets[type] > cost * 5) this.threatBudgets[type] = cost * 5;
+                const maxBudget = phase.is_infinite ? (phase.max_threat_budget || cost * 5) : (cost * 5);
+                
+                if (this.threatBudgets[type] > maxBudget) {
+                    this.threatBudgets[type] = maxBudget;
+                    // Déclenchement de l'accélération si on atteint le plafond en mode infini
+                    if (phase.is_infinite && this.accelerationStartTime === null) {
+                        this.accelerationStartTime = this.phaseTimer;
+                    }
+                }
             });
 
             this.trySpawnEnemy();
+            
+            // Change the active types every 10 seconds in infinite mode
+            if (phase.is_infinite && Math.floor(this.phaseTimer) % 10 === 0 && Math.floor(this.phaseTimer - deltaTime/1000) % 10 !== 0) {
+                this.rollInfiniteEnemyTypes();
+            }
         }
 
         this.updateGameEntities(deltaTime);
@@ -865,6 +994,18 @@ class Game {
             }
         }
 
+        // Apply health and damage scaling for infinite mode based on acceleration
+        if (this.currentPhase && this.currentPhase.is_infinite && this.accelerationStartTime !== null) {
+            const accelTimeMinutes = Math.floor((this.phaseTimer - this.accelerationStartTime) / 60);
+            if (accelTimeMinutes > 0) {
+                const rate = this.currentPhase.acceleration_rate || 0;
+                const scaleFactor = 1 + (accelTimeMinutes * (rate / 100));
+                enemy.hp *= scaleFactor;
+                enemy.maxHp = enemy.hp;
+                enemy.damage *= scaleFactor;
+            }
+        }
+
         this.enemies.push(enemy);
         this.saveSystem.saveDiscoveredEntity('monstres', type);
     }
@@ -972,6 +1113,11 @@ class Game {
         if (this.state === GameState.VICTORY && this.victoryScreen) this.victoryScreen.draw(this.ctx);
         if (this.state === GameState.PHASE_SELECTION && this.phaseSelectionScreen) {
             this.phaseSelectionScreen.draw(this.ctx);
+            this.ctx.restore();
+            return;
+        }
+        if (this.state === GameState.INFINITE_SETUP && this.infiniteSetupScreen) {
+            this.infiniteSetupScreen.draw(this.ctx);
             this.ctx.restore();
             return;
         }
@@ -1595,7 +1741,14 @@ class Game {
         // Stats
         ctx.fillStyle = 'white';
         ctx.font = '24px Inter, Arial';
-        ctx.fillText(`KILLS: ${this.killCount}`, centerX, centerY - 40);
+        
+        if (this.currentPhase && this.currentPhase.is_infinite) {
+            const kills = this.killCount || 0;
+            const score = kills * (this.infiniteMultiplier || 1);
+            ctx.fillText(`KILLS: ${kills}  |  SCORE: ${score}`, centerX, centerY - 40);
+        } else {
+            ctx.fillText(`KILLS: ${this.killCount}`, centerX, centerY - 40);
+        }
 
         // --- Bouton unique : RETOUR AU MENU ---
         const btnW = 320;

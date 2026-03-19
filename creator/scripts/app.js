@@ -17,6 +17,7 @@ class App {
             phases: null,
             upgrades: null,
             transitions: null,
+            infinite: null,
             config: null
         };
 
@@ -334,6 +335,12 @@ class App {
                     this.modules.transitions = new TransitionsModule(this);
                 }
                 this.modules.transitions.init();
+                break;
+            case 'infinite':
+                if (!this.modules.infinite) {
+                    this.modules.infinite = new InfiniteModule(this);
+                }
+                this.modules.infinite.init();
                 break;
             case 'config':
                 if (!this.modules.config) {

@@ -55,10 +55,22 @@ export class MainMenu {
                 y: 0.70
             },
             {
+                id: 'infinite_mode',
+                text: 'MODE INFINI',
+                color: Colors.DANGER || '#EF4444',
+                y: 0.80,
+                // Accessible if the user has reached the end of the game phases
+                condition: () => {
+                    const progress = this.game.saveSystem.getProgress();
+                    const totalPhases = this.game.dataManager.data.phases?.phases?.length || 0;
+                    return progress >= totalPhases && totalPhases > 0;
+                }
+            },
+            {
                 id: 'bestiary',
                 text: 'BESTIAIRE',
                 color: Colors.EPIC || '#A855F7',
-                y: 0.80
+                y: 0.90
             }
         ];
     }

@@ -253,5 +253,39 @@
         }
     ],
     "menu_background": "assets/fond/conception/fond-ovule-dark.png",
-    "victory_background": "assets/fond/conception/fond-ovule.png"
+    "victory_background": "assets/fond/conception/fond-ovule.png",
+    "infinite_mode": {
+        "spawn_rate": 1000,
+        "initial_threat_budget": 20,
+        "max_threat_budget": 200,
+        "threat_growth_rate": 5,
+        "acceleration_rate": 0,
+        "xp_visual": "",
+        "available_upgrades": [
+            "sperm_hp"
+        ],
+        "difficulties": {
+            "simple": {
+                "stat_multiplier": 1,
+                "score_multiplier": 1,
+                "spawn_rate_multiplier": 1.2,
+                "initial_threat_multiplier": 1,
+                "max_threat_multiplier": 1
+            },
+            "medium": {
+                "stat_multiplier": 1.2,
+                "score_multiplier": 2,
+                "spawn_rate_multiplier": 1,
+                "initial_threat_multiplier": 1.2,
+                "max_threat_multiplier": 1.2
+            },
+            "extreme": {
+                "stat_multiplier": 1.5,
+                "score_multiplier": 3,
+                "spawn_rate_multiplier": 0.7,
+                "initial_threat_multiplier": 1.5,
+                "max_threat_multiplier": 1.5
+            }
+        }
+    }
 }
