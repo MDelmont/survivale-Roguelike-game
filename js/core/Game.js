@@ -535,7 +535,7 @@ class Game {
             threat_growth_rate: (infiniteConfig.threat_growth_rate || 5) * difficultyFactor,
             initial_threat_budget: (infiniteConfig.initial_threat_budget || 30) * (activeDiff.initial_threat_multiplier || 1),
             max_threat_budget: (infiniteConfig.max_threat_budget || 200) * (activeDiff.max_threat_multiplier || 1),
-            acceleration_rate: infiniteConfig.acceleration_rate || 0,
+            acceleration_rate: activeDiff.acceleration_rate || infiniteConfig.acceleration_rate || 0,
             available_upgrades: infiniteConfig.available_upgrades || []
         };
 

@@ -259,7 +259,6 @@
         "initial_threat_budget": 20,
         "max_threat_budget": 200,
         "threat_growth_rate": 5,
-        "acceleration_rate": 0,
         "xp_visual": "",
         "available_upgrades": [
             "infinite_hp",
@@ -278,21 +277,24 @@
                 "score_multiplier": 1,
                 "spawn_rate_multiplier": 1.2,
                 "initial_threat_multiplier": 1,
-                "max_threat_multiplier": 1
+                "max_threat_multiplier": 1,
+                "acceleration_rate": 3
             },
             "medium": {
-                "stat_multiplier": 1.2,
+                "stat_multiplier": 1.3,
                 "score_multiplier": 2,
                 "spawn_rate_multiplier": 1,
-                "initial_threat_multiplier": 1.2,
-                "max_threat_multiplier": 1.2
+                "initial_threat_multiplier": 1.3,
+                "max_threat_multiplier": 1.3,
+                "acceleration_rate": 8
             },
             "extreme": {
                 "stat_multiplier": 1.5,
                 "score_multiplier": 3,
                 "spawn_rate_multiplier": 0.7,
                 "initial_threat_multiplier": 1.5,
-                "max_threat_multiplier": 1.5
+                "max_threat_multiplier": 1.5,
+                "acceleration_rate": 8
             }
         }
     }

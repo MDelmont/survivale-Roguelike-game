@@ -76,12 +76,6 @@ class InfiniteModule {
                                     <input type="number" step="0.1" class="form-input" id="infiniteThreatGrowth" value="${config.threat_growth_rate || 0.5}">
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Accélération (stats % / min) <span class="info-icon" data-tooltip="Augmente les PV/Dégâts des ennemis chaque minute après que le budget max a été atteint.">ⓘ</span></label>
-                                    <input type="number" step="1" class="form-input" id="infiniteAcceleration" value="${config.acceleration_rate || 0}">
-                                </div>
-                            </div>
                         </div>
 
                         <!-- Paramètres de Difficulté -->
@@ -113,6 +107,10 @@ class InfiniteModule {
                                             <label class="form-label">Multiplicateur de Budget Max <span class="info-icon" data-tooltip="Multiplie la limite maximale du budget de menace.">ⓘ</span></label>
                                             <input type="number" step="0.1" class="form-input" id="diffSimpleBudgetMax" value="${config.difficulties?.simple?.max_threat_multiplier || 0.8}">
                                         </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Accélération (% / min) <span class="info-icon" data-tooltip="Augmente les PV/Dégâts des ennemis chaque minute après le plafond budgétaire.">ⓘ</span></label>
+                                            <input type="number" step="1" class="form-input" id="diffSimpleAcceleration" value="${config.difficulties?.simple?.acceleration_rate || 0}">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="panel" style="flex: 1;">
@@ -140,6 +138,10 @@ class InfiniteModule {
                                             <label class="form-label">Multiplicateur de Budget Max <span class="info-icon" data-tooltip="Multiplie la limite maximale du budget de menace.">ⓘ</span></label>
                                             <input type="number" step="0.1" class="form-input" id="diffMediumBudgetMax" value="${config.difficulties?.medium?.max_threat_multiplier || 1.0}">
                                         </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Accélération (% / min) <span class="info-icon" data-tooltip="Augmente les PV/Dégâts des ennemis chaque minute après le plafond budgétaire.">ⓘ</span></label>
+                                            <input type="number" step="1" class="form-input" id="diffMediumAcceleration" value="${config.difficulties?.medium?.acceleration_rate || 0}">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="panel" style="flex: 1;">
@@ -166,6 +168,10 @@ class InfiniteModule {
                                         <div class="form-group">
                                             <label class="form-label">Multiplicateur de Budget Max <span class="info-icon" data-tooltip="Multiplie la limite maximale du budget de menace.">ⓘ</span></label>
                                             <input type="number" step="0.1" class="form-input" id="diffExtremeBudgetMax" value="${config.difficulties?.extreme?.max_threat_multiplier || 1.5}">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Accélération (% / min) <span class="info-icon" data-tooltip="Augmente les PV/Dégâts des ennemis chaque minute après le plafond budgétaire.">ⓘ</span></label>
+                                            <input type="number" step="1" class="form-input" id="diffExtremeAcceleration" value="${config.difficulties?.extreme?.acceleration_rate || 0}">
                                         </div>
                                     </div>
                                 </div>
@@ -255,7 +261,6 @@ class InfiniteModule {
             initial_threat_budget: parseInt(document.getElementById('infiniteInitialThreat').value) || 20,
             max_threat_budget: parseInt(document.getElementById('infiniteMaxThreat').value) || 200,
             threat_growth_rate: parseFloat(document.getElementById('infiniteThreatGrowth').value) || 0.5,
-            acceleration_rate: parseInt(document.getElementById('infiniteAcceleration').value) || 0,
             xp_visual: document.getElementById('infiniteXpVisual').value,
             available_upgrades: upgradeIds,
             difficulties: {
@@ -264,21 +269,24 @@ class InfiniteModule {
                     score_multiplier: parseInt(document.getElementById('diffSimpleScore').value) || 1,
                     spawn_rate_multiplier: parseFloat(document.getElementById('diffSimpleSpawn').value) || 1.2,
                     initial_threat_multiplier: parseFloat(document.getElementById('diffSimpleBudgetInit').value) || 0.8,
-                    max_threat_multiplier: parseFloat(document.getElementById('diffSimpleBudgetMax').value) || 0.8
+                    max_threat_multiplier: parseFloat(document.getElementById('diffSimpleBudgetMax').value) || 0.8,
+                    acceleration_rate: parseInt(document.getElementById('diffSimpleAcceleration').value) || 0
                 },
                 medium: { 
                     stat_multiplier: parseFloat(document.getElementById('diffMediumStat').value) || 1.0,
                     score_multiplier: parseInt(document.getElementById('diffMediumScore').value) || 2,
                     spawn_rate_multiplier: parseFloat(document.getElementById('diffMediumSpawn').value) || 1.0,
                     initial_threat_multiplier: parseFloat(document.getElementById('diffMediumBudgetInit').value) || 1.0,
-                    max_threat_multiplier: parseFloat(document.getElementById('diffMediumBudgetMax').value) || 1.0
+                    max_threat_multiplier: parseFloat(document.getElementById('diffMediumBudgetMax').value) || 1.0,
+                    acceleration_rate: parseInt(document.getElementById('diffMediumAcceleration').value) || 0
                 },
                 extreme: { 
                     stat_multiplier: parseFloat(document.getElementById('diffExtremeStat').value) || 1.5,
                     score_multiplier: parseInt(document.getElementById('diffExtremeScore').value) || 3,
                     spawn_rate_multiplier: parseFloat(document.getElementById('diffExtremeSpawn').value) || 0.7,
                     initial_threat_multiplier: parseFloat(document.getElementById('diffExtremeBudgetInit').value) || 1.5,
-                    max_threat_multiplier: parseFloat(document.getElementById('diffExtremeBudgetMax').value) || 1.5
+                    max_threat_multiplier: parseFloat(document.getElementById('diffExtremeBudgetMax').value) || 1.5,
+                    acceleration_rate: parseInt(document.getElementById('diffExtremeAcceleration').value) || 0
                 }
             }
         };
