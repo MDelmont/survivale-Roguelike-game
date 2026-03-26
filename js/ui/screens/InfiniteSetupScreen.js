@@ -151,55 +151,75 @@ export class InfiniteSetupScreen {
             });
         }
     }
-
     handleClick(mouseX, mouseY) {
         if (this.isAnimating) return null;
 
-        switch (this.hoveredItem) {
-            case 'back':
-                return { action: 'back' };
-            
-            case 'start':
-                if (this.selectedWeapons.size === 5) {
-                    const player = this.players[this.currentPlayerIndex];
-                    return {
-                        action: 'start',
-                        config: {
-                            playerId: player.id,
-                            weapons: Array.from(this.selectedWeapons),
-                            difficulty: this.difficulty,
-                            background_image: player.background_image
+        const layout = this.getLayout();
+
+        // 1. Check Back Button
+        if (this.isInside(mouseX, mouseY, layout.backBtn)) return { action: 'back' };
+
+        // 2. Check Start Button
+        if (this.isInside(mouseX, mouseY, layout.pnlStart)) {
+            if (this.selectedWeapons.size === 5) {
+                const player = this.players[this.currentPlayerIndex];
+                return {
+                    action: 'start',
+                    config: {
+                        playerId: player.id,
+                        weapons: Array.from(this.selectedWeapons),
+                        difficulty: this.difficulty,
+                        background_image: player.background_image
+                    }
+                };
+            }
+        }
+
+        // 3. Check Hero Navigation
+        if (this.isInside(mouseX, mouseY, layout.playerPrev)) {
+            this.currentPlayerIndex = (this.currentPlayerIndex - 1 + this.players.length) % this.players.length;
+            this._validateSelection();
+            return null;
+        }
+        if (this.isInside(mouseX, mouseY, layout.playerNext)) {
+            this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
+            this._validateSelection();
+            return null;
+        }
+
+        // 4. Check Difficulties
+        for (const dr of layout.diffRects) {
+            if (this.isInside(mouseX, mouseY, dr.rect)) {
+                this.difficulty = dr.id;
+                return null;
+            }
+        }
+
+        // 5. Check Weapons List
+        // Note: Clicks in the arsenal panel area
+        const arsenalScrollArea = { 
+            x: layout.pnlArsenal.x, 
+            y: layout.pnlArsenal.y + 80, 
+            w: layout.pnlArsenal.w, 
+            h: layout.pnlArsenal.h - 90 
+        };
+        
+        if (this.isInside(mouseX, mouseY, arsenalScrollArea)) {
+            for (const wr of layout.weaponRects) {
+                // Info button or Row click (both should work on mobile, but prioritized row)
+                if (this.isInside(mouseX, mouseY, wr.rect)) {
+                    const wid = wr.weapon.id;
+                    if (this.selectedWeapons.has(wid)) {
+                        this.selectedWeapons.delete(wid);
+                    } else {
+                        if (this.selectedWeapons.size >= 5) {
+                            const oldest = Array.from(this.selectedWeapons)[0];
+                            this.selectedWeapons.delete(oldest);
                         }
-                    };
+                        this.selectedWeapons.add(wid);
+                    }
+                    return null;
                 }
-                break;
-
-            case 'playerPrev':
-                this.currentPlayerIndex = (this.currentPlayerIndex - 1 + this.players.length) % this.players.length;
-                this._validateSelection();
-                break;
-
-            case 'playerNext':
-                this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
-                this._validateSelection();
-                break;
-        }
-
-        if (this.hoveredItem?.startsWith('diff_')) {
-            this.difficulty = this.hoveredItem.split('_')[1];
-        }
-
-        if (this.hoveredItem?.startsWith('weapon_')) {
-            const wid = this.hoveredItem.substring(7); // "weapon_".length
-            if (this.selectedWeapons.has(wid)) {
-                this.selectedWeapons.delete(wid);
-            } else {
-                // If 5 are already selected, we unselect the oldest one
-                if (this.selectedWeapons.size >= 5) {
-                    const oldest = Array.from(this.selectedWeapons)[0];
-                    this.selectedWeapons.delete(oldest);
-                }
-                this.selectedWeapons.add(wid);
             }
         }
 
@@ -222,6 +242,17 @@ export class InfiniteSetupScreen {
         const w = this.game.logicalWidth;
         const h = this.game.logicalHeight;
 
+        // Sensible detection of mobile/vertical layout
+        const isPortrait = h > w || w < 1100;
+
+        if (isPortrait) {
+            return this.getPortraitLayout(w, h);
+        } else {
+            return this.getDesktopLayout(w, h);
+        }
+    }
+
+    getDesktopLayout(w, h) {
         const startY = 120;
         const totalHeight = h - startY - 40;
 
@@ -234,7 +265,7 @@ export class InfiniteSetupScreen {
         const col3X = col2X + col2W + gap;
         const col3W = w - col3X - 50; // 50px right margin
 
-        // Pannels
+        // Panels
         const pnlHero = { x: col1X, y: startY, w: col1W, h: 420 };
         const pnlDiff = { x: col1X, y: pnlHero.y + pnlHero.h + gap, w: col1W, h: totalHeight - pnlHero.h - gap };
         const pnlArsenal = { x: col2X, y: startY, w: col2W, h: totalHeight };
@@ -272,7 +303,6 @@ export class InfiniteSetupScreen {
             const y = contentStartY + i * (weaponH + weaponGap) + this.weaponScrollY;
             const x = pnlArsenal.x + 20;
             const wRow = pnlArsenal.w - 40;
-            // Info button rect at the right of the listing
             const infoRect = { x: x + wRow - 40, y: y + 10, w: 30, h: 30 };
             return {
                 weapon: wp,
@@ -283,8 +313,74 @@ export class InfiniteSetupScreen {
         
         this.maxWeaponScroll = filteredWeapons.length * (weaponH + weaponGap);
 
-        return { pnlHero, pnlDiff, pnlArsenal, pnlDetails, pnlStart, backBtn, playerPrev, playerNext, playerAreaY, diffAreaY, diffRects, weaponRects, baseWeaponRect, baseWeaponInfoBtn };
+        return { pnlHero, pnlDiff, pnlArsenal, pnlDetails, pnlStart, backBtn, playerPrev, playerNext, playerAreaY, diffAreaY, diffRects, weaponRects, baseWeaponRect, baseWeaponInfoBtn, isPortrait: false };
     }
+
+    getPortraitLayout(w, h) {
+        // En mode portrait, on empile tout verticalement. 
+        // L'arsenal prend le plus de place.
+        const startY = 120;
+        const gap = 20;
+        const padding = 40;
+        const colW = w - padding * 2;
+
+        const pnlHero = { x: padding, y: startY, w: colW, h: 400 };
+        const pnlDiff = { x: padding, y: pnlHero.y + pnlHero.h + gap, w: colW, h: 180 };
+        
+        // On calcule la place restante pour l'arsenal et le bouton start
+        const bottomAreaH = 150; // Bouton start
+        const arsenalH = Math.max(400, h - pnlDiff.y - pnlDiff.h - bottomAreaH - gap * 3);
+        
+        const pnlArsenal = { x: padding, y: pnlDiff.y + pnlDiff.h + gap, w: colW, h: arsenalH };
+        const pnlStart = { x: padding, y: h - bottomAreaH + 20, w: colW, h: bottomAreaH - 40 };
+        
+        // Pnl details (invisible ou flottant en portrait ? On le cache car on affiche déjà les infos de base ou on le met par dessus)
+        const pnlDetails = { x: -2000, y: -2000, w: 10, h: 10 }; 
+
+        const backBtn = { x: padding, y: 30, w: 140, h: 50 };
+
+        // Hero Nav
+        const playerAreaY = pnlHero.y + 40;
+        const playerPrev = { x: pnlHero.x + 20, y: playerAreaY + 100, w: 50, h: 50 };
+        const playerNext = { x: pnlHero.x + pnlHero.w - 70, y: playerAreaY + 100, w: 50, h: 50 };
+        
+        const baseWeaponRect = { x: pnlHero.x + 20, y: pnlHero.y + pnlHero.h - 90, w: pnlHero.w - 40, h: 70 };
+        const baseWeaponInfoBtn = { x: baseWeaponRect.x + baseWeaponRect.w - 45, y: baseWeaponRect.y + 15, w: 40, h: 40 };
+
+        // Diff
+        const diffAreaY = pnlDiff.y + 35;
+        const drW = (pnlDiff.w - 60) / 3;
+        const diffRects = this.difficulties.map((diff, i) => ({
+            id: diff.id,
+            rect: { x: pnlDiff.x + 20 + i * (drW + 10), y: diffAreaY + 40, w: drW, h: 80 }
+        }));
+
+        // Arsenal (Larger rows for touch)
+        const weaponH = 70;
+        const weaponGap = 12;
+        const contentStartY = pnlArsenal.y + 80;
+
+        const player = this.players[this.currentPlayerIndex];
+        const baseWpId = player?.default_weapon;
+        const filteredWeapons = this.weapons.filter(wp => wp.id !== baseWpId);
+
+        const weaponRects = filteredWeapons.map((wp, i) => {
+            const y = contentStartY + i * (weaponH + weaponGap) + this.weaponScrollY;
+            const x = pnlArsenal.x + 20;
+            const wRow = pnlArsenal.w - 40;
+            const infoRect = { x: x + wRow - 50, y: y + 15, w: 40, h: 40 };
+            return {
+                weapon: wp,
+                rect: { x, y, w: wRow, h: weaponH },
+                infoRect
+            };
+        });
+        
+        this.maxWeaponScroll = filteredWeapons.length * (weaponH + weaponGap);
+
+        return { pnlHero, pnlDiff, pnlArsenal, pnlDetails, pnlStart, backBtn, playerPrev, playerNext, playerAreaY, diffAreaY, diffRects, weaponRects, baseWeaponRect, baseWeaponInfoBtn, isPortrait: true };
+    }
+
 
     draw(ctx) {
         const layout = this.getLayout();
@@ -320,7 +416,10 @@ export class InfiniteSetupScreen {
         drawGlassPanel(ctx, layout.pnlHero.x, layout.pnlHero.y, layout.pnlHero.w, layout.pnlHero.h);
         drawGlassPanel(ctx, layout.pnlDiff.x, layout.pnlDiff.y, layout.pnlDiff.w, layout.pnlDiff.h);
         drawGlassPanel(ctx, layout.pnlArsenal.x, layout.pnlArsenal.y, layout.pnlArsenal.w, layout.pnlArsenal.h);
-        drawGlassPanel(ctx, layout.pnlDetails.x, layout.pnlDetails.y, layout.pnlDetails.w, layout.pnlDetails.h);
+        
+        if (!layout.isPortrait) {
+            drawGlassPanel(ctx, layout.pnlDetails.x, layout.pnlDetails.y, layout.pnlDetails.w, layout.pnlDetails.h);
+        }
 
         this.drawHeroPanel(ctx, layout);
         this.drawDiffPanel(ctx, layout);
@@ -422,7 +521,7 @@ export class InfiniteSetupScreen {
 
     drawDiffPanel(ctx, layout) {
         ctx.fillStyle = '#fff';
-        ctx.font = `bold 22px ${Typography.FONT_PRIMARY}`;
+        ctx.font = `bold ${layout.isPortrait ? 24 : 22}px ${Typography.FONT_PRIMARY}`;
         ctx.textAlign = 'center';
         ctx.fillText('DIFFICULTÉ', layout.pnlDiff.x + layout.pnlDiff.w / 2, layout.diffAreaY);
 
@@ -442,8 +541,16 @@ export class InfiniteSetupScreen {
             }
 
             ctx.fillStyle = isSelected ? '#fff' : diffData.color;
-            ctx.font = `bold 18px ${Typography.FONT_PRIMARY}`;
-            ctx.fillText(diffData.label + ` (Score x${diffData.multiplier})`, dr.rect.x + dr.rect.w / 2, dr.rect.y + dr.rect.h / 2);
+            ctx.font = `bold ${layout.isPortrait ? 16 : 18}px ${Typography.FONT_PRIMARY}`;
+            
+            if (layout.isPortrait) {
+                // Wrap text if needed or use smaller font
+                ctx.fillText(diffData.label, dr.rect.x + dr.rect.w / 2, dr.rect.y + dr.rect.h / 2 - 10);
+                ctx.font = `12px ${Typography.FONT_PRIMARY}`;
+                ctx.fillText(`(x${diffData.multiplier})`, dr.rect.x + dr.rect.w / 2, dr.rect.y + dr.rect.h / 2 + 15);
+            } else {
+                ctx.fillText(diffData.label + ` (Score x${diffData.multiplier})`, dr.rect.x + dr.rect.w / 2, dr.rect.y + dr.rect.h / 2);
+            }
         });
     }
 
@@ -452,7 +559,7 @@ export class InfiniteSetupScreen {
         ctx.font = `bold 24px ${Typography.FONT_PRIMARY}`;
         ctx.textAlign = 'left';
         ctx.fillText(`ARSENAL (${this.selectedWeapons.size}/5)`, layout.pnlArsenal.x + 20, layout.pnlArsenal.y + 40);
-        ctx.font = `14px ${Typography.FONT_PRIMARY}`;
+        ctx.font = `${layout.isPortrait ? 16 : 14}px ${Typography.FONT_PRIMARY}`;
         ctx.fillStyle = Colors.TEXT_MUTED;
         ctx.fillText('Cochez vos armes secondaires', layout.pnlArsenal.x + 20, layout.pnlArsenal.y + 65);
 
@@ -476,35 +583,39 @@ export class InfiniteSetupScreen {
             ctx.lineWidth = 1;
             ctx.stroke();
 
+            const checkSize = layout.isPortrait ? 30 : 20;
+            const checkY = wr.rect.y + (wr.rect.h - checkSize) / 2;
+
             // Checkbox visual (left side)
             ctx.strokeStyle = isSelected ? Colors.SUCCESS : 'rgba(255,255,255,0.5)';
             ctx.fillStyle = isSelected ? Colors.SUCCESS : 'transparent';
-            this.roundRectPath(ctx, wr.rect.x + 15, wr.rect.y + 15, 20, 20, 3);
+            this.roundRectPath(ctx, wr.rect.x + 15, checkY, checkSize, checkSize, 3);
             ctx.fill();
             ctx.stroke();
             if (isSelected) {
                 ctx.fillStyle = '#111';
-                ctx.font = 'bold 14px Arial';
+                ctx.font = `bold ${layout.isPortrait ? 18 : 14}px Arial`;
                 ctx.textAlign = 'center';
-                ctx.fillText('✓', wr.rect.x + 25, wr.rect.y + 30);
+                ctx.fillText('✓', wr.rect.x + 15 + checkSize/2, checkY + checkSize/2 + (layout.isPortrait ? 7 : 5));
             }
 
             // Text
             ctx.fillStyle = '#fff';
-            ctx.font = `bold 18px ${Typography.FONT_PRIMARY}`;
+            ctx.font = `bold ${layout.isPortrait ? 22 : 18}px ${Typography.FONT_PRIMARY}`;
             ctx.textAlign = 'left';
             let name = wr.weapon.name || wr.weapon.id;
-            ctx.fillText(name, wr.rect.x + 50, wr.rect.y + 32);
+            ctx.fillText(name, wr.rect.x + 25 + checkSize, wr.rect.y + wr.rect.h/2 + (layout.isPortrait ? 8 : 6));
 
             // Info button
             ctx.fillStyle = isInfoHovered ? Colors.PRIMARY : 'rgba(255,255,255,0.2)';
             ctx.beginPath();
-            ctx.arc(wr.infoRect.x + 15, wr.infoRect.y + 15, 12, 0, Math.PI * 2);
+            const infoR = layout.isPortrait ? 18 : 12;
+            ctx.arc(wr.infoRect.x + wr.infoRect.w/2, wr.infoRect.y + wr.infoRect.h/2, infoR, 0, Math.PI * 2);
             ctx.fill();
             ctx.fillStyle = '#fff';
-            ctx.font = `bold 14px ${Typography.FONT_PRIMARY}`;
+            ctx.font = `bold ${layout.isPortrait ? 18 : 14}px ${Typography.FONT_PRIMARY}`;
             ctx.textAlign = 'center';
-            ctx.fillText('i', wr.infoRect.x + 15, wr.infoRect.y + 20);
+            ctx.fillText('i', wr.infoRect.x + wr.infoRect.w/2, wr.infoRect.y + wr.infoRect.h/2 + (layout.isPortrait ? 6 : 5));
         });
 
         // Scrollbar track
@@ -531,6 +642,8 @@ export class InfiniteSetupScreen {
     }
 
     drawDetailsPanel(ctx, layout) {
+        if (layout.isPortrait) return; // Hidden in portrait
+
         const px = layout.pnlDetails.x;
         const py = layout.pnlDetails.y;
         

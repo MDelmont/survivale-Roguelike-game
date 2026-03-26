@@ -201,7 +201,8 @@ class Game {
             // et que le doigt n'ait pas trop bougé (vrai "tap" et pas glissement)
             const isSelectionScreen = this.state === GameState.UPGRADE ||
                                        this.state === GameState.WEAPON_MENU ||
-                                       this.state === GameState.PHASE_SELECTION;
+                                       this.state === GameState.PHASE_SELECTION ||
+                                       this.state === GameState.INFINITE_SETUP;
 
             if (isSelectionScreen) {
                 // Ignorer si l'état a changé entre touchstart et touchend
@@ -220,7 +221,10 @@ class Game {
                 clientY: e.changedTouches[0].clientY
             };
             this.handleCanvasClick(fakeEvent);
-        }, { passive: true });
+            
+            // Empêcher le déclenchement du 'click' synthétique après le 'touchend'
+            if (e.cancelable) e.preventDefault();
+        }, { passive: false });
         // ===== FIN SUPPORT TACTILE =====
 
         // Mouse tracking for hover effects
