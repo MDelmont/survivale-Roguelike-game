@@ -93,6 +93,7 @@ class Game {
         this.dpr = window.devicePixelRatio || 1;
         this.debugMode = false;
         this.audioSystem = new AudioSystem();
+        this.stateChangeTime = Date.now();
 
         this.init();
     }
@@ -376,6 +377,12 @@ class Game {
         const mouseX = (e.clientX - rect.left) * (this.logicalWidth / rect.width);
         const mouseY = (e.clientY - rect.top) * (this.logicalHeight / rect.height);
 
+        // DELAY DE SÉCURITÉ : Empêcher les "clics fantômes" lors d'un changement d'état vers le MENU
+        // (Évite de re-déclencher un bouton du menu immédiatement après avoir cliqué sur "Suivant" dans une cinématique)
+        if (this.state === GameState.MENU && (Date.now() - this.stateChangeTime < 200)) {
+            return;
+        }
+
         if (this.state === GameState.MENU && this.mainMenu) {
             const action = this.mainMenu.handleClick(mouseX, mouseY);
             if (action === 'new_game') {
@@ -441,10 +448,12 @@ class Game {
             } else {
                 // Fin du jeu
                 this.state = GameState.MENU;
+                this.stateChangeTime = Date.now();
             }
         } else if (this.state === GameState.GAMEOVER) {
             // Un seul choix : retour au menu
             this.state = GameState.MENU;
+            this.stateChangeTime = Date.now();
             this.exitFullscreen();
         } else if (this.state === GameState.PHASE_SELECTION && this.phaseSelectionScreen) {
             const action = this.phaseSelectionScreen.handleClick(mouseX, mouseY);
@@ -456,6 +465,7 @@ class Game {
                     this.startPhase(action.index);
                 } else if (action.type === 'back') {
                     this.state = GameState.MENU;
+                    this.stateChangeTime = Date.now();
                 }
             }
         } else if (this.state === GameState.INFINITE_SETUP && this.infiniteSetupScreen) {
@@ -463,6 +473,7 @@ class Game {
             if (result) {
                 if (result.action === 'back') {
                     this.state = GameState.MENU;
+                    this.stateChangeTime = Date.now();
                 } else if (result.action === 'start') {
                     this.requestFullscreen();
                     this.audioSystem.playMusic('music/Big-up-Anthony.mp3');
@@ -474,6 +485,7 @@ class Game {
             if (action) {
                 if (action === 'back') {
                     this.state = GameState.MENU;
+                    this.stateChangeTime = Date.now();
                 }
             }
         }
@@ -834,6 +846,7 @@ class Game {
                 this.saveSystem.saveDiscoveredEntity('transitions', transition.id);
                 this.openStory(transition.pages, () => {
                     this.state = GameState.VICTORY;
+                    this.stateChangeTime = Date.now();
                     if (this.victoryScreen) this.victoryScreen.reset();
                 }, transition.id);
                 return;
@@ -843,10 +856,12 @@ class Game {
         if (this.currentPhase.story_outro && this.currentPhase.story_outro.length > 0) {
             this.openStory(this.currentPhase.story_outro, () => {
                 this.state = GameState.VICTORY;
+                this.stateChangeTime = Date.now();
                 if (this.victoryScreen) this.victoryScreen.reset();
             });
         } else {
             this.state = GameState.VICTORY;
+            this.stateChangeTime = Date.now();
             if (this.victoryScreen) this.victoryScreen.reset();
         }
     }
@@ -861,14 +876,16 @@ class Game {
                 this.openStory(transition.pages, () => {
                     this.exitFullscreen();
                     this.state = GameState.MENU;
+                    this.stateChangeTime = Date.now();
                 }, transition.id);
                 return;
             }
         }
 
-        // Fallback standard
+        // Fallback standard : retour au menu d'accueil
         this.exitFullscreen();
-        this.state = GameState.GAMEOVER;
+        this.state = GameState.MENU;
+        this.stateChangeTime = Date.now();
     }
 
     /**
