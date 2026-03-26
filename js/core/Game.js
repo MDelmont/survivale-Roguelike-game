@@ -213,7 +213,7 @@ class Game {
                 const dx = endX - this._touchStartX;
                 const dy = endY - this._touchStartY;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist > 30) return;
+                if (dist > 100) return; // Seuil augmenté pour les écrans logiques de 1600px
             }
 
             const fakeEvent = {

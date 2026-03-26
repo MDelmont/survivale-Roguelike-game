@@ -266,7 +266,9 @@ export class InfiniteSetupScreen {
         const col3W = w - col3X - 50; // 50px right margin
 
         // Panels
-        const pnlHero = { x: col1X, y: startY, w: col1W, h: 420 };
+        // Adapt Hero panel height based on totalHeight
+        const pnlHeroH = Math.min(420, Math.max(300, totalHeight - 200));
+        const pnlHero = { x: col1X, y: startY, w: col1W, h: pnlHeroH };
         const pnlDiff = { x: col1X, y: pnlHero.y + pnlHero.h + gap, w: col1W, h: totalHeight - pnlHero.h - gap };
         const pnlArsenal = { x: col2X, y: startY, w: col2W, h: totalHeight };
         const pnlDetails = { x: col3X, y: startY, w: col3W, h: totalHeight - 110 };
@@ -275,19 +277,20 @@ export class InfiniteSetupScreen {
         const backBtn = { x: 50, y: 30, w: 120, h: 40 };
 
         // Hero Content
-        const playerAreaY = pnlHero.y + 40;
-        const playerPrev = { x: pnlHero.x + 20, y: playerAreaY + 120 - 20, w: 40, h: 40 };
-        const playerNext = { x: pnlHero.x + pnlHero.w - 60, y: playerAreaY + 120 - 20, w: 40, h: 40 };
+        const playerAreaY = pnlHero.y + 35;
+        const playerPrev = { x: pnlHero.x + 10, y: playerAreaY + (pnlHero.h * 0.3), w: 40, h: 40 };
+        const playerNext = { x: pnlHero.x + pnlHero.w - 50, y: playerAreaY + (pnlHero.h * 0.3), w: 40, h: 40 };
 
         // Hero Base Weapon Info
-        const baseWeaponRect = { x: pnlHero.x + 20, y: pnlHero.y + pnlHero.h - 90, w: pnlHero.w - 40, h: 70 };
-        const baseWeaponInfoBtn = { x: baseWeaponRect.x + baseWeaponRect.w - 40, y: baseWeaponRect.y + 15, w: 30, h: 30 };
+        const baseWeaponRect = { x: pnlHero.x + 20, y: pnlHero.y + pnlHero.h - 85, w: pnlHero.w - 40, h: 65 };
+        const baseWeaponInfoBtn = { x: baseWeaponRect.x + baseWeaponRect.w - 40, y: baseWeaponRect.y + 12, w: 30, h: 30 };
 
         // Diff Content
         const diffAreaY = pnlDiff.y + 40;
+        const diffGap = Math.min(50, (pnlDiff.h - 80) / 3);
         const diffRects = this.difficulties.map((diff, i) => ({
             id: diff.id,
-            rect: { x: pnlDiff.x + 20, y: diffAreaY + 30 + i * 50, w: pnlDiff.w - 40, h: 40 }
+            rect: { x: pnlDiff.x + 20, y: diffAreaY + 25 + i * diffGap, w: pnlDiff.w - 40, h: Math.min(40, diffGap - 5) }
         }));
 
         // Arsenal List (1 column now)
