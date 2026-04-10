@@ -29,6 +29,9 @@ export class Boss extends Enemy {
 
         // Phase de comportement (optionnel pour MVP)
         this.behaviorPhase = 0;
+
+        // Flag d'entrée à l'écran (pour les patterns comme flee qui doivent d'abord arriver)
+        this._hasEnteredScreen = false;
     }
 
     update(deltaTime, player, onShoot, context = {}, forceState = null) {
@@ -36,7 +39,7 @@ export class Boss extends Enemy {
         const oldY = this.y;
 
         // Logique de mouvement spécifique
-        this.handleMovement(deltaTime, player);
+        this.handleMovement(deltaTime, player, context);
 
         // Contrainte : rester dans l'écran visible si on y était déjà
         if (context.logicalWidth && context.logicalHeight) {
@@ -44,9 +47,10 @@ export class Boss extends Enemy {
             const wasOnScreen = oldX >= -margin && oldX <= context.logicalWidth + margin &&
                 oldY >= -margin && oldY <= context.logicalHeight + margin;
 
-            if (wasOnScreen) {
+            if (wasOnScreen || this._hasEnteredScreen) {
                 this.x = Math.max(margin, Math.min(context.logicalWidth - margin, this.x));
                 this.y = Math.max(margin, Math.min(context.logicalHeight - margin, this.y));
+                this._hasEnteredScreen = true;
             }
         }
 
@@ -92,7 +96,7 @@ export class Boss extends Enemy {
         }
     }
 
-    handleMovement(deltaTime, player) {
+    handleMovement(deltaTime, player, context = {}) {
         const dt = deltaTime / 1000;
 
         switch (this.movePattern) {
@@ -203,6 +207,27 @@ export class Boss extends Enemy {
 
             case 'flee':
                 if (player) {
+                    // Phase d'entrée : si le boss n'est pas encore à l'écran, il se dirige vers le centre
+                    if (!this._hasEnteredScreen && context.logicalWidth && context.logicalHeight) {
+                        const targetX = context.logicalWidth / 2;
+                        const targetY = context.logicalHeight * 0.25; // Arrivée en haut de l'écran
+                        const dxEntry = targetX - this.x;
+                        const dyEntry = targetY - this.y;
+                        const distEntry = Math.sqrt(dxEntry * dxEntry + dyEntry * dyEntry);
+
+                        if (distEntry > 5) {
+                            this.velocity.x = (dxEntry / distEntry) * this.speed;
+                            this.velocity.y = (dyEntry / distEntry) * this.speed;
+                            this.x += this.velocity.x * dt;
+                            this.y += this.velocity.y * dt;
+                            this.angle = Math.atan2(this.velocity.y, this.velocity.x);
+                        } else {
+                            this.velocity.x = 0;
+                            this.velocity.y = 0;
+                        }
+                        break;
+                    }
+
                     const dx = player.x - this.x;
                     const dy = player.y - this.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
