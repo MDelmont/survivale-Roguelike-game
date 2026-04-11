@@ -176,22 +176,29 @@ class Game {
                     this.bestiaryScreen.handleWheel(deltaY * 2);
                     this._touchStartY = currentY; // reset so it scrolls continuously
                 }
+                // Empêcher le scroll/bounce natif du navigateur pendant le scroll custom
+                if (e.cancelable) e.preventDefault();
             } else if (this.state === GameState.INFINITE_SETUP && this.infiniteSetupScreen) {
                 if (Math.abs(deltaY) > 5) {
                     this._touchScrolling = true;
                     this.infiniteSetupScreen.handleWheel(deltaY * 2);
                     this._touchStartY = currentY;
                 }
+                // Empêcher le scroll/bounce natif du navigateur pendant le scroll custom
+                if (e.cancelable) e.preventDefault();
             }
 
             // Update mouse pos for hover effects
             this.mouseX = (touch.clientX - rect.left) * (this.logicalWidth / rect.width);
             this.mouseY = (touch.clientY - rect.top) * (this.logicalHeight / rect.height);
-        }, { passive: true });
+        }, { passive: false }); // Non-passive pour pouvoir appeler preventDefault()
 
         this.canvas.addEventListener('touchend', (e) => {
-            // Si on scrollait, pas de clic
-            if (this._touchScrolling) return;
+            // Si on scrollait, pas de clic — mais on empêche quand même le click synthétique
+            if (this._touchScrolling) {
+                if (e.cancelable) e.preventDefault();
+                return;
+            }
 
             const rect = this.canvas.getBoundingClientRect();
             const endX = (e.changedTouches[0].clientX - rect.left) * (this.logicalWidth / rect.width);
