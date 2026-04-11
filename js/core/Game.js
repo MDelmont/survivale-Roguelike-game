@@ -165,7 +165,8 @@ class Game {
         this.canvas.addEventListener('touchmove', (e) => {
             const touch = e.touches[0];
             const rect = this.canvas.getBoundingClientRect();
-            const currentY = (touch.clientY - rect.top) / this.scale;
+            // Convertir en coordonnées logiques (même formule que touchstart)
+            const currentY = (touch.clientY - rect.top) * (this.logicalHeight / rect.height);
             const deltaY = this._touchStartY - currentY;
 
             // Bestiary scroll on swipe
